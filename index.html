@@ -6096,9 +6096,18 @@
     };
 
     const state = loadState();
+
+    function getDefaultDayId(referenceDate = new Date()) {
+      if (!Array.isArray(APP_DATA) || !APP_DATA.length) return "";
+      const localDate = new Date(referenceDate.getTime() - referenceDate.getTimezoneOffset() * 60000)
+        .toISOString()
+        .slice(0, 10);
+      return (APP_DATA.find(day => day.id === localDate) || APP_DATA.find(day => day.id > localDate) || APP_DATA[APP_DATA.length - 1]).id;
+    }
+
     let currentDayId = state.selectedDay && APP_DATA.some(day => day.id === state.selectedDay)
       ? state.selectedDay
-      : APP_DATA[0].id;
+      : getDefaultDayId();
     const dayScrollMemory = {};
     const aiRuntime = {
       imageDataUrl: "",
@@ -10060,11 +10069,12 @@
       const includeScore = marketIntent.includes("score");
       const style = wantHighOdds ? "highOdds" : wantStable ? "stable" : "balanced";
       const compactRaw = raw.replace(/\s+/g, "");
+      const defaultDayId = getDefaultDayId();
       const day = APP_DATA.find(item =>
         raw.includes(item.id) ||
         compactRaw.includes(item.label.replace(/\s+/g, "")) ||
         item.matches.some(match => raw.includes(match.home.name) || raw.includes(match.away.name))
-      ) || APP_DATA.find(item => item.id === currentDayId) || APP_DATA[0];
+      ) || APP_DATA.find(item => item.id === defaultDayId) || APP_DATA.find(item => item.id === currentDayId) || APP_DATA[0];
 
       return { raw, stake, passSize, style, includeScore, marketIntent, day, wantHighestProbability };
     }

@@ -6098,11 +6098,15 @@
 
     const state = loadState();
 
-    function getDefaultDayId(referenceDate = new Date()) {
-      if (!Array.isArray(APP_DATA) || !APP_DATA.length) return "";
-      const localDate = new Date(referenceDate.getTime() - referenceDate.getTimezoneOffset() * 60000)
+    function getLocalDateId(referenceDate = new Date()) {
+      return new Date(referenceDate.getTime() - referenceDate.getTimezoneOffset() * 60000)
         .toISOString()
         .slice(0, 10);
+    }
+
+    function getDefaultDayId(referenceDate = new Date()) {
+      if (!Array.isArray(APP_DATA) || !APP_DATA.length) return "";
+      const localDate = getLocalDateId(referenceDate);
       return (APP_DATA.find(day => day.id === localDate) || APP_DATA.find(day => day.id > localDate) || APP_DATA[APP_DATA.length - 1]).id;
     }
 
@@ -9528,6 +9532,98 @@
       return { ticketSettlements, settledProfit, pendingCount, wonCount, lostCount };
     }
 
+    function getDailySinglePackSettlement(day) {
+      const dayAnalysis = getCachedOrBuildDayAnalysis(day);
+      const dailyRecommendations = pickDailyRecommendedPurchases(dayAnalysis);
+      const pack = dailyRecommendations.single;
+      if (!pack || !Array.isArray(pack.tickets) || !pack.tickets.length) {
+        return { day, pack: null, ticketSettlements: [], settledProfit: 0, pendingCount: 0, wonCount: 0, lostCount: 0 };
+      }
+      const ticketSettlements = settleTickets(pack.tickets);
+      return {
+        day,
+        pack,
+        ticketSettlements,
+        settledProfit: ticketSettlements.reduce((sum, item) => sum + item.profit, 0),
+        pendingCount: ticketSettlements.filter(item => !item.settled).length,
+        wonCount: ticketSettlements.filter(item => item.settled && item.won).length,
+        lostCount: ticketSettlements.filter(item => item.settled && !item.won).length
+      };
+    }
+
+    function buildSingleChaseAdvice(day) {
+      const todayId = getLocalDateId();
+      if (day.id <= todayId) {
+        return {
+          status: day.id === todayId ? "今日已锁定" : "历史已锁定",
+          action: day.id === todayId
+            ? `今天的推荐单关已按你已购买的 ${BANKROLL_PER_DAY} 元锁定，追投规则从明天开始启用。`
+            : `历史日期保持原来的推荐单关 ${BANKROLL_PER_DAY} 元，不回改已发生的票面。`,
+          recommendedBudget: BANKROLL_PER_DAY,
+          consecutiveLosses: 0,
+          roundLoss: 0,
+          history: [],
+          lockedToday: true
+        };
+      }
+      const dayIndex = APP_DATA.findIndex(item => item.id === day.id);
+      const previousDays = dayIndex > 0 ? APP_DATA.slice(0, dayIndex).reverse() : [];
+      const history = [];
+      for (const previousDay of previousDays) {
+        const settlement = getDailySinglePackSettlement(previousDay);
+        if (!settlement.pack || settlement.pendingCount > 0) break;
+        history.push(settlement);
+      }
+
+      const lossStreak = history.findIndex(item => item.settledProfit >= 0);
+      const consecutiveLosses = lossStreak === -1 ? history.length : lossStreak;
+      const unresolvedPrevious = previousDays.length ? getDailySinglePackSettlement(previousDays[0]) : null;
+      const ladder = [BANKROLL_PER_DAY, 150, 200, 300];
+      const shouldPause = consecutiveLosses >= 4;
+      let recommendedBudget = shouldPause ? BANKROLL_PER_DAY : ladder[Math.min(consecutiveLosses, ladder.length - 1)];
+      const previousSettled = unresolvedPrevious && unresolvedPrevious.pack && unresolvedPrevious.pendingCount === 0;
+      const previousProfit = previousSettled ? unresolvedPrevious.settledProfit : null;
+      const roundLoss = history
+        .slice(0, consecutiveLosses)
+        .reduce((sum, item) => sum + Math.min(0, item.settledProfit), 0);
+
+      let status = "正常执行";
+      let action = `今天继续买推荐单关 ${recommendedBudget} 元。`;
+      if (!previousDays.length) {
+        status = "首日基准";
+        recommendedBudget = BANKROLL_PER_DAY;
+        action = `今天按基础仓位买推荐单关 ${BANKROLL_PER_DAY} 元。`;
+      } else if (unresolvedPrevious && unresolvedPrevious.pack && unresolvedPrevious.pendingCount > 0) {
+        status = "等待赛果";
+        recommendedBudget = BANKROLL_PER_DAY;
+        action = "上一天推荐单关还没全部结算，先保持 100 元，不盲目加仓。";
+      } else if (shouldPause) {
+        status = "暂停追投";
+        recommendedBudget = BANKROLL_PER_DAY;
+        action = `已经连续 ${consecutiveLosses} 天单关未盈利，今天建议暂停追投或重置为 ${BANKROLL_PER_DAY} 元。`;
+      } else if (previousProfit != null && previousProfit >= 0) {
+        status = "盈利重置";
+        recommendedBudget = BANKROLL_PER_DAY;
+        action = `上一天单关盈利 ${formatMoney(previousProfit)}，今天重置为基础 ${BANKROLL_PER_DAY} 元。`;
+      } else if (consecutiveLosses === 1 && previousProfit != null && previousProfit > -50) {
+        status = "小亏不追";
+        recommendedBudget = BANKROLL_PER_DAY;
+        action = `上一天只是小亏 ${formatMoney(previousProfit)}，今天仍按 ${BANKROLL_PER_DAY} 元，不加仓。`;
+      } else if (consecutiveLosses > 0) {
+        status = `连续 ${consecutiveLosses} 天未盈利`;
+        action = `今天推荐单关预算加到 ${recommendedBudget} 元；只要这一轮回正，第二天恢复 ${BANKROLL_PER_DAY} 元。`;
+      }
+
+      return {
+        status,
+        action,
+        recommendedBudget,
+        consecutiveLosses,
+        roundLoss,
+        history: history.slice(0, 4)
+      };
+    }
+
     function getAiSettings() {
       if (!state.ai) {
         state.ai = {
@@ -12535,11 +12631,13 @@
 
     */
     function renderPurePortfolio(day, dayAnalysis = getCachedOrBuildDayAnalysis(day)) {
-      const dailyRecommendations = pickDailyRecommendedPurchases(dayAnalysis);
+      const chaseAdvice = buildSingleChaseAdvice(day);
+      const dailyRecommendations = pickDailyRecommendedPurchases(dayAnalysis, { singleBankroll: chaseAdvice.recommendedBudget });
       const isCompactMobile = window.matchMedia && window.matchMedia("(max-width: 520px)").matches;
       const planMarkup = `
+        ${renderSingleChaseAdviceCard(day, chaseAdvice)}
         ${renderDailyRecommendationCard(
-          "推荐单关 100 元",
+          `推荐单关 ${chaseAdvice.recommendedBudget} 元`,
           "优先放当天更适合直接下的单关组合，默认更看重单票命中率、赔率区间和单场可买权限。",
           dailyRecommendations.single,
           "这一天暂时没有筛出足够稳妥的单关推荐。"
@@ -12871,9 +12969,11 @@
       return cloned;
     }
 
-    function buildDailyRecommendationPack(kind, tickets) {
+    function buildDailyRecommendationPack(kind, tickets, options = {}) {
       if (!tickets.length) return null;
-      const bankroll = kind === "parlay" ? DAILY_PARLAY_BANKROLL : BANKROLL_PER_DAY;
+      const bankroll = Number.isFinite(Number(options.bankroll))
+        ? Number(options.bankroll)
+        : kind === "parlay" ? DAILY_PARLAY_BANKROLL : BANKROLL_PER_DAY;
       const picked = kind === "single"
         ? pickDailyRecommendationTicketList(tickets, rankDailyRecommendedSingle, 3)
         : pickDailyRecommendationTicketList(tickets, rankDailyRecommendedParlay, 2);
@@ -12895,10 +12995,10 @@
       };
     }
 
-    function pickDailyRecommendedPurchases(dayAnalysis) {
+    function pickDailyRecommendedPurchases(dayAnalysis, options = {}) {
       const tickets = collectStrategyTickets(dayAnalysis);
       return {
-        single: buildDailyRecommendationPack("single", tickets.filter(ticket => ticket.kind === "single")),
+        single: buildDailyRecommendationPack("single", tickets.filter(ticket => ticket.kind === "single"), { bankroll: options.singleBankroll }),
         parlay: buildDailyRecommendationPack("parlay", tickets.filter(ticket => ticket.kind === "parlay"))
       };
     }
@@ -12911,6 +13011,39 @@
     function getDailyRecommendationMetricSub(pack, fallbackText) {
       if (!pack) return fallbackText;
       return `共 ${pack.tickets.length} 张 · 至少中 1 张约 ${formatPercent(pack.atLeastOneHitApprox)}`;
+    }
+
+    function renderSingleChaseAdviceCard(day, providedAdvice = null) {
+      const advice = providedAdvice || buildSingleChaseAdvice(day);
+      const historyText = advice.history.length
+        ? advice.history.map(item => `${item.day.label} ${formatMoney(item.settledProfit)}`).join(" / ")
+        : "暂无已结算历史，按基础仓位开始。";
+      return `
+        <div class="plan-card plan-card--settlement">
+          <h3>单关追投建议</h3>
+          <div class="plan-note">只针对“推荐单关 ${BANKROLL_PER_DAY} 元”这一套做追投判断；今天和历史票面不回改，规则从明天开始根据上一天结果启用。</div>
+          <div class="settlement">
+            <div class="settlement-line">
+              <span>今日建议</span>
+              <strong>${advice.status}</strong>
+            </div>
+            <div class="settlement-line">
+              <span>今日单关预算</span>
+              <strong>${advice.recommendedBudget} 元</strong>
+            </div>
+            <div class="settlement-line">
+              <span>连续未盈利</span>
+              <strong>${advice.consecutiveLosses} 天</strong>
+            </div>
+            <div class="settlement-line">
+              <span>本轮已亏</span>
+              <strong class="${advice.roundLoss < 0 ? "warning" : "edge-up"}">${formatMoney(advice.roundLoss)}</strong>
+            </div>
+          </div>
+          <div class="ai-inline-note">${escapeHtml(advice.action)}</div>
+          <div class="tiny-note">最近单关结算：${escapeHtml(historyText)}</div>
+        </div>
+      `;
     }
 
     function renderDailyRecommendationCard(title, note, pack, emptyText) {
@@ -13405,7 +13538,8 @@
     }
 
     function renderDay(day, dayAnalysis = getCachedOrBuildDayAnalysis(day), settlement = null) {
-      const dailyRecommendations = pickDailyRecommendedPurchases(dayAnalysis);
+      const chaseAdvice = buildSingleChaseAdvice(day);
+      const dailyRecommendations = pickDailyRecommendedPurchases(dayAnalysis, { singleBankroll: chaseAdvice.recommendedBudget });
       const displaySettlement = settlement || settleDailyRecommendationPacks(dailyRecommendations);
 
       return `
@@ -13465,7 +13599,8 @@
     function computeOverallProfit() {
       return APP_DATA.reduce((sum, day) => {
         const dayAnalysis = getCachedOrBuildDayAnalysis(day);
-        const dailyRecommendations = pickDailyRecommendedPurchases(dayAnalysis);
+        const chaseAdvice = buildSingleChaseAdvice(day);
+        const dailyRecommendations = pickDailyRecommendedPurchases(dayAnalysis, { singleBankroll: chaseAdvice.recommendedBudget });
         return sum + settleDailyRecommendationPacks(dailyRecommendations).settledProfit;
       }, 0);
     }
@@ -13704,7 +13839,8 @@
       renderTabs({ scrollActiveTab: animateDayChange });
       const day = APP_DATA.find(item => item.id === currentDayId) || APP_DATA[0];
       const dayAnalysis = cacheDayAnalysis(day);
-      const dailyRecommendations = pickDailyRecommendedPurchases(dayAnalysis);
+      const chaseAdvice = buildSingleChaseAdvice(day);
+      const dailyRecommendations = pickDailyRecommendedPurchases(dayAnalysis, { singleBankroll: chaseAdvice.recommendedBudget });
       const settlement = settleDailyRecommendationPacks(dailyRecommendations);
       document.getElementById("aiAdvisor").innerHTML = renderAiAdvisor();
       const dashboard = document.getElementById("dashboard");

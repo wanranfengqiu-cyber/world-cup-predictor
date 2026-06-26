@@ -4861,6 +4861,7 @@
   <script>
     const STORAGE_KEY = "world-cup-betting-lab-v4";
     const BANKROLL_PER_DAY = 100;
+    const DAILY_PARLAY_BANKROLL = 20;
     const TICKET_UNIT = 10;
     const BASE_STAKE_UNIT = 2;
     const MAX_SINGLE_TICKETS = 3;
@@ -9514,6 +9515,19 @@
       return { ticketSettlements, settledProfit, pendingCount, wonCount, lostCount };
     }
 
+    function settleDailyRecommendationPacks(dailyRecommendations) {
+      const packs = dailyRecommendations || {};
+      const tickets = [packs.single, packs.parlay]
+        .filter(Boolean)
+        .flatMap(pack => Array.isArray(pack.tickets) ? pack.tickets : []);
+      const ticketSettlements = settleTickets(tickets);
+      const settledProfit = ticketSettlements.reduce((sum, item) => sum + item.profit, 0);
+      const pendingCount = ticketSettlements.filter(item => !item.settled).length;
+      const wonCount = ticketSettlements.filter(item => item.settled && item.won).length;
+      const lostCount = ticketSettlements.filter(item => item.settled && !item.won).length;
+      return { ticketSettlements, settledProfit, pendingCount, wonCount, lostCount };
+    }
+
     function getAiSettings() {
       if (!state.ai) {
         state.ai = {
@@ -12531,7 +12545,7 @@
           "这一天暂时没有筛出足够稳妥的单关推荐。"
         )}
         ${renderDailyRecommendationCard(
-          "推荐串关 100 元",
+          `推荐串关 ${DAILY_PARLAY_BANKROLL} 元`,
           "优先放当天更适合拿去配串的组合，默认更看重赔率弹性、串关适配度和互相不要太像。",
           dailyRecommendations.parlay,
           "这一天暂时没有筛出足够清晰的串关推荐。"
@@ -12545,12 +12559,12 @@
               <span class="section-kicker">每日推荐</span>
               <h2 class="section-title">每日推荐购买</h2>
             </div>
-            <div class="section-meta">这里改回按 100 元整套来给。上面两套彼此独立，一套是单关 100 元，一套是串关 100 元，你按自己更喜欢的买法单独看即可。</div>
+            <div class="section-meta">这里按两套独立推荐展示：单关总共 ${BANKROLL_PER_DAY} 元，串关总共 ${DAILY_PARLAY_BANKROLL} 元；顶部盈亏会按单关+串关合并计算。</div>
           </div>
           <div class="day-strategy ${isCompactMobile ? "day-strategy--mobile" : ""}">${planMarkup}</div>
           ${isCompactMobile ? `
             <div class="tiny-note mobile-strategy-note">
-              手机上先看上面的两套 100 元推荐就够了，详细组合和自定义打票再到下方票筐里慢慢配。
+              手机上先看上面的单关 100 元和串关 ${DAILY_PARLAY_BANKROLL} 元推荐就够了，详细组合和自定义打票再到下方票筐里慢慢配。
             </div>
           ` : ""}
         </div>
@@ -12833,22 +12847,22 @@
       return picked;
     }
 
-    function allocateDailyRecommendationPackStakes(tickets, weights) {
+    function allocateDailyRecommendationPackStakes(tickets, weights, bankroll = BANKROLL_PER_DAY) {
       const normalizedWeights = Array.isArray(weights) && weights.length
         ? weights.slice(0, tickets.length)
         : tickets.map(() => 1);
       const totalWeight = normalizedWeights.reduce((sum, value) => sum + value, 0) || 1;
       const cloned = tickets.map((ticket, index) => ({
         ...ticket,
-        stake: roundStake(BANKROLL_PER_DAY * (normalizedWeights[index] || 0) / totalWeight)
+        stake: roundStake(bankroll * (normalizedWeights[index] || 0) / totalWeight)
       }));
 
       let total = cloned.reduce((sum, ticket) => sum + ticket.stake, 0);
-      while (total < BANKROLL_PER_DAY && cloned.length) {
+      while (total < bankroll && cloned.length) {
         cloned[0].stake += TICKET_UNIT;
         total += TICKET_UNIT;
       }
-      while (total > BANKROLL_PER_DAY) {
+      while (total > bankroll) {
         const target = cloned.find(ticket => ticket.stake > TICKET_UNIT) || null;
         if (!target) break;
         target.stake -= TICKET_UNIT;
@@ -12859,13 +12873,15 @@
 
     function buildDailyRecommendationPack(kind, tickets) {
       if (!tickets.length) return null;
+      const bankroll = kind === "parlay" ? DAILY_PARLAY_BANKROLL : BANKROLL_PER_DAY;
       const picked = kind === "single"
         ? pickDailyRecommendationTicketList(tickets, rankDailyRecommendedSingle, 3)
         : pickDailyRecommendationTicketList(tickets, rankDailyRecommendedParlay, 2);
       if (!picked.length) return null;
       const weightedTickets = allocateDailyRecommendationPackStakes(
         picked,
-        kind === "single" ? [0.4, 0.35, 0.25] : [0.6, 0.4]
+        kind === "single" ? [0.4, 0.35, 0.25] : [0.5, 0.5],
+        bankroll
       );
       const totalStake = weightedTickets.reduce((sum, ticket) => sum + ticket.stake, 0);
       const atLeastOneHitApprox = 1 - weightedTickets.reduce((product, ticket) => product * (1 - ticket.probability), 1);
@@ -12912,7 +12928,7 @@
       return `
         <div class="plan-card plan-card--strategy">
           <h3>${title}</h3>
-          <div class="plan-note">${note} 这整套推荐会单独把 100 元分配完，不和另一套共用预算。</div>
+          <div class="plan-note">${note} 这整套推荐会单独把 ${pack.totalStake} 元分配完，不和另一套共用预算。</div>
           <div class="candidate-filter-summary daily-pack-summary">
             <span class="candidate-filter-pill">总投入 ${pack.totalStake} 元</span>
             <span class="candidate-filter-pill">共 ${pack.tickets.length} 张票</span>
@@ -12934,7 +12950,7 @@
                     ${renderMatchJumpButtons(ticket.legs || [], currentDayId)}
                     <div class="meta">${(ticket.legs || []).map(getStrategyLegLabel).join(" / ")}</div>
                     ${renderTicketSettlementBadge(settlement)}
-                    <div class="meta">这一张建议投 ${ticket.stake} 元，和本组其他票一起正好拼成 100 元整。</div>
+                    <div class="meta">这一张建议投 ${ticket.stake} 元，和本组其他票一起正好拼成 ${pack.totalStake} 元整。</div>
                   </div>
                   <div class="bet-row-stats">
                     <div class="stack-stat"><em>赔率</em><strong>${formatOdds(ticket.odds)}</strong></div>
@@ -13388,8 +13404,9 @@
       `;
     }
 
-    function renderDay(day, dayAnalysis = getCachedOrBuildDayAnalysis(day), settlement = settleDay(day, dayAnalysis)) {
+    function renderDay(day, dayAnalysis = getCachedOrBuildDayAnalysis(day), settlement = null) {
       const dailyRecommendations = pickDailyRecommendedPurchases(dayAnalysis);
+      const displaySettlement = settlement || settleDailyRecommendationPacks(dailyRecommendations);
 
       return `
         <section class="day-panel">
@@ -13411,8 +13428,8 @@
             </div>
             <div class="metric">
               <span class="label">已结算盈亏</span>
-              <span class="value ${settlement.settledProfit >= 0 ? "edge-up" : "warning"}">${formatMoney(settlement.settledProfit)}</span>
-              <div class="sub">${settlement.pendingCount ? `当前仍有 ${settlement.pendingCount} 张推荐票待赛果` : "当前已录入的推荐票都已完成结算"}</div>
+              <span class="value ${displaySettlement.settledProfit >= 0 ? "edge-up" : "warning"}">${formatMoney(displaySettlement.settledProfit)}</span>
+              <div class="sub">${displaySettlement.pendingCount ? `单关+串关仍有 ${displaySettlement.pendingCount} 张推荐票待赛果` : "单关+串关推荐票都已完成结算"}</div>
             </div>
           </div>
           ${renderFinishedMatchesCard(day)}
@@ -13448,7 +13465,8 @@
     function computeOverallProfit() {
       return APP_DATA.reduce((sum, day) => {
         const dayAnalysis = getCachedOrBuildDayAnalysis(day);
-        return sum + settleDay(day, dayAnalysis).settledProfit;
+        const dailyRecommendations = pickDailyRecommendedPurchases(dayAnalysis);
+        return sum + settleDailyRecommendationPacks(dailyRecommendations).settledProfit;
       }, 0);
     }
 
@@ -13686,7 +13704,8 @@
       renderTabs({ scrollActiveTab: animateDayChange });
       const day = APP_DATA.find(item => item.id === currentDayId) || APP_DATA[0];
       const dayAnalysis = cacheDayAnalysis(day);
-      const settlement = settleDay(day, dayAnalysis);
+      const dailyRecommendations = pickDailyRecommendedPurchases(dayAnalysis);
+      const settlement = settleDailyRecommendationPacks(dailyRecommendations);
       document.getElementById("aiAdvisor").innerHTML = renderAiAdvisor();
       const dashboard = document.getElementById("dashboard");
       dashboard.innerHTML = renderDayV2(day, dayAnalysis, settlement);

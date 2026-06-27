@@ -418,6 +418,194 @@
       overflow-wrap: anywhere;
     }
 
+    .tournament-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 14px;
+    }
+
+    .tournament-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+
+    .tournament-summary-card {
+      display: grid;
+      gap: 8px;
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.045);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    .tournament-summary-card span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .tournament-summary-card strong {
+      color: #ffffff;
+      font-size: 20px;
+    }
+
+    .tournament-summary-card p {
+      margin: 0;
+      color: #dcece5;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .group-table-card,
+    .knockout-card {
+      display: grid;
+      gap: 12px;
+      padding: 16px;
+      border-radius: 22px;
+      background:
+        radial-gradient(circle at top left, rgba(229, 194, 107, 0.11), transparent 38%),
+        linear-gradient(180deg, rgba(7, 22, 27, 0.92), rgba(5, 14, 20, 0.96));
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      min-width: 0;
+    }
+
+    .group-table-title,
+    .knockout-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: #f8fcfa;
+      font-weight: 800;
+    }
+
+    .group-table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .group-table {
+      width: 100%;
+      min-width: 620px;
+      border-collapse: collapse;
+      color: #dcece5;
+      font-size: 13px;
+    }
+
+    .group-table th,
+    .group-table td {
+      padding: 10px 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    .group-table th {
+      color: var(--gold);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .group-table tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .group-table .team-cell {
+      color: #ffffff;
+      font-weight: 800;
+    }
+
+    .group-table .rank-cell {
+      color: var(--gold);
+      font-weight: 900;
+    }
+
+    .group-status {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 72px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #d9eee5;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .group-status.qualified {
+      color: #b9f8d2;
+      border-color: rgba(117, 216, 178, 0.38);
+      background: rgba(117, 216, 178, 0.12);
+    }
+
+    .group-status.pending {
+      color: #ffe4a6;
+      border-color: rgba(229, 194, 107, 0.38);
+      background: rgba(229, 194, 107, 0.11);
+    }
+
+    .group-status.danger {
+      color: #ffc1bd;
+      border-color: rgba(255, 124, 113, 0.38);
+      background: rgba(255, 124, 113, 0.1);
+    }
+
+    .knockout-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+    }
+
+    .knockout-card {
+      gap: 10px;
+    }
+
+    .knockout-match {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      align-items: center;
+      gap: 10px;
+    }
+
+    .knockout-team {
+      display: grid;
+      gap: 4px;
+      padding: 11px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.045);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      min-width: 0;
+    }
+
+    .knockout-team strong {
+      color: #ffffff;
+      overflow-wrap: anywhere;
+    }
+
+    .knockout-team span,
+    .knockout-note {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .knockout-team.placeholder {
+      border-style: dashed;
+      background: rgba(229, 194, 107, 0.075);
+    }
+
+    .knockout-vs {
+      color: var(--gold);
+      font-weight: 900;
+      letter-spacing: 0.08em;
+    }
+
     .summary-bar {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -12868,6 +13056,261 @@
       `;
     }
 
+    function getOrderedTournamentGroups(groupTables) {
+      return Object.entries(groupTables || {})
+        .filter(([, rows]) => Array.isArray(rows) && rows.length)
+        .sort(([left], [right]) => String(left).localeCompare(String(right), "zh-CN", { numeric: true }))
+        .map(([group, rows]) => ({
+          group,
+          rows: rows.slice().sort((left, right) => (left.rank || 99) - (right.rank || 99))
+        }));
+    }
+
+    function getTournamentStatusBadge(profile) {
+      const inferred = inferTournamentStatus(profile);
+      if (inferred === "qualified") return { label: "已晋级", tone: "qualified" };
+      if (inferred === "eliminated") return { label: "已出局", tone: "danger" };
+      if (profile && profile.rank <= 2) {
+        return {
+          label: profile.mp >= 2 ? "暂列晋级" : "晋级区",
+          tone: "qualified"
+        };
+      }
+      if (inferred === "mustWin") return { label: "必须抢分", tone: "danger" };
+      if (inferred === "drawEnough" || inferred === "seedingControl") return { label: "主动权", tone: "pending" };
+      return { label: "待定", tone: "pending" };
+    }
+
+    function renderGroupStandingsTable(groupInfo) {
+      return `
+        <div class="group-table-card">
+          <div class="group-table-title">
+            <span>${escapeHtml(groupInfo.group)}组积分榜</span>
+            <span class="candidate-filter-pill">前 2 名晋级区</span>
+          </div>
+          <div class="group-table-wrap">
+            <table class="group-table">
+              <thead>
+                <tr>
+                  <th>排名</th>
+                  <th>球队</th>
+                  <th>场次</th>
+                  <th>胜平负</th>
+                  <th>进/失/净</th>
+                  <th>积分</th>
+                  <th>状态</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${groupInfo.rows.map(profile => {
+                  const status = getTournamentStatusBadge(profile);
+                  return `
+                    <tr>
+                      <td class="rank-cell">${profile.rank || "-"}</td>
+                      <td class="team-cell">${escapeHtml(profile.localName)}</td>
+                      <td>${profile.mp || 0}</td>
+                      <td>${profile.w || 0}-${profile.d || 0}-${profile.l || 0}</td>
+                      <td>${profile.gf || 0}/${profile.ga || 0}/${profile.gd > 0 ? "+" : ""}${profile.gd || 0}</td>
+                      <td><strong>${profile.points || 0}</strong></td>
+                      <td><span class="group-status ${status.tone}">${status.label}</span></td>
+                    </tr>
+                  `;
+                }).join("")}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function summarizeTeamNames(items, limit = 10) {
+      if (!items.length) return "暂无";
+      const names = items.slice(0, limit).map(item => item.localName).join("、");
+      return items.length > limit ? `${names} 等 ${items.length} 队` : names;
+    }
+
+    function buildTournamentQualificationSummary(groups) {
+      const allRows = groups.flatMap(groupInfo => groupInfo.rows);
+      const qualified = allRows.filter(profile => getTournamentStatusBadge(profile).label === "已晋级");
+      const projectedTopTwo = allRows.filter(profile => profile.rank <= 2 && !qualified.includes(profile));
+      const bestThird = getBestThirdPlaceCandidates(groups);
+      const eliminated = allRows.filter(profile => getTournamentStatusBadge(profile).label === "已出局");
+      const undecided = allRows.filter(profile => {
+        const status = getTournamentStatusBadge(profile).label;
+        return status !== "已晋级" && status !== "已出局" && profile.rank > 2;
+      });
+      return { qualified, projectedTopTwo, bestThird, eliminated, undecided };
+    }
+
+    function renderTournamentQualificationSummary(groups) {
+      const summary = buildTournamentQualificationSummary(groups);
+      return `
+        <div class="tournament-summary-grid">
+          <div class="tournament-summary-card">
+            <span>已基本锁定 / 已晋级</span>
+            <strong>${summary.qualified.length} 队</strong>
+            <p>${escapeHtml(summarizeTeamNames(summary.qualified))}</p>
+          </div>
+          <div class="tournament-summary-card">
+            <span>当前小组前二晋级区</span>
+            <strong>${summary.projectedTopTwo.length} 队</strong>
+            <p>${escapeHtml(summarizeTeamNames(summary.projectedTopTwo))}</p>
+          </div>
+          <div class="tournament-summary-card">
+            <span>最佳第三名候选区</span>
+            <strong>${summary.bestThird.length} 队</strong>
+            <p>${escapeHtml(summarizeTeamNames(summary.bestThird))}</p>
+          </div>
+          <div class="tournament-summary-card">
+            <span>还没晋级 / 仍待定</span>
+            <strong>${summary.undecided.length} 队</strong>
+            <p>${escapeHtml(summarizeTeamNames(summary.undecided))}</p>
+          </div>
+        </div>
+      `;
+    }
+
+    function getBestThirdPlaceCandidates(groups) {
+      return groups
+        .map(groupInfo => groupInfo.rows[2] ? { ...groupInfo.rows[2], group: groupInfo.group } : null)
+        .filter(Boolean)
+        .sort(compareTournamentTableRow)
+        .slice(0, 8);
+    }
+
+    function createProjectedQualifiedSlot(groupInfo, rank) {
+      const profile = groupInfo && groupInfo.rows ? groupInfo.rows[rank - 1] || null : null;
+      const group = groupInfo ? groupInfo.group : "";
+      return {
+        code: `${group}${rank}`,
+        profile,
+        group,
+        rank,
+        label: profile ? profile.localName : `${group}组第 ${rank}`,
+        note: profile ? `${group}组第 ${rank} · ${profile.points} 分` : "等待小组排名同步"
+      };
+    }
+
+    function buildProjectedKnockoutPairs(groups) {
+      const bestThirdCandidates = getBestThirdPlaceCandidates(groups);
+      const qualifiedSlots = [
+        ...groups.map(groupInfo => createProjectedQualifiedSlot(groupInfo, 1)),
+        ...groups.map(groupInfo => createProjectedQualifiedSlot(groupInfo, 2)),
+        ...bestThirdCandidates.map(profile => ({
+          code: `${profile.group}3`,
+          profile,
+          group: profile.group,
+          rank: 3,
+          label: profile.localName,
+          note: `${profile.group}组第 3 · ${profile.points} 分 · 当前最佳第三名区`
+        }))
+      ].filter(slot => slot.profile);
+
+      const leftSide = qualifiedSlots.slice(0, Math.ceil(qualifiedSlots.length / 2));
+      const rightSide = qualifiedSlots.slice(Math.ceil(qualifiedSlots.length / 2)).reverse();
+      const pairs = [];
+      leftSide.forEach(left => {
+        if (!rightSide.length) return;
+        let opponentIndex = rightSide.findIndex(slot => slot.group !== left.group);
+        if (opponentIndex < 0) opponentIndex = 0;
+        const right = rightSide.splice(opponentIndex, 1)[0];
+        pairs.push({
+          label: `${left.code} vs ${right.code}`,
+          left,
+          right,
+          note: `${left.code} 对 ${right.code}，按当前晋级席位池做可视化模拟。`
+        });
+      });
+      return pairs;
+    }
+
+    function renderKnockoutSlot(slot) {
+      const profile = slot.profile;
+      return `
+        <div class="knockout-team ${profile ? "" : "placeholder"}">
+          <strong>${escapeHtml(slot.label)}</strong>
+          <span>${escapeHtml(slot.note)}</span>
+        </div>
+      `;
+    }
+
+    function renderProjectedKnockoutBracket(groups) {
+      const pairs = buildProjectedKnockoutPairs(groups);
+      if (!pairs.length) {
+        return `<div class="empty-state">当前小组数据还不足以模拟淘汰赛对阵，等更多小组积分同步后会自动补上。</div>`;
+      }
+      return `
+        <div class="knockout-grid">
+          ${pairs.map((pair, index) => `
+            <div class="knockout-card">
+              <div class="knockout-title">
+                <span>32强模拟 ${index + 1}</span>
+                <span class="candidate-filter-pill">${escapeHtml(pair.label)}</span>
+              </div>
+              <div class="knockout-match">
+                ${renderKnockoutSlot(pair.left)}
+                <div class="knockout-vs">VS</div>
+                ${renderKnockoutSlot(pair.right)}
+              </div>
+              <div class="knockout-note">${escapeHtml(pair.note)}，按当前积分榜即时投影。</div>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function renderTournamentRoadmap() {
+      const payload = tournamentInsightRuntime.payload;
+      const loadingText = tournamentInsightRuntime.busy ? "正在同步小组积分和赛果，请稍等几秒。" : "";
+      if (!payload || !payload.groupTables) {
+        return `
+          <div class="section-group">
+            <div class="section-head">
+              <div class="section-copy">
+                <span class="section-kicker">实时小组形势</span>
+                <h2 class="section-title">小组积分榜与淘汰赛路线</h2>
+              </div>
+              <div class="section-meta">这里会跟随公开赛果自动刷新，展示哪些球队在晋级区，以及当前排名模拟出的后续淘汰赛分组图。</div>
+            </div>
+            <div class="empty-state">${escapeHtml(loadingText || tournamentInsightRuntime.error || "暂未同步到小组积分，页面会继续尝试自动拉取。")}</div>
+          </div>
+        `;
+      }
+
+      const groups = getOrderedTournamentGroups(payload.groupTables);
+      if (!groups.length) return "";
+
+      return `
+        <div class="section-group">
+          <div class="section-head">
+            <div class="section-copy">
+              <span class="section-kicker">实时小组形势</span>
+              <h2 class="section-title">小组积分榜与淘汰赛路线</h2>
+            </div>
+            <div class="section-meta">按当前已同步赛果实时排序；“暂列晋级”代表目前在前 2 名晋级区，不等于官方最终锁定。</div>
+          </div>
+          <div class="candidate-filter-summary">
+            <span class="candidate-filter-pill">已同步 ${groups.length} 个小组</span>
+            <span class="candidate-filter-pill">前 2 名进入晋级区</span>
+            <span class="candidate-filter-pill">另取 8 个最佳第三名</span>
+            ${tournamentInsightRuntime.loadedAt ? `<span class="candidate-filter-pill">更新时间 ${new Date(tournamentInsightRuntime.loadedAt).toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" })}</span>` : ""}
+          </div>
+          ${renderTournamentQualificationSummary(groups)}
+          <div class="tournament-grid">
+            ${groups.map(renderGroupStandingsTable).join("")}
+          </div>
+          <div class="section-head">
+            <div class="section-copy">
+              <span class="section-kicker">淘汰赛模拟</span>
+              <h3 class="section-title">按当前排名模拟 32 强入口</h3>
+            </div>
+            <div class="section-meta">2026 为 48 队赛制：12 个小组前二 + 8 个最佳第三名进入 32 强。这里是根据当前积分即时模拟，不代表官方最终对阵。</div>
+          </div>
+          ${renderProjectedKnockoutBracket(groups)}
+        </div>
+      `;
+    }
+
     function getTicketSignature(ticket) {
       if (!ticket || !Array.isArray(ticket.legs)) return "";
       return ticket.legs.map(leg => {
@@ -13569,6 +14012,7 @@
           ${renderFinishedMatchesCard(day)}
           ${renderMetricGlossary()}
           ${renderResultSyncCard(day)}
+          ${renderTournamentRoadmap()}
           ${renderPurePortfolio(day, dayAnalysis)}
           ${renderCandidateExplorer(day, dayAnalysis)}
 

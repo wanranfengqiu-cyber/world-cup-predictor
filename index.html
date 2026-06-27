@@ -2438,6 +2438,41 @@
       padding: 9px 10px;
     }
 
+    [data-managed-page-section="tickets"] .daily-reco-layout {
+      grid-template-columns: minmax(240px, 0.62fr) repeat(2, minmax(380px, 1fr));
+      align-items: start;
+      gap: 12px;
+    }
+
+    [data-managed-page-section="tickets"] .daily-reco-card .bet-list {
+      grid-template-columns: 1fr;
+    }
+
+    [data-managed-page-section="tickets"] .daily-reco-card .bet-row {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 8px;
+    }
+
+    [data-managed-page-section="tickets"] .daily-reco-card .bet-primary {
+      gap: 6px;
+    }
+
+    [data-managed-page-section="tickets"] .daily-reco-card .bet-row-stats {
+      grid-template-columns: repeat(5, minmax(76px, 1fr));
+      padding-top: 8px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    [data-managed-page-section="tickets"] .daily-reco-card .stack-stat {
+      min-height: 54px;
+    }
+
+    @media (max-width: 1180px) {
+      [data-managed-page-section="tickets"] .daily-reco-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
     .result-grid {
       display: grid;
       gap: 12px;
@@ -13695,7 +13730,7 @@
             </div>
             <div class="section-meta">这里按两套独立推荐展示：单关总共 ${BANKROLL_PER_DAY} 元，串关总共 ${DAILY_PARLAY_BANKROLL} 元；顶部盈亏会按单关+串关合并计算。</div>
           </div>
-          <div class="day-strategy ${isCompactMobile ? "day-strategy--mobile" : ""}">${planMarkup}</div>
+          <div class="day-strategy daily-reco-layout ${isCompactMobile ? "day-strategy--mobile" : ""}">${planMarkup}</div>
           ${isCompactMobile ? `
             <div class="tiny-note mobile-strategy-note">
               手机上先看上面的单关 100 元和串关 ${DAILY_PARLAY_BANKROLL} 元推荐就够了，详细组合和自定义打票再到下方票筐里慢慢配。
@@ -14615,7 +14650,7 @@
     function renderDailyRecommendationCard(title, note, pack, emptyText) {
       if (!pack || !Array.isArray(pack.tickets) || !pack.tickets.length) {
         return `
-          <div class="plan-card plan-card--strategy">
+          <div class="plan-card plan-card--strategy daily-reco-card">
             <h3>${title}</h3>
             <div class="plan-note">${note}</div>
             <div class="empty-state">${emptyText}</div>
@@ -14625,7 +14660,7 @@
 
       const settlements = settleTickets(pack.tickets);
       return `
-        <div class="plan-card plan-card--strategy">
+        <div class="plan-card plan-card--strategy daily-reco-card">
           <h3>${title}</h3>
           <div class="plan-note">${note} 这整套推荐会单独把 ${pack.totalStake} 元分配完，不和另一套共用预算。</div>
           <div class="candidate-filter-summary daily-pack-summary">

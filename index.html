@@ -551,7 +551,7 @@
 
     .tournament-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
       gap: 14px;
     }
 
@@ -613,46 +613,88 @@
 
     .group-table-wrap {
       width: 100%;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
+      display: grid;
+      gap: 7px;
     }
 
-    .group-table {
-      width: 100%;
-      min-width: 620px;
-      border-collapse: collapse;
+    .group-table-head,
+    .group-standing-row {
+      display: grid;
+      grid-template-columns: 34px minmax(64px, 1.08fr) 28px 50px 62px 36px 74px;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .group-table-head {
+      padding: 0 8px 2px;
+      color: var(--gold);
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.05em;
+    }
+
+    .group-standing-row {
+      padding: 8px;
+      border-radius: 13px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
       color: #dcece5;
-      font-size: 13px;
+      font-size: 12px;
     }
 
-    .group-table th,
-    .group-table td {
-      padding: 10px 8px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-      text-align: left;
+    .group-standing-row.advance {
+      border-color: rgba(69, 201, 152, 0.22);
+      background:
+        linear-gradient(90deg, rgba(69, 201, 152, 0.10), rgba(255, 255, 255, 0.035));
+    }
+
+    .group-standing-row .team-cell {
+      color: #ffffff;
+      font-weight: 800;
+      overflow: hidden;
+      text-overflow: ellipsis;
       white-space: nowrap;
     }
 
-    .group-table th {
-      color: var(--gold);
-      font-size: 11px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      background: rgba(255, 255, 255, 0.03);
-    }
-
-    .group-table tr:last-child td {
-      border-bottom: 0;
-    }
-
-    .group-table .team-cell {
-      color: #ffffff;
-      font-weight: 800;
-    }
-
-    .group-table .rank-cell {
+    .group-standing-row .rank-cell {
       color: var(--gold);
       font-weight: 900;
+    }
+
+    .group-standing-row strong {
+      color: #ffffff;
+    }
+
+    @media (max-width: 520px) {
+      .tournament-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .group-table-card {
+        padding: 12px;
+      }
+
+      .group-table-head,
+      .group-standing-row {
+        grid-template-columns: 28px minmax(58px, 1fr) 24px 46px 54px 32px 62px;
+        gap: 4px;
+      }
+
+      .group-table-head {
+        font-size: 9px;
+      }
+
+      .group-standing-row {
+        padding: 7px 6px;
+        font-size: 11px;
+      }
+
+      .group-status {
+        min-width: 0;
+        padding: 4px 5px;
+        font-size: 10px;
+      }
     }
 
     .group-status {
@@ -667,6 +709,9 @@
       color: #d9eee5;
       font-size: 12px;
       font-weight: 800;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .group-status.qualified {
@@ -13972,35 +14017,30 @@
             <span class="candidate-filter-pill">前 2 名晋级区</span>
           </div>
           <div class="group-table-wrap">
-            <table class="group-table">
-              <thead>
-                <tr>
-                  <th>排名</th>
-                  <th>球队</th>
-                  <th>场次</th>
-                  <th>胜平负</th>
-                  <th>进/失/净</th>
-                  <th>积分</th>
-                  <th>状态</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${groupInfo.rows.map(profile => {
-                  const status = getTournamentStatusBadge(profile);
-                  return `
-                    <tr>
-                      <td class="rank-cell">${profile.rank || "-"}</td>
-                      <td class="team-cell">${escapeHtml(profile.localName)}</td>
-                      <td>${profile.mp || 0}</td>
-                      <td>${profile.w || 0}-${profile.d || 0}-${profile.l || 0}</td>
-                      <td>${profile.gf || 0}/${profile.ga || 0}/${profile.gd > 0 ? "+" : ""}${profile.gd || 0}</td>
-                      <td><strong>${profile.points || 0}</strong></td>
-                      <td><span class="group-status ${status.tone}">${status.label}</span></td>
-                    </tr>
-                  `;
-                }).join("")}
-              </tbody>
-            </table>
+            <div class="group-table-head" aria-hidden="true">
+              <span>排名</span>
+              <span>球队</span>
+              <span>场</span>
+              <span>胜平负</span>
+              <span>进失净</span>
+              <span>分</span>
+              <span>状态</span>
+            </div>
+            ${groupInfo.rows.map(profile => {
+              const status = getTournamentStatusBadge(profile);
+              const goalDiff = `${profile.gf || 0}/${profile.ga || 0}/${profile.gd > 0 ? "+" : ""}${profile.gd || 0}`;
+              return `
+                <div class="group-standing-row ${profile.rank <= 2 ? "advance" : ""}">
+                  <span class="rank-cell">${profile.rank || "-"}</span>
+                  <span class="team-cell" title="${escapeHtml(profile.localName)}">${escapeHtml(profile.localName)}</span>
+                  <span>${profile.mp || 0}</span>
+                  <span>${profile.w || 0}-${profile.d || 0}-${profile.l || 0}</span>
+                  <span>${goalDiff}</span>
+                  <strong>${profile.points || 0}</strong>
+                  <span class="group-status ${status.tone}">${status.label}</span>
+                </div>
+              `;
+            }).join("")}
           </div>
         </div>
       `;

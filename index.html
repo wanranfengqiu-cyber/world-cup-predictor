@@ -836,30 +836,6 @@
       box-shadow: inset 0 0 42px rgba(229, 194, 107, 0.05);
     }
 
-    .advancement-connectors {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 1;
-      pointer-events: none;
-      overflow: visible;
-    }
-
-    .advancement-connector {
-      fill: none;
-      stroke: rgba(229, 194, 107, 0.52);
-      stroke-width: 2.2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      filter: drop-shadow(0 0 5px rgba(229, 194, 107, 0.16));
-    }
-
-    .advancement-connector.secondary {
-      stroke: rgba(117, 216, 178, 0.28);
-      stroke-width: 1.5;
-    }
-
     .advancement-round {
       position: relative;
       z-index: 2;
@@ -14031,61 +14007,6 @@
       };
     }
 
-    function getAdvancementNodeCenter(total, index) {
-      const slot = getAdvancementSlotMeta(total, index);
-      return ((slot.start - 1) + slot.span / 2) / 16;
-    }
-
-    function createAdvancementPath(fromRound, childAIndex, childBIndex, toRound, parentIndex) {
-      const xPositions = [8, 25.5, 42.4, 59.2, 75.4, 91.2];
-      const yTop = 9.5;
-      const yHeight = 84;
-      const x1 = xPositions[fromRound];
-      const x2 = xPositions[toRound];
-      const midX = (x1 + x2) / 2;
-      const y1 = yTop + getAdvancementNodeCenter(Math.pow(2, 4 - fromRound), childAIndex) * yHeight;
-      const y2 = yTop + getAdvancementNodeCenter(Math.pow(2, 4 - fromRound), childBIndex) * yHeight;
-      const yp = yTop + getAdvancementNodeCenter(Math.max(1, Math.pow(2, 4 - toRound)), parentIndex) * yHeight;
-      return `M ${x1.toFixed(2)} ${y1.toFixed(2)} H ${midX.toFixed(2)} V ${y2.toFixed(2)} H ${x1.toFixed(2)} M ${midX.toFixed(2)} ${((y1 + y2) / 2).toFixed(2)} H ${x2.toFixed(2)} V ${yp.toFixed(2)}`;
-    }
-
-    function createAdvancementStraightPath(fromRound, fromIndex, toRound, toIndex) {
-      const xPositions = [8, 25.5, 42.4, 59.2, 75.4, 91.2];
-      const yTop = 9.5;
-      const yHeight = 84;
-      const fromTotal = Math.max(1, Math.pow(2, 4 - fromRound));
-      const toTotal = Math.max(1, Math.pow(2, 4 - toRound));
-      const x1 = xPositions[fromRound];
-      const x2 = xPositions[toRound];
-      const y1 = yTop + getAdvancementNodeCenter(fromTotal, fromIndex) * yHeight;
-      const y2 = yTop + getAdvancementNodeCenter(toTotal, toIndex) * yHeight;
-      const midX = (x1 + x2) / 2;
-      return `M ${x1.toFixed(2)} ${y1.toFixed(2)} H ${midX.toFixed(2)} V ${y2.toFixed(2)} H ${x2.toFixed(2)}`;
-    }
-
-    function renderAdvancementConnectorSvg(rounds) {
-      const paths = [];
-      const roundSizes = [rounds.round32.length, rounds.round16.length, rounds.quarter.length, rounds.semi.length, rounds.final.length, rounds.champion.length];
-      for (let roundIndex = 0; roundIndex < 5; roundIndex += 1) {
-        const parentCount = roundSizes[roundIndex + 1] || 0;
-        for (let parentIndex = 0; parentIndex < parentCount; parentIndex += 1) {
-          const childA = parentIndex * 2;
-          const childB = childA + 1;
-          if (childB >= roundSizes[roundIndex]) continue;
-          const path = createAdvancementPath(roundIndex, childA, childB, roundIndex + 1, parentIndex);
-          paths.push(`<path class="advancement-connector ${roundIndex >= 3 ? "secondary" : ""}" d="${path}"></path>`);
-        }
-      }
-      if (roundSizes[4] && roundSizes[5]) {
-        paths.push(`<path class="advancement-connector secondary" d="${createAdvancementStraightPath(4, 0, 5, 0)}"></path>`);
-      }
-      return `
-        <svg class="advancement-connectors" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-          ${paths.join("")}
-        </svg>
-      `;
-    }
-
     function renderAdvancementMatchNode(match, index, stageName, totalCount = 1) {
       const winner = match.winner || pickProjectedWinner(match.left, match.right, match.id);
       const slot = getAdvancementSlotMeta(totalCount, index);
@@ -14167,7 +14088,6 @@
         </div>
         <div class="advancement-board">
           <div class="advancement-chart">
-            ${renderAdvancementConnectorSvg(rounds)}
             ${renderAdvancementRound("32强入口", round32Html)}
             ${renderAdvancementRound("16强", round16Html)}
             ${renderAdvancementRound("8强", quarterHtml)}

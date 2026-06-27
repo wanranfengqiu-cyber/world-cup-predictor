@@ -620,7 +620,7 @@
     .group-table-head,
     .group-standing-row {
       display: grid;
-      grid-template-columns: 42px minmax(96px, 1.25fr) 36px 64px 78px 42px 88px;
+      grid-template-columns: 42px minmax(112px, 1.35fr) 36px 64px 78px 42px;
       align-items: center;
       gap: 8px;
       min-width: 0;
@@ -650,6 +650,15 @@
     }
 
     .group-standing-row .team-cell {
+      display: grid;
+      gap: 4px;
+      justify-items: start;
+      min-width: 0;
+    }
+
+    .group-team-name {
+      display: block;
+      max-width: 100%;
       color: #ffffff;
       font-weight: 800;
       overflow: hidden;
@@ -673,7 +682,7 @@
 
       .group-table-head,
       .group-standing-row {
-        grid-template-columns: 38px minmax(86px, 1.2fr) 32px 58px 70px 38px 82px;
+        grid-template-columns: 38px minmax(100px, 1.24fr) 32px 58px 70px 38px;
         gap: 7px;
       }
     }
@@ -695,7 +704,7 @@
 
       .group-table-head,
       .group-standing-row {
-        grid-template-columns: 30px minmax(72px, 1fr) 24px 46px 58px 32px 68px;
+        grid-template-columns: 30px minmax(86px, 1fr) 24px 46px 58px 32px;
         gap: 4px;
       }
 
@@ -719,13 +728,14 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-width: 72px;
-      padding: 5px 9px;
+      max-width: 100%;
+      min-width: 0;
+      padding: 3px 8px;
       border-radius: 999px;
       background: rgba(255, 255, 255, 0.06);
       border: 1px solid rgba(255, 255, 255, 0.08);
       color: #d9eee5;
-      font-size: 12px;
+      font-size: 10px;
       font-weight: 800;
       white-space: nowrap;
     }
@@ -14040,7 +14050,6 @@
               <span>胜平负</span>
               <span>进失净</span>
               <span>分</span>
-              <span>状态</span>
             </div>
             ${groupInfo.rows.map(profile => {
               const status = getTournamentStatusBadge(profile);
@@ -14048,12 +14057,14 @@
               return `
                 <div class="group-standing-row ${profile.rank <= 2 ? "advance" : ""}">
                   <span class="rank-cell">${profile.rank || "-"}</span>
-                  <span class="team-cell" title="${escapeHtml(profile.localName)}">${escapeHtml(profile.localName)}</span>
+                  <span class="team-cell" title="${escapeHtml(profile.localName)}">
+                    <span class="group-team-name">${escapeHtml(profile.localName)}</span>
+                    <span class="group-status ${status.tone}">${status.label}</span>
+                  </span>
                   <span>${profile.mp || 0}</span>
                   <span>${profile.w || 0}-${profile.d || 0}-${profile.l || 0}</span>
                   <span>${goalDiff}</span>
                   <strong>${profile.points || 0}</strong>
-                  <span class="group-status ${status.tone}">${status.label}</span>
                 </div>
               `;
             }).join("")}

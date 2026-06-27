@@ -848,15 +848,67 @@
       gap: 8px;
       padding: 7px 8px;
       border-radius: 12px;
+      border: 1px solid transparent;
       background: rgba(255, 255, 255, 0.045);
       color: #e8f6ef;
       font-size: 12px;
+      cursor: pointer;
+      text-align: left;
+      transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+    }
+
+    .advancement-team-line:hover:not(:disabled) {
+      transform: translateX(2px);
+      border-color: rgba(229, 194, 107, 0.28);
+      background: rgba(229, 194, 107, 0.1);
     }
 
     .advancement-team-line.is-projected {
       color: #bdf5d6;
       background: rgba(117, 216, 178, 0.12);
       border: 1px solid rgba(117, 216, 178, 0.17);
+    }
+
+    .advancement-team-line.is-manual {
+      color: #ffe7ad;
+      background: rgba(229, 194, 107, 0.14);
+      border-color: rgba(229, 194, 107, 0.34);
+    }
+
+    .advancement-team-line.is-locked {
+      color: #b9f8d2;
+      background: rgba(117, 216, 178, 0.16);
+      border-color: rgba(117, 216, 178, 0.4);
+      cursor: not-allowed;
+    }
+
+    .advancement-team-line:disabled {
+      opacity: 0.95;
+    }
+
+    .advancement-team-name {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .advancement-team-prob {
+      flex: 0 0 auto;
+      color: var(--gold);
+      font-weight: 900;
+    }
+
+    .advancement-lock-note {
+      display: inline-flex;
+      width: fit-content;
+      padding: 5px 8px;
+      border-radius: 999px;
+      background: rgba(117, 216, 178, 0.12);
+      border: 1px solid rgba(117, 216, 178, 0.26);
+      color: #b9f8d2;
+      font-size: 11px;
+      font-weight: 800;
     }
 
     .advancement-note {
@@ -6661,6 +6713,7 @@
             aiSheetOpen: !!safeUi.aiSheetOpen,
             openDetails: isPlainObject(safeUi.openDetails) ? safeUi.openDetails : {},
             activePageSection: typeof safeUi.activePageSection === "string" ? safeUi.activePageSection : "overview",
+            advancementPicks: isPlainObject(safeUi.advancementPicks) ? safeUi.advancementPicks : {},
             ticketSheetHeight: Number.isFinite(Number(safeUi.ticketSheetHeight)) ? Number(safeUi.ticketSheetHeight) : null,
             sidePanelWidth: Number.isFinite(Number(safeUi.sidePanelWidth)) ? Number(safeUi.sidePanelWidth) : null,
             sidePanelHeight: Number.isFinite(Number(safeUi.sidePanelHeight)) ? Number(safeUi.sidePanelHeight) : null,
@@ -6696,6 +6749,7 @@
             aiSheetOpen: false,
             openDetails: {},
             activePageSection: "overview",
+            advancementPicks: {},
             ticketSheetHeight: null,
             sidePanelWidth: null,
             sidePanelHeight: null,
@@ -7291,6 +7345,7 @@
 
       const teamProfiles = {};
       const groupTables = {};
+      const knockoutResults = [];
 
       const ensureTeamProfile = (localName, group) => {
         if (!teamProfiles[localName]) {
@@ -7358,6 +7413,27 @@
           }
         });
 
+      (games || [])
+        .filter(game => String(game && game.type || "").toLowerCase() !== "group")
+        .forEach(game => {
+          const homeLocal = resolveLocalTeamNameByApiName(game.home_team_name_en || game.home_team_label);
+          const awayLocal = resolveLocalTeamNameByApiName(game.away_team_name_en || game.away_team_label);
+          const homeScore = parseApiScore(game.home_score);
+          const awayScore = parseApiScore(game.away_score);
+          if (!homeLocal || !awayLocal || !isApiGameFinished(game) || homeScore == null || awayScore == null || homeScore === awayScore) return;
+          knockoutResults.push({
+            type: String(game.type || "").toLowerCase(),
+            homeLocal,
+            awayLocal,
+            homeScore,
+            awayScore,
+            winnerLocal: homeScore > awayScore ? homeLocal : awayLocal,
+            loserLocal: homeScore > awayScore ? awayLocal : homeLocal,
+            scoreLine: `${homeScore}:${awayScore}`,
+            kickoff: game.local_date || ""
+          });
+        });
+
       Object.values(teamProfiles).forEach(profile => {
         profile.gd = profile.gf - profile.ga;
         profile.finishedMatches.sort((left, right) => {
@@ -7405,7 +7481,7 @@
         }
       });
 
-      return { teamProfiles: filteredProfiles, groupTables };
+      return { teamProfiles: filteredProfiles, groupTables, knockoutResults };
     }
 
     async function ensureTournamentInsightsLoaded(options = {}) {
@@ -13538,37 +13614,101 @@
         + Math.max(0, 4 - (profile.rank || 4)) * 18;
     }
 
-    function pickProjectedWinner(left, right) {
+    function getAdvancementPicks() {
+      if (!isPlainObject(state.ui.advancementPicks)) {
+        state.ui.advancementPicks = {};
+      }
+      return state.ui.advancementPicks;
+    }
+
+    function getAdvancementMatchId(stageKey, index, left, right) {
+      const leftCode = left && left.code ? left.code : "left";
+      const rightCode = right && right.code ? right.code : "right";
+      return `${stageKey}-${index + 1}-${leftCode}-${rightCode}`;
+    }
+
+    function findLockedKnockoutResult(left, right) {
+      const payload = tournamentInsightRuntime.payload || {};
+      const results = Array.isArray(payload.knockoutResults) ? payload.knockoutResults : [];
+      if (!left || !right || !left.label || !right.label) return null;
+      return results.find(result => {
+        const names = [result.homeLocal, result.awayLocal];
+        return names.includes(left.label) && names.includes(right.label);
+      }) || null;
+    }
+
+    function getAdvancementProbabilities(left, right) {
+      const leftRaw = Math.max(1, scoreProjectedAdvancementSlot(left) + 140);
+      const rightRaw = Math.max(1, scoreProjectedAdvancementSlot(right) + 140);
+      const total = leftRaw + rightRaw;
+      let leftProbability = total > 0 ? leftRaw / total : 0.5;
+      leftProbability = clamp(leftProbability, 0.12, 0.88);
+      return {
+        left: leftProbability,
+        right: 1 - leftProbability
+      };
+    }
+
+    function pickProjectedWinner(left, right, matchId = "") {
+      const locked = findLockedKnockoutResult(left, right);
+      if (locked) return locked.winnerLocal === left.label ? left : right;
+      const manualPick = matchId ? getAdvancementPicks()[matchId] : "";
+      if (manualPick) {
+        if (left && left.code === manualPick) return left;
+        if (right && right.code === manualPick) return right;
+      }
       const leftScore = scoreProjectedAdvancementSlot(left);
       const rightScore = scoreProjectedAdvancementSlot(right);
       if (leftScore !== rightScore) return leftScore > rightScore ? left : right;
       return String(left.label || "").localeCompare(String(right.label || ""), "zh-CN") <= 0 ? left : right;
     }
 
+    function setAdvancementWinner(matchId, slotCode) {
+      if (!matchId || !slotCode) return;
+      getAdvancementPicks()[matchId] = slotCode;
+      saveState();
+      render({ preserveScroll: true });
+    }
+
+    function createAdvancementMatch(stageKey, index, left, right, note) {
+      const id = getAdvancementMatchId(stageKey, index, left, right);
+      const lockedResult = findLockedKnockoutResult(left, right);
+      const probabilities = getAdvancementProbabilities(left, right);
+      const winner = pickProjectedWinner(left, right, id);
+      return {
+        id,
+        stageKey,
+        label: `${left.label} vs ${right.label}`,
+        left,
+        right,
+        probabilities,
+        winner,
+        lockedResult,
+        manualPick: getAdvancementPicks()[id] || "",
+        note
+      };
+    }
+
     function buildProjectedAdvancementRounds(groups) {
-      const round32 = buildProjectedKnockoutPairs(groups);
-      const buildNextRound = (matches, roundName) => {
-        const winners = matches.map(match => pickProjectedWinner(match.left, match.right));
+      const round32 = buildProjectedKnockoutPairs(groups).map((match, index) =>
+        createAdvancementMatch("r32", index, match.left, match.right, "32强入口按当前晋级席位池生成。")
+      );
+      const buildNextRound = (matches, stageKey, roundName) => {
+        const winners = matches.map(match => match.winner);
         const nextMatches = [];
         for (let index = 0; index < winners.length; index += 2) {
           const left = winners[index];
           const right = winners[index + 1];
           if (!left || !right) continue;
-          nextMatches.push({
-            label: `${left.label} vs ${right.label}`,
-            left,
-            right,
-            winner: pickProjectedWinner(left, right),
-            note: `${roundName}按当前积分、净胜球、进球数和小组排名强度模拟。`
-          });
+          nextMatches.push(createAdvancementMatch(stageKey, index / 2, left, right, `${roundName}按当前选择、积分、净胜球、进球数和小组排名强度模拟。`));
         }
         return nextMatches;
       };
-      const round16 = buildNextRound(round32, "16强");
-      const quarter = buildNextRound(round16, "8强");
-      const semi = buildNextRound(quarter, "半决赛");
-      const final = buildNextRound(semi, "决赛");
-      const champion = final[0] ? [pickProjectedWinner(final[0].left, final[0].right)] : [];
+      const round16 = buildNextRound(round32, "r16", "16强");
+      const quarter = buildNextRound(round16, "qf", "8强");
+      const semi = buildNextRound(quarter, "sf", "半决赛");
+      const final = buildNextRound(semi, "final", "决赛");
+      const champion = final[0] ? [final[0].winner] : [];
       return { round32, round16, quarter, semi, final, champion };
     }
 
@@ -13582,18 +13722,33 @@
       `;
     }
 
-    function renderAdvancementTeamLine(slot, winner) {
+    function renderAdvancementTeamLine(slot, winner, match, side) {
       const isProjected = winner && slot && winner.code === slot.code;
+      const isManual = match && match.manualPick && slot && match.manualPick === slot.code;
+      const isLocked = !!(match && match.lockedResult);
+      const probability = match && match.probabilities ? match.probabilities[side] : 0.5;
       return `
-        <div class="advancement-team-line ${isProjected ? "is-projected" : ""}">
-          <span>${escapeHtml(slot ? slot.label : "待定")}</span>
-          <span>${escapeHtml(slot && slot.code ? slot.code : "")}</span>
-        </div>
+        <button type="button"
+          class="advancement-team-line ${isProjected ? "is-projected" : ""} ${isManual ? "is-manual" : ""} ${isLocked && isProjected ? "is-locked" : ""}"
+          data-advancement-pick="${escapeHtml(match ? match.id : "")}"
+          data-advancement-slot="${escapeHtml(slot && slot.code ? slot.code : "")}"
+          ${isLocked ? "disabled" : ""}>
+          <span class="advancement-team-name">${escapeHtml(slot ? slot.label : "待定")}</span>
+          <span class="advancement-team-prob">${formatPercent(probability)}</span>
+        </button>
       `;
     }
 
     function renderAdvancementMatchNode(match, index, stageName) {
-      const winner = match.winner || pickProjectedWinner(match.left, match.right);
+      const winner = match.winner || pickProjectedWinner(match.left, match.right, match.id);
+      const lockedText = match.lockedResult
+        ? `<span class="advancement-lock-note">已出结果 · ${escapeHtml(match.lockedResult.scoreLine)} · 锁定 ${escapeHtml(match.lockedResult.winnerLocal)}</span>`
+        : "";
+      const sourceText = match.lockedResult
+        ? "真实结果已同步，不能手动选择。"
+        : match.manualPick
+          ? "已按你的手动选择推进，后续轮次会跟着变化。"
+          : "可点击球队手动选择晋级方；未选择时按概率自动模拟。";
       return `
         <div class="advancement-node">
           <div class="advancement-node-head">
@@ -13601,11 +13756,12 @@
             <span>${escapeHtml(match.label || "")}</span>
           </div>
           <div class="advancement-match-teams">
-            ${renderAdvancementTeamLine(match.left, winner)}
-            ${renderAdvancementTeamLine(match.right, winner)}
+            ${renderAdvancementTeamLine(match.left, winner, match, "left")}
+            ${renderAdvancementTeamLine(match.right, winner, match, "right")}
           </div>
+          ${lockedText}
           <strong>模拟晋级：${escapeHtml(winner ? winner.label : "待定")}</strong>
-          <span>${escapeHtml(match.note || "按当前积分榜即时投影。")}</span>
+          <span>${escapeHtml(sourceText)} ${escapeHtml(match.note || "按当前积分榜即时投影。")}</span>
         </div>
       `;
     }
@@ -13665,7 +13821,7 @@
             ${renderAdvancementRound("冠军", championHtml, "champion-round")}
           </div>
         </div>
-        <div class="advancement-note">说明：这是一整张按当前积分实时推演的晋级图，后续轮次不是官方预测结果，只是用当前积分、净胜球、进球数和小组排名强度做可视化模拟。</div>
+        <div class="advancement-note">说明：每场会显示双方晋级概率。你可以点击球队手动选择晋级方，后续轮次会自动重算；如果公开赛果已同步到该淘汰赛结果，对阵会自动锁定，不能再手选。</div>
       `;
     }
 
@@ -13739,7 +13895,7 @@
               <span class="section-kicker">淘汰赛模拟</span>
               <h3 class="section-title">完整晋级图：32强到决赛</h3>
             </div>
-            <div class="section-meta">2026 为 48 队赛制：12 个小组前二 + 8 个最佳第三名进入 32 强。横向滑动可以看完整路线，后续轮次按当前积分强度模拟。</div>
+            <div class="section-meta">2026 为 48 队赛制：12 个小组前二 + 8 个最佳第三名进入 32 强。每场显示晋级概率，可手动点选；已出结果的比赛会锁定。</div>
           </div>
           ${renderFullAdvancementChart(groups)}
         </div>
@@ -14616,6 +14772,15 @@
           setActivePageSection(target.dataset.pageSection, { preserveScroll: false, scrollY: targetTop });
         });
         document.body.dataset.pageSectionBound = "1";
+      }
+      if (!document.body.dataset.advancementPickBound) {
+        document.body.addEventListener("click", event => {
+          const target = event.target.closest("button[data-advancement-pick]");
+          if (!target || target.disabled) return;
+          event.preventDefault();
+          setAdvancementWinner(target.dataset.advancementPick, target.dataset.advancementSlot);
+        });
+        document.body.dataset.advancementPickBound = "1";
       }
       document.querySelectorAll("input[data-match]").forEach(input => {
         input.addEventListener("input", event => {

@@ -5579,6 +5579,138 @@
         grid-template-columns: 1fr !important;
       }
     }
+
+    @media (max-width: 760px) {
+      html,
+      body {
+        max-width: 100%;
+        overflow-x: hidden;
+      }
+
+      .page-section-nav {
+        position: relative;
+        top: auto;
+        padding: 10px;
+        border-radius: 18px;
+      }
+
+      .page-section-nav-title {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .page-section-tabs {
+        margin-inline: -2px;
+        padding: 2px 2px 6px;
+        mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
+        scrollbar-width: none;
+      }
+
+      .page-section-tabs::-webkit-scrollbar,
+      .advancement-board::-webkit-scrollbar {
+        display: none;
+      }
+
+      .advancement-toolbar {
+        align-items: flex-start;
+        flex-direction: column;
+        border-radius: 16px;
+      }
+
+      .advancement-legend {
+        gap: 6px;
+      }
+
+      .advancement-board {
+        margin-inline: -10px;
+        padding: 0 10px 8px;
+        overflow-x: auto;
+        overscroll-behavior-x: contain;
+        scroll-snap-type: x proximity;
+        mask-image: linear-gradient(90deg, transparent, black 5%, black 95%, transparent);
+      }
+
+      .advancement-board::before {
+        content: "左右滑动查看完整晋级图";
+        position: sticky;
+        left: 10px;
+        z-index: 4;
+        display: inline-flex;
+        margin: 0 0 8px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(229, 194, 107, 0.14);
+        border: 1px solid rgba(229, 194, 107, 0.22);
+        color: #ffe5aa;
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .advancement-chart {
+        min-width: 1040px;
+        grid-template-columns: 1.18fr 1.08fr 1fr 0.94fr 0.94fr 1.08fr;
+        gap: 18px;
+        padding: 16px 18px 20px;
+        border-radius: 22px;
+        scroll-snap-align: start;
+      }
+
+      .advancement-round,
+      .advancement-round.final-round,
+      .advancement-round.champion-round {
+        min-height: 1030px;
+        grid-template-rows: auto repeat(16, minmax(48px, 1fr));
+      }
+
+      .advancement-node {
+        padding: 8px;
+        border-radius: 14px;
+      }
+
+      .advancement-node-head {
+        font-size: 9px;
+      }
+
+      .advancement-team-line {
+        min-height: 30px;
+        padding: 6px 8px;
+      }
+
+      [data-managed-page-section="tickets"] .bet-list {
+        grid-template-columns: 1fr;
+      }
+
+      [data-managed-page-section="tickets"] .bet-row {
+        grid-template-columns: 1fr;
+      }
+
+      [data-managed-page-section="tickets"] .bet-row-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .floating-tool-rail {
+        right: 7px !important;
+        gap: 8px !important;
+      }
+
+      .ticket-dock {
+        --side-panel-right: calc(var(--side-tool-edge) + var(--side-tool-width) + 6px);
+        padding-left: 8px !important;
+        padding-right: var(--side-panel-right) !important;
+      }
+
+      .ticket-dock-inner,
+      .ai-panel {
+        width: min(100vw - var(--side-panel-right) - 8px, 420px) !important;
+        max-width: min(100vw - var(--side-panel-right) - 8px, 420px) !important;
+      }
+
+      .side-panel-resize-edge,
+      .side-panel-resize-corner {
+        display: none;
+      }
+    }
   </style>
 </head>
 <body>

@@ -717,11 +717,6 @@
         font-size: 11px;
       }
 
-      .group-status {
-        min-width: 0;
-        padding: 4px 5px;
-        font-size: 10px;
-      }
     }
 
     .group-status {
@@ -738,6 +733,13 @@
       font-size: 10px;
       font-weight: 800;
       white-space: nowrap;
+    }
+
+    @media (max-width: 520px) {
+      .group-status {
+        padding: 4px 6px;
+        font-size: 10px;
+      }
     }
 
     .group-status.qualified {
@@ -5083,6 +5085,10 @@
 
       .day-strategy--mobile .daily-reco-card .card-copy {
         font-size: 13px;
+      }
+
+      .day-strategy--mobile .daily-reco-card .bet-row-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
       .ticket-dock-inner:not(.expanded) .ticket-status-copy,

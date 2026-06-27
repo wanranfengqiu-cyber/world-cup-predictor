@@ -551,8 +551,8 @@
 
     .tournament-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 14px;
+      grid-template-columns: repeat(auto-fit, minmax(430px, 1fr));
+      gap: 18px;
     }
 
     .tournament-summary-grid {
@@ -620,9 +620,9 @@
     .group-table-head,
     .group-standing-row {
       display: grid;
-      grid-template-columns: 34px minmax(64px, 1.08fr) 28px 50px 62px 36px 74px;
+      grid-template-columns: 42px minmax(96px, 1.25fr) 36px 64px 78px 42px 88px;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       min-width: 0;
     }
 
@@ -640,7 +640,7 @@
       background: rgba(255, 255, 255, 0.04);
       border: 1px solid rgba(255, 255, 255, 0.06);
       color: #dcece5;
-      font-size: 12px;
+      font-size: 13px;
     }
 
     .group-standing-row.advance {
@@ -666,6 +666,24 @@
       color: #ffffff;
     }
 
+    @media (max-width: 1420px) {
+      .tournament-grid {
+        grid-template-columns: repeat(auto-fit, minmax(390px, 1fr));
+      }
+
+      .group-table-head,
+      .group-standing-row {
+        grid-template-columns: 38px minmax(86px, 1.2fr) 32px 58px 70px 38px 82px;
+        gap: 7px;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .tournament-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
     @media (max-width: 520px) {
       .tournament-grid {
         grid-template-columns: 1fr;
@@ -677,7 +695,7 @@
 
       .group-table-head,
       .group-standing-row {
-        grid-template-columns: 28px minmax(58px, 1fr) 24px 46px 54px 32px 62px;
+        grid-template-columns: 30px minmax(72px, 1fr) 24px 46px 58px 32px 68px;
         gap: 4px;
       }
 
@@ -709,8 +727,6 @@
       color: #d9eee5;
       font-size: 12px;
       font-weight: 800;
-      overflow: hidden;
-      text-overflow: ellipsis;
       white-space: nowrap;
     }
 

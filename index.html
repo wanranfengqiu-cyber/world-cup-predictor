@@ -7155,8 +7155,8 @@
         const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
         const safeAi = isPlainObject(parsed.ai) ? parsed.ai : {};
         const safeUi = isPlainObject(parsed.ui) ? parsed.ui : {};
-        const aiSheetOpen = !!safeUi.aiSheetOpen;
-        const builderSheetOpen = !!safeUi.builderSheetOpen && !aiSheetOpen;
+        const aiSheetOpen = false;
+        const builderSheetOpen = false;
         const safeCandidateExplorer = isPlainObject(safeUi.candidateExplorer) ? safeUi.candidateExplorer : {};
         const defaultExplorer = createDefaultCandidateExplorerState();
         const safeAppliedExplorer = isPlainObject(safeCandidateExplorer.applied) ? safeCandidateExplorer.applied : {};
@@ -14332,16 +14332,7 @@
       const semiHtml = rounds.semi.map((match, index) => renderAdvancementMatchNode(match, index, "半决赛", rounds.semi.length)).join("");
       const finalHtml = rounds.final.map((match, index) => renderAdvancementMatchNode(match, index, "决赛", rounds.final.length)).join("");
       const championHtml = rounds.champion.length
-        ? rounds.champion.map((slot, index) => `
-          <div class="advancement-node champion connector-up" data-slot="${index + 1}" style="--slot-row: 9; --slot-span: 2;">
-            <div class="advancement-node-head">
-              <span>当前模拟冠军</span>
-              <span>${escapeHtml(slot.code)}</span>
-            </div>
-            <strong>${escapeHtml(slot.label)}</strong>
-            <span>${escapeHtml(slot.note || "按当前实时积分强度从整张图一路模拟产生。")}</span>
-          </div>
-        `).join("")
+        ? rounds.champion.map((slot, index) => renderAdvancementWinnerNode(slot, index, "当前模拟冠军")).join("")
         : renderAdvancementWinnerNode(null, 0, "当前模拟冠军");
       return `
         <div class="advancement-toolbar">

@@ -739,34 +739,100 @@
 
     .advancement-board {
       overflow-x: auto;
-      padding-bottom: 6px;
+      padding: 4px 0 10px;
       -webkit-overflow-scrolling: touch;
+      scrollbar-color: rgba(229, 194, 107, 0.38) rgba(255, 255, 255, 0.06);
+    }
+
+    .advancement-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    .advancement-toolbar strong {
+      color: #ffffff;
+      font-size: 14px;
+    }
+
+    .advancement-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .advancement-legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.045);
+      border: 1px solid rgba(255, 255, 255, 0.065);
+    }
+
+    .advancement-legend i {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--gold);
+      box-shadow: 0 0 10px currentColor;
+    }
+
+    .advancement-legend .auto i {
+      background: var(--mint);
+    }
+
+    .advancement-legend .locked i {
+      background: var(--sky);
     }
 
     .advancement-chart {
       position: relative;
       display: grid;
-      grid-template-columns: 1.45fr repeat(4, 1fr) 1.1fr;
-      gap: 28px;
-      min-width: 1320px;
-      padding: 18px 24px;
-      border-radius: 28px;
+      grid-template-columns: 1.28fr 1.12fr 1fr 0.92fr 0.92fr 1.08fr;
+      gap: 34px;
+      min-width: 1420px;
+      padding: 22px 30px 26px;
+      border-radius: 32px;
       background:
-        radial-gradient(circle at 50% 0%, rgba(229, 194, 107, 0.17), transparent 34%),
-        linear-gradient(135deg, rgba(7, 30, 28, 0.96), rgba(5, 13, 21, 0.98));
-      border: 1px solid rgba(255, 255, 255, 0.09);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 20px 48px rgba(0, 0, 0, 0.22);
+        radial-gradient(circle at 50% -10%, rgba(229, 194, 107, 0.24), transparent 30%),
+        radial-gradient(circle at 12% 45%, rgba(117, 216, 178, 0.12), transparent 30%),
+        linear-gradient(135deg, rgba(4, 19, 20, 0.98), rgba(5, 12, 20, 0.99));
+      border: 1px solid rgba(229, 194, 107, 0.14);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.06),
+        0 26px 70px rgba(0, 0, 0, 0.28);
     }
 
     .advancement-chart::before {
       content: "";
       position: absolute;
-      inset: 18px;
+      inset: 18px 22px;
       pointer-events: none;
-      border-radius: 22px;
+      border-radius: 26px;
       background:
-        linear-gradient(90deg, transparent 0 15%, rgba(229, 194, 107, 0.1) 15% 15.2%, transparent 15.2% 32%, rgba(229, 194, 107, 0.08) 32% 32.2%, transparent 32.2% 49%, rgba(229, 194, 107, 0.08) 49% 49.2%, transparent 49.2% 66%, rgba(229, 194, 107, 0.08) 66% 66.2%, transparent 66.2% 83%, rgba(229, 194, 107, 0.1) 83% 83.2%, transparent 83.2% 100%);
-      opacity: 0.7;
+        linear-gradient(90deg, transparent 0 16%, rgba(229, 194, 107, 0.1) 16% 16.15%, transparent 16.15% 33%, rgba(229, 194, 107, 0.08) 33% 33.15%, transparent 33.15% 50%, rgba(229, 194, 107, 0.08) 50% 50.15%, transparent 50.15% 67%, rgba(229, 194, 107, 0.08) 67% 67.15%, transparent 67.15% 84%, rgba(229, 194, 107, 0.1) 84% 84.15%, transparent 84.15% 100%),
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 56px);
+      opacity: 0.84;
+    }
+
+    .advancement-chart::after {
+      content: "";
+      position: absolute;
+      inset: 20px;
+      pointer-events: none;
+      border-radius: 28px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      box-shadow: inset 0 0 42px rgba(229, 194, 107, 0.05);
     }
 
     .advancement-round {
@@ -784,42 +850,46 @@
     }
 
     .advancement-round-title {
-      position: sticky;
-      top: 0;
+      position: relative;
       z-index: 2;
-      padding: 9px 11px;
+      padding: 9px 10px;
       border-radius: 999px;
-      background: rgba(3, 12, 16, 0.9);
-      border: 1px solid rgba(229, 194, 107, 0.24);
+      background:
+        linear-gradient(135deg, rgba(229, 194, 107, 0.13), rgba(255, 255, 255, 0.035));
+      border: 1px solid rgba(229, 194, 107, 0.22);
       color: var(--gold);
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 900;
       letter-spacing: 0.08em;
       text-align: center;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.16);
     }
 
     .advancement-node {
       position: relative;
       display: grid;
-      gap: 8px;
+      gap: 7px;
       align-self: center;
-      padding: 10px;
-      border-radius: 16px;
+      padding: 9px;
+      border-radius: 18px;
       background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.065), rgba(255, 255, 255, 0.035));
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+        radial-gradient(circle at 0% 0%, rgba(229, 194, 107, 0.08), transparent 42%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.036));
+      border: 1px solid rgba(255, 255, 255, 0.095);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.05),
+        0 10px 24px rgba(0, 0, 0, 0.18);
       min-width: 0;
     }
 
     .advancement-node::before {
       content: "";
       position: absolute;
-      left: -18px;
+      left: -22px;
       top: 50%;
-      width: 18px;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(229, 194, 107, 0.42));
+      width: 22px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(229, 194, 107, 0.56));
       pointer-events: none;
     }
 
@@ -830,11 +900,11 @@
     .advancement-node::after {
       content: "";
       position: absolute;
-      right: -18px;
+      right: -22px;
       top: 50%;
-      width: 18px;
-      height: 1px;
-      background: linear-gradient(90deg, rgba(229, 194, 107, 0.42), transparent);
+      width: 22px;
+      height: 2px;
+      background: linear-gradient(90deg, rgba(229, 194, 107, 0.56), transparent);
       pointer-events: none;
     }
 
@@ -845,10 +915,10 @@
     .advancement-node.connector-up::before,
     .advancement-node.connector-down::before {
       height: var(--connector-height, 72px);
-      width: 18px;
-      border-left: 1px solid rgba(229, 194, 107, 0.32);
-      border-top: 1px solid rgba(229, 194, 107, 0.32);
-      border-bottom: 1px solid rgba(229, 194, 107, 0.32);
+      width: 22px;
+      border-left: 2px solid rgba(229, 194, 107, 0.38);
+      border-top: 2px solid rgba(229, 194, 107, 0.38);
+      border-bottom: 2px solid rgba(229, 194, 107, 0.38);
       background: transparent;
     }
 
@@ -865,19 +935,22 @@
     }
 
     .advancement-node.projected {
-      border-color: rgba(117, 216, 178, 0.24);
+      border-color: rgba(117, 216, 178, 0.28);
       background:
         radial-gradient(circle at top left, rgba(117, 216, 178, 0.14), transparent 48%),
         linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.03));
     }
 
     .advancement-node.champion {
-      padding: 18px;
-      border-color: rgba(229, 194, 107, 0.5);
+      padding: 20px 16px;
+      border-color: rgba(229, 194, 107, 0.62);
       background:
-        radial-gradient(circle at top, rgba(229, 194, 107, 0.26), transparent 56%),
+        radial-gradient(circle at top, rgba(229, 194, 107, 0.34), transparent 58%),
         linear-gradient(180deg, rgba(34, 29, 12, 0.9), rgba(6, 16, 20, 0.96));
-      box-shadow: 0 0 28px rgba(229, 194, 107, 0.13);
+      box-shadow:
+        0 0 0 1px rgba(229, 194, 107, 0.16),
+        0 0 36px rgba(229, 194, 107, 0.18),
+        0 18px 34px rgba(0, 0, 0, 0.24);
     }
 
     .advancement-node-head {
@@ -886,20 +959,20 @@
       justify-content: space-between;
       gap: 8px;
       color: var(--muted);
-      font-size: 11px;
+      font-size: 10px;
     }
 
     .advancement-node strong {
       color: #ffffff;
-      font-size: 15px;
+      font-size: 14px;
       line-height: 1.35;
       overflow-wrap: anywhere;
     }
 
     .advancement-node span {
       color: var(--muted);
-      font-size: 12px;
-      line-height: 1.5;
+      font-size: 11px;
+      line-height: 1.42;
     }
 
     .advancement-match-teams {
@@ -911,7 +984,8 @@
       display: flex;
       justify-content: space-between;
       gap: 8px;
-      padding: 7px 8px;
+      min-height: 32px;
+      padding: 7px 9px;
       border-radius: 12px;
       border: 1px solid transparent;
       background: rgba(255, 255, 255, 0.045);
@@ -923,15 +997,17 @@
     }
 
     .advancement-team-line:hover:not(:disabled) {
-      transform: translateX(2px);
+      transform: translateX(3px);
       border-color: rgba(229, 194, 107, 0.28);
       background: rgba(229, 194, 107, 0.1);
     }
 
     .advancement-team-line.is-projected {
       color: #bdf5d6;
-      background: rgba(117, 216, 178, 0.12);
-      border: 1px solid rgba(117, 216, 178, 0.17);
+      background:
+        linear-gradient(135deg, rgba(117, 216, 178, 0.18), rgba(117, 216, 178, 0.06));
+      border: 1px solid rgba(117, 216, 178, 0.26);
+      box-shadow: inset 3px 0 0 rgba(117, 216, 178, 0.74);
     }
 
     .advancement-team-line.is-manual {
@@ -962,6 +1038,21 @@
       flex: 0 0 auto;
       color: var(--gold);
       font-weight: 900;
+    }
+
+    .advancement-result-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding-top: 2px;
+      color: #eaf7f1;
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .advancement-source-line {
+      display: none;
     }
 
     .advancement-lock-note {
@@ -13937,11 +14028,7 @@
       const lockedText = match.lockedResult
         ? `<span class="advancement-lock-note">已出结果 · ${escapeHtml(match.lockedResult.scoreLine)} · 锁定 ${escapeHtml(match.lockedResult.winnerLocal)}</span>`
         : "";
-      const sourceText = match.lockedResult
-        ? "真实结果已同步，不能手动选择。"
-        : match.manualPick
-          ? "已按你的手动选择推进，后续轮次会跟着变化。"
-          : "可点击球队手动选择晋级方；未选择时按概率自动模拟。";
+      const sourceText = match.lockedResult ? "已锁定" : match.manualPick ? "手动选择" : "概率模拟";
       return `
         <div class="advancement-node ${stageName === "32强" ? "" : slot.connectorClass}" data-slot="${index + 1}" style="--slot-row: ${slot.start + 1}; --slot-span: ${slot.span}; --connector-height: ${slot.connectorHeight}px;">
           <div class="advancement-node-head">
@@ -13953,8 +14040,10 @@
             ${renderAdvancementTeamLine(match.right, winner, match, "right")}
           </div>
           ${lockedText}
-          <strong>模拟晋级：${escapeHtml(winner ? winner.label : "待定")}</strong>
-          <span>${escapeHtml(sourceText)} ${escapeHtml(match.note || "按当前积分榜即时投影。")}</span>
+          <div class="advancement-result-line">
+            <strong>${escapeHtml(winner ? winner.label : "待定")}</strong>
+            <span>${escapeHtml(sourceText)}</span>
+          </div>
         </div>
       `;
     }
@@ -14004,6 +14093,14 @@
         `).join("")
         : renderAdvancementWinnerNode(null, 0, "当前模拟冠军");
       return `
+        <div class="advancement-toolbar">
+          <strong>晋级路线图</strong>
+          <div class="advancement-legend">
+            <span class="auto"><i></i>当前模拟晋级</span>
+            <span><i></i>手动选择</span>
+            <span class="locked"><i></i>已出结果锁定</span>
+          </div>
+        </div>
         <div class="advancement-board">
           <div class="advancement-chart">
             ${renderAdvancementRound("32强入口", round32Html)}

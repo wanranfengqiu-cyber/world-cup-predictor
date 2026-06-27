@@ -606,6 +606,160 @@
       letter-spacing: 0.08em;
     }
 
+    .advancement-board {
+      overflow-x: auto;
+      padding-bottom: 6px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .advancement-chart {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1.45fr repeat(4, 1fr) 1.1fr;
+      gap: 18px;
+      min-width: 1180px;
+      padding: 18px;
+      border-radius: 28px;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(229, 194, 107, 0.17), transparent 34%),
+        linear-gradient(135deg, rgba(7, 30, 28, 0.96), rgba(5, 13, 21, 0.98));
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 20px 48px rgba(0, 0, 0, 0.22);
+    }
+
+    .advancement-chart::before {
+      content: "";
+      position: absolute;
+      inset: 18px;
+      pointer-events: none;
+      border-radius: 22px;
+      background:
+        linear-gradient(90deg, transparent 0 15%, rgba(229, 194, 107, 0.1) 15% 15.2%, transparent 15.2% 32%, rgba(229, 194, 107, 0.08) 32% 32.2%, transparent 32.2% 49%, rgba(229, 194, 107, 0.08) 49% 49.2%, transparent 49.2% 66%, rgba(229, 194, 107, 0.08) 66% 66.2%, transparent 66.2% 83%, rgba(229, 194, 107, 0.1) 83% 83.2%, transparent 83.2% 100%);
+      opacity: 0.7;
+    }
+
+    .advancement-round {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      gap: 10px;
+      align-content: space-around;
+      min-height: 1060px;
+    }
+
+    .advancement-round.final-round,
+    .advancement-round.champion-round {
+      min-height: 1060px;
+      align-content: center;
+    }
+
+    .advancement-round-title {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      padding: 9px 11px;
+      border-radius: 999px;
+      background: rgba(3, 12, 16, 0.9);
+      border: 1px solid rgba(229, 194, 107, 0.24);
+      color: var(--gold);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-align: center;
+    }
+
+    .advancement-node {
+      display: grid;
+      gap: 8px;
+      padding: 12px;
+      border-radius: 18px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.065), rgba(255, 255, 255, 0.035));
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      min-width: 0;
+    }
+
+    .advancement-node.projected {
+      border-color: rgba(117, 216, 178, 0.24);
+      background:
+        radial-gradient(circle at top left, rgba(117, 216, 178, 0.14), transparent 48%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.03));
+    }
+
+    .advancement-node.champion {
+      padding: 18px;
+      border-color: rgba(229, 194, 107, 0.5);
+      background:
+        radial-gradient(circle at top, rgba(229, 194, 107, 0.26), transparent 56%),
+        linear-gradient(180deg, rgba(34, 29, 12, 0.9), rgba(6, 16, 20, 0.96));
+      box-shadow: 0 0 28px rgba(229, 194, 107, 0.13);
+    }
+
+    .advancement-node-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .advancement-node strong {
+      color: #ffffff;
+      font-size: 15px;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+    }
+
+    .advancement-node span {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .advancement-match-teams {
+      display: grid;
+      gap: 6px;
+    }
+
+    .advancement-team-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 7px 8px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.045);
+      color: #e8f6ef;
+      font-size: 12px;
+    }
+
+    .advancement-team-line.is-projected {
+      color: #bdf5d6;
+      background: rgba(117, 216, 178, 0.12);
+      border: 1px solid rgba(117, 216, 178, 0.17);
+    }
+
+    .advancement-note {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.65;
+    }
+
+    @media (max-width: 760px) {
+      .advancement-chart {
+        min-width: 980px;
+        gap: 12px;
+        padding: 14px;
+      }
+
+      .advancement-round,
+      .advancement-round.final-round,
+      .advancement-round.champion-round {
+        min-height: 980px;
+      }
+    }
+
     .summary-bar {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -13224,6 +13378,50 @@
       return pairs;
     }
 
+    function scoreProjectedAdvancementSlot(slot) {
+      const profile = slot && slot.profile;
+      if (!profile) return -999;
+      return (profile.points || 0) * 100
+        + (profile.gd || 0) * 12
+        + (profile.gf || 0) * 3
+        - (profile.ga || 0) * 2
+        + Math.max(0, 4 - (profile.rank || 4)) * 18;
+    }
+
+    function pickProjectedWinner(left, right) {
+      const leftScore = scoreProjectedAdvancementSlot(left);
+      const rightScore = scoreProjectedAdvancementSlot(right);
+      if (leftScore !== rightScore) return leftScore > rightScore ? left : right;
+      return String(left.label || "").localeCompare(String(right.label || ""), "zh-CN") <= 0 ? left : right;
+    }
+
+    function buildProjectedAdvancementRounds(groups) {
+      const round32 = buildProjectedKnockoutPairs(groups);
+      const buildNextRound = (matches, roundName) => {
+        const winners = matches.map(match => pickProjectedWinner(match.left, match.right));
+        const nextMatches = [];
+        for (let index = 0; index < winners.length; index += 2) {
+          const left = winners[index];
+          const right = winners[index + 1];
+          if (!left || !right) continue;
+          nextMatches.push({
+            label: `${left.label} vs ${right.label}`,
+            left,
+            right,
+            winner: pickProjectedWinner(left, right),
+            note: `${roundName}按当前积分、净胜球、进球数和小组排名强度模拟。`
+          });
+        }
+        return nextMatches;
+      };
+      const round16 = buildNextRound(round32, "16强");
+      const quarter = buildNextRound(round16, "8强");
+      const semi = buildNextRound(quarter, "半决赛");
+      const final = buildNextRound(semi, "决赛");
+      const champion = final[0] ? [pickProjectedWinner(final[0].left, final[0].right)] : [];
+      return { round32, round16, quarter, semi, final, champion };
+    }
+
     function renderKnockoutSlot(slot) {
       const profile = slot.profile;
       return `
@@ -13231,6 +13429,93 @@
           <strong>${escapeHtml(slot.label)}</strong>
           <span>${escapeHtml(slot.note)}</span>
         </div>
+      `;
+    }
+
+    function renderAdvancementTeamLine(slot, winner) {
+      const isProjected = winner && slot && winner.code === slot.code;
+      return `
+        <div class="advancement-team-line ${isProjected ? "is-projected" : ""}">
+          <span>${escapeHtml(slot ? slot.label : "待定")}</span>
+          <span>${escapeHtml(slot && slot.code ? slot.code : "")}</span>
+        </div>
+      `;
+    }
+
+    function renderAdvancementMatchNode(match, index, stageName) {
+      const winner = match.winner || pickProjectedWinner(match.left, match.right);
+      return `
+        <div class="advancement-node">
+          <div class="advancement-node-head">
+            <span>${escapeHtml(stageName)} ${index + 1}</span>
+            <span>${escapeHtml(match.label || "")}</span>
+          </div>
+          <div class="advancement-match-teams">
+            ${renderAdvancementTeamLine(match.left, winner)}
+            ${renderAdvancementTeamLine(match.right, winner)}
+          </div>
+          <strong>模拟晋级：${escapeHtml(winner ? winner.label : "待定")}</strong>
+          <span>${escapeHtml(match.note || "按当前积分榜即时投影。")}</span>
+        </div>
+      `;
+    }
+
+    function renderAdvancementWinnerNode(slot, index, stageName) {
+      return `
+        <div class="advancement-node projected">
+          <div class="advancement-node-head">
+            <span>${escapeHtml(stageName)} ${index + 1}</span>
+            <span>${escapeHtml(slot && slot.code ? slot.code : "模拟")}</span>
+          </div>
+          <strong>${escapeHtml(slot ? slot.label : "待定")}</strong>
+          <span>${escapeHtml(slot && slot.note ? slot.note : "由上一轮模拟晋级产生")}</span>
+        </div>
+      `;
+    }
+
+    function renderAdvancementRound(title, nodesHtml, extraClass = "") {
+      return `
+        <div class="advancement-round ${extraClass}">
+          <div class="advancement-round-title">${escapeHtml(title)}</div>
+          ${nodesHtml}
+        </div>
+      `;
+    }
+
+    function renderFullAdvancementChart(groups) {
+      const rounds = buildProjectedAdvancementRounds(groups);
+      if (!rounds.round32.length) {
+        return `<div class="empty-state">当前小组数据还不足以生成完整晋级图，等更多积分同步后会自动补上。</div>`;
+      }
+      const round32Html = rounds.round32.map((match, index) => renderAdvancementMatchNode(match, index, "32强")).join("");
+      const round16Html = rounds.round16.map((match, index) => renderAdvancementMatchNode(match, index, "16强")).join("");
+      const quarterHtml = rounds.quarter.map((match, index) => renderAdvancementMatchNode(match, index, "8强")).join("");
+      const semiHtml = rounds.semi.map((match, index) => renderAdvancementMatchNode(match, index, "半决赛")).join("");
+      const finalHtml = rounds.final.map((match, index) => renderAdvancementMatchNode(match, index, "决赛")).join("");
+      const championHtml = rounds.champion.length
+        ? rounds.champion.map((slot, index) => `
+          <div class="advancement-node champion">
+            <div class="advancement-node-head">
+              <span>当前模拟冠军</span>
+              <span>${escapeHtml(slot.code)}</span>
+            </div>
+            <strong>${escapeHtml(slot.label)}</strong>
+            <span>${escapeHtml(slot.note || "按当前实时积分强度从整张图一路模拟产生。")}</span>
+          </div>
+        `).join("")
+        : renderAdvancementWinnerNode(null, 0, "当前模拟冠军");
+      return `
+        <div class="advancement-board">
+          <div class="advancement-chart">
+            ${renderAdvancementRound("32强入口", round32Html)}
+            ${renderAdvancementRound("16强", round16Html)}
+            ${renderAdvancementRound("8强", quarterHtml)}
+            ${renderAdvancementRound("半决赛", semiHtml)}
+            ${renderAdvancementRound("决赛", finalHtml, "final-round")}
+            ${renderAdvancementRound("冠军", championHtml, "champion-round")}
+          </div>
+        </div>
+        <div class="advancement-note">说明：这是一整张按当前积分实时推演的晋级图，后续轮次不是官方预测结果，只是用当前积分、净胜球、进球数和小组排名强度做可视化模拟。</div>
       `;
     }
 
@@ -13302,11 +13587,11 @@
           <div class="section-head">
             <div class="section-copy">
               <span class="section-kicker">淘汰赛模拟</span>
-              <h3 class="section-title">按当前排名模拟 32 强入口</h3>
+              <h3 class="section-title">完整晋级图：32强到决赛</h3>
             </div>
-            <div class="section-meta">2026 为 48 队赛制：12 个小组前二 + 8 个最佳第三名进入 32 强。这里是根据当前积分即时模拟，不代表官方最终对阵。</div>
+            <div class="section-meta">2026 为 48 队赛制：12 个小组前二 + 8 个最佳第三名进入 32 强。横向滑动可以看完整路线，后续轮次按当前积分强度模拟。</div>
           </div>
-          ${renderProjectedKnockoutBracket(groups)}
+          ${renderFullAdvancementChart(groups)}
         </div>
       `;
     }

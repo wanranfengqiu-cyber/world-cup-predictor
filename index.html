@@ -13829,37 +13829,82 @@
       };
     }
 
-    function buildProjectedKnockoutPairs(groups) {
-      const bestThirdCandidates = getBestThirdPlaceCandidates(groups);
-      const qualifiedSlots = [
-        ...groups.map(groupInfo => createProjectedQualifiedSlot(groupInfo, 1)),
-        ...groups.map(groupInfo => createProjectedQualifiedSlot(groupInfo, 2)),
-        ...bestThirdCandidates.map(profile => ({
-          code: `${profile.group}3`,
-          profile,
-          group: profile.group,
-          rank: 3,
-          label: profile.localName,
-          note: `${profile.group}组第 3 · ${profile.points} 分 · 当前最佳第三名区`
-        }))
-      ].filter(slot => slot.profile);
+    function getTournamentGroupInfo(groups, groupCode) {
+      return groups.find(groupInfo => String(groupInfo.group).toUpperCase() === String(groupCode).toUpperCase()) || null;
+    }
 
-      const leftSide = qualifiedSlots.slice(0, Math.ceil(qualifiedSlots.length / 2));
-      const rightSide = qualifiedSlots.slice(Math.ceil(qualifiedSlots.length / 2)).reverse();
-      const pairs = [];
-      leftSide.forEach(left => {
-        if (!rightSide.length) return;
-        let opponentIndex = rightSide.findIndex(slot => slot.group !== left.group);
-        if (opponentIndex < 0) opponentIndex = 0;
-        const right = rightSide.splice(opponentIndex, 1)[0];
-        pairs.push({
-          label: `${left.code} vs ${right.code}`,
+    function createOfficialRankSlot(groups, groupCode, rank) {
+      return createProjectedQualifiedSlot(getTournamentGroupInfo(groups, groupCode), rank);
+    }
+
+    function createOfficialThirdPlaceSlot(groups, allowedGroups, usedThirdGroups) {
+      const allowed = allowedGroups.split("");
+      const bestThirdCandidates = getBestThirdPlaceCandidates(groups);
+      const candidate = bestThirdCandidates.find(profile =>
+        allowed.includes(String(profile.group).toUpperCase()) && !usedThirdGroups.has(String(profile.group).toUpperCase())
+      ) || null;
+      if (candidate) {
+        usedThirdGroups.add(String(candidate.group).toUpperCase());
+        return {
+          code: `${candidate.group}3*`,
+          profile: candidate,
+          group: candidate.group,
+          rank: 3,
+          label: candidate.localName,
+          note: `${candidate.group}组第 3 · 当前临时填入 ${allowedGroups} 组第三名候选槽，最终以官方第三名组合为准`
+        };
+      }
+      return {
+        code: `3${allowedGroups}`,
+        profile: null,
+        group: "",
+        rank: 3,
+        label: `最佳第三名 ${allowedGroups}`,
+        note: `官方槽位：最佳第三名来自 ${allowed.join("/")} 组之一，等待第三名组合确定`
+      };
+    }
+
+    function createOfficialKnockoutSlot(groups, slotCode, usedThirdGroups) {
+      const normalized = String(slotCode).toUpperCase();
+      if (normalized.startsWith("3")) {
+        return createOfficialThirdPlaceSlot(groups, normalized.slice(1), usedThirdGroups);
+      }
+      const rank = Number(normalized[0]);
+      const group = normalized.slice(1);
+      return createOfficialRankSlot(groups, group, rank);
+    }
+
+    function buildProjectedKnockoutPairs(groups) {
+      const usedThirdGroups = new Set();
+      const officialRound32BracketOrder = [
+        { matchNo: 73, left: "2A", right: "2B" },
+        { matchNo: 75, left: "1F", right: "2C" },
+        { matchNo: 74, left: "1E", right: "3ABCDF" },
+        { matchNo: 77, left: "1I", right: "3CDFGH" },
+        { matchNo: 76, left: "1C", right: "2F" },
+        { matchNo: 78, left: "2E", right: "2I" },
+        { matchNo: 79, left: "1A", right: "3CEFHI" },
+        { matchNo: 80, left: "1L", right: "3EHIJK" },
+        { matchNo: 83, left: "2K", right: "2L" },
+        { matchNo: 84, left: "1H", right: "2J" },
+        { matchNo: 81, left: "1D", right: "3BEFIJ" },
+        { matchNo: 82, left: "1G", right: "3AEHIJ" },
+        { matchNo: 86, left: "1J", right: "2H" },
+        { matchNo: 88, left: "2D", right: "2G" },
+        { matchNo: 85, left: "1B", right: "3EFGIJ" },
+        { matchNo: 87, left: "1K", right: "3DEIJL" }
+      ];
+
+      return officialRound32BracketOrder.map(item => {
+        const left = createOfficialKnockoutSlot(groups, item.left, usedThirdGroups);
+        const right = createOfficialKnockoutSlot(groups, item.right, usedThirdGroups);
+        return {
+          label: `M${item.matchNo} · ${item.left} vs ${item.right}`,
           left,
           right,
-          note: `${left.code} 对 ${right.code}，按当前晋级席位池做可视化模拟。`
-        });
+          note: `官方 Match ${item.matchNo} 槽位：${item.left} 对 ${item.right}`
+        };
       });
-      return pairs;
     }
 
     function scoreProjectedAdvancementSlot(slot) {
@@ -13949,7 +13994,7 @@
 
     function buildProjectedAdvancementRounds(groups) {
       const round32 = buildProjectedKnockoutPairs(groups).map((match, index) =>
-        createAdvancementMatch("r32", index, match.left, match.right, "32强入口按当前晋级席位池生成。")
+        createAdvancementMatch("r32", index, match.left, match.right, "32强入口按官方 Match 73-88 槽位生成；第三名槽位为当前候选临时填充。")
       );
       const buildNextRound = (matches, stageKey, roundName) => {
         const winners = matches.map(match => match.winner);
@@ -14096,7 +14141,7 @@
             ${renderAdvancementRound("冠军", championHtml, "champion-round")}
           </div>
         </div>
-        <div class="advancement-note">说明：每场会显示双方晋级概率。你可以点击球队手动选择晋级方，后续轮次会自动重算；如果公开赛果已同步到该淘汰赛结果，对阵会自动锁定，不能再手选。</div>
+        <div class="advancement-note">说明：32 强入口已按官方 Match 73-88 槽位展示；最佳第三名槽位先用当前候选临时填充，最终仍要等官方第三名组合确定。你可以点击球队手动选择晋级方，后续轮次会自动重算。</div>
       `;
     }
 
@@ -14170,7 +14215,7 @@
               <span class="section-kicker">淘汰赛模拟</span>
               <h3 class="section-title">完整晋级图：32强到决赛</h3>
             </div>
-            <div class="section-meta">2026 为 48 队赛制：12 个小组前二 + 8 个最佳第三名进入 32 强。每场显示晋级概率，可手动点选；已出结果的比赛会锁定。</div>
+            <div class="section-meta">2026 为 48 队赛制：12 个小组前二 + 8 个最佳第三名进入 32 强。前二名按官方 32 强槽位落位；第三名槽位先按当前候选临时填充。</div>
           </div>
           ${renderFullAdvancementChart(groups)}
         </div>

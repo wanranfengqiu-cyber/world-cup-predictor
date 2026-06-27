@@ -5584,7 +5584,6 @@
       html,
       body {
         max-width: 100%;
-        overflow-x: hidden;
       }
 
       .page-section-nav {
@@ -5592,6 +5591,10 @@
         top: auto;
         padding: 10px;
         border-radius: 18px;
+      }
+
+      .app {
+        padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 128px);
       }
 
       .page-section-nav-title {
@@ -5690,20 +5693,87 @@
       }
 
       .floating-tool-rail {
-        right: 7px !important;
+        left: 50% !important;
+        right: auto !important;
+        top: auto !important;
+        bottom: calc(env(safe-area-inset-bottom, 0px) + 10px) !important;
+        transform: translateX(-50%) !important;
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(118px, 1fr));
+        width: min(92vw, 340px);
         gap: 8px !important;
       }
 
+      .floating-tool-btn {
+        width: auto !important;
+        min-height: 52px;
+        grid-template-columns: auto 1fr;
+        justify-content: start;
+        padding: 8px 12px;
+        border-radius: 18px !important;
+      }
+
+      .floating-tool-meta {
+        display: none;
+      }
+
       .ticket-dock {
-        --side-panel-right: calc(var(--side-tool-edge) + var(--side-tool-width) + 6px);
-        padding-left: 8px !important;
-        padding-right: var(--side-panel-right) !important;
+        --side-panel-right: 0px;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100vw !important;
+        padding: 8px 8px calc(env(safe-area-inset-bottom, 0px) + 74px) !important;
+        z-index: 95 !important;
       }
 
       .ticket-dock-inner,
       .ai-panel {
-        width: min(100vw - var(--side-panel-right) - 8px, 420px) !important;
-        max-width: min(100vw - var(--side-panel-right) - 8px, 420px) !important;
+        top: auto !important;
+        bottom: calc(env(safe-area-inset-bottom, 0px) + 76px) !important;
+        right: 8px !important;
+        left: 8px !important;
+        width: auto !important;
+        max-width: none !important;
+        height: min(78vh, calc(100vh - 96px)) !important;
+        max-height: min(78vh, calc(100vh - 96px)) !important;
+        border-radius: 22px 22px 18px 18px !important;
+        transition-duration: 180ms !important;
+      }
+
+      .ticket-dock-inner {
+        transform: translateY(calc(100% + 96px)) !important;
+      }
+
+      .ticket-dock-inner.expanded {
+        transform: translateY(0) !important;
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+      }
+
+      body.is-ai-sheet-open .ticket-dock-inner {
+        transform: translateY(calc(100% + 96px)) !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+      }
+
+      .ai-panel {
+        transform: translateY(calc(100% + 96px)) !important;
+        overflow: hidden !important;
+      }
+
+      .ai-panel.open {
+        transform: translateY(0) !important;
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+      }
+
+      .ticket-sheet,
+      .ai-list,
+      .ai-result {
+        -webkit-overflow-scrolling: touch;
       }
 
       .side-panel-resize-edge,
@@ -7085,6 +7155,8 @@
         const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
         const safeAi = isPlainObject(parsed.ai) ? parsed.ai : {};
         const safeUi = isPlainObject(parsed.ui) ? parsed.ui : {};
+        const aiSheetOpen = !!safeUi.aiSheetOpen;
+        const builderSheetOpen = !!safeUi.builderSheetOpen && !aiSheetOpen;
         const safeCandidateExplorer = isPlainObject(safeUi.candidateExplorer) ? safeUi.candidateExplorer : {};
         const defaultExplorer = createDefaultCandidateExplorerState();
         const safeAppliedExplorer = isPlainObject(safeCandidateExplorer.applied) ? safeCandidateExplorer.applied : {};
@@ -7099,8 +7171,8 @@
             ticketText: typeof safeAi.ticketText === "string" ? safeAi.ticketText : ""
           },
           ui: {
-            builderSheetOpen: !!safeUi.builderSheetOpen,
-            aiSheetOpen: !!safeUi.aiSheetOpen,
+            builderSheetOpen,
+            aiSheetOpen,
             openDetails: isPlainObject(safeUi.openDetails) ? safeUi.openDetails : {},
             activePageSection: typeof safeUi.activePageSection === "string" ? safeUi.activePageSection : "overview",
             advancementPicks: isPlainObject(safeUi.advancementPicks) ? safeUi.advancementPicks : {},
@@ -7252,6 +7324,11 @@
       }
       saveState();
       render({ preserveScroll: true });
+    }
+
+    function syncBodyPanelState() {
+      document.body.classList.toggle("is-ai-sheet-open", !!state.ui.aiSheetOpen);
+      document.body.classList.toggle("is-ticket-sheet-open", !!state.ui.builderSheetOpen && !state.ui.aiSheetOpen);
     }
 
     function cacheDayAnalysis(day, dayAnalysis = buildDayAnalysis(day)) {
@@ -7500,6 +7577,7 @@
     }
 
     function renderTicketDockOnly(options = {}) {
+      syncBodyPanelState();
       const preserveScroll = options.preserveScroll !== false;
       const scrollY = preserveScroll ? window.scrollY || 0 : 0;
       const previousSheet = document.querySelector("#ticketDock .ticket-sheet");
@@ -12903,7 +12981,7 @@
       const metrics = buildManualTicketMetrics(day.id, dayAnalysis);
       const selectionCount = getSelectionCount(metrics.builder);
       const legCount = metrics.legs.length;
-      const showExpanded = !!state.ui.builderSheetOpen;
+      const showExpanded = !!state.ui.builderSheetOpen && !state.ui.aiSheetOpen;
       const sheetLabel = state.ui.builderSheetOpen ? "收起" : "展开出票";
       const metricsBlocked = metrics.empty || metrics.overBudget || metrics.singleBlocked;
       const expectedProfitLabel = metricsBlocked ? "--" : formatMoney(metrics.expectedProfit || 0);
@@ -15300,7 +15378,7 @@
           if (aiToggle) {
             event.preventDefault();
             event.stopPropagation();
-            toggleAiSheet();
+            toggleAiSheet(state.ui.builderSheetOpen || !state.ui.aiSheetOpen);
             return;
           }
           const aiClose = event.target.closest("[data-ai-close]");
@@ -15314,7 +15392,7 @@
           if (ticketToggle) {
             event.preventDefault();
             event.stopPropagation();
-            toggleBuilderSheet(!state.ui.builderSheetOpen);
+            toggleBuilderSheet(state.ui.aiSheetOpen || !state.ui.builderSheetOpen, { preserveScroll: true });
           }
         });
         document.body.dataset.sidePanelClickBound = "1";
@@ -15385,6 +15463,7 @@
     }
 
     function render(options = {}) {
+      syncBodyPanelState();
       const preserveScroll = options.preserveScroll !== false;
       const animateDayChange = !!options.animateDayChange;
       const requestedScrollY = typeof options.scrollY === "number"

@@ -418,6 +418,125 @@
       overflow-wrap: anywhere;
     }
 
+    .page-section-nav {
+      position: sticky;
+      top: 10px;
+      z-index: 18;
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+      border-radius: 24px;
+      background:
+        linear-gradient(135deg, rgba(6, 21, 24, 0.92), rgba(9, 31, 34, 0.86)),
+        radial-gradient(circle at top left, rgba(229, 194, 107, 0.11), transparent 36%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 18px 44px rgba(0, 0, 0, 0.22);
+      backdrop-filter: blur(16px);
+    }
+
+    .page-section-nav-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: #dcece5;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .page-section-nav-title strong {
+      color: #ffffff;
+      font-size: 16px;
+    }
+
+    .page-section-tabs {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .page-section-tab {
+      display: grid;
+      gap: 4px;
+      min-height: 58px;
+      padding: 10px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.075);
+      background: rgba(255, 255, 255, 0.045);
+      color: #dcece5;
+      cursor: pointer;
+      text-align: left;
+      transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+    }
+
+    .page-section-tab:hover,
+    .page-section-tab.active {
+      transform: translateY(-1px);
+      border-color: rgba(229, 194, 107, 0.42);
+      background: linear-gradient(135deg, rgba(229, 194, 107, 0.14), rgba(117, 216, 178, 0.08));
+    }
+
+    .page-section-tab strong {
+      color: #ffffff;
+      font-size: 14px;
+      line-height: 1.2;
+    }
+
+    .page-section-tab span {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .managed-page-section {
+      display: grid;
+      gap: 16px;
+    }
+
+    .dashboard-quick-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+
+    .dashboard-quick-card {
+      display: grid;
+      gap: 8px;
+      padding: 16px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.045);
+      border: 1px solid rgba(255, 255, 255, 0.075);
+    }
+
+    .dashboard-quick-card strong {
+      color: #ffffff;
+      font-size: 17px;
+    }
+
+    .dashboard-quick-card span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 860px) {
+      .page-section-nav {
+        top: 6px;
+      }
+
+      .page-section-tabs {
+        display: flex;
+        overflow-x: auto;
+        padding-bottom: 2px;
+        scroll-snap-type: x proximity;
+      }
+
+      .page-section-tab {
+        flex: 0 0 142px;
+        scroll-snap-align: start;
+      }
+    }
+
     .tournament-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -6481,6 +6600,13 @@
       error: "",
       payload: null
     };
+    const PAGE_SECTIONS = [
+      { key: "overview", label: "今日总览", desc: "概览、赛果、指标" },
+      { key: "tickets", label: "推荐出票", desc: "单关、串关、追投" },
+      { key: "tournament", label: "积分晋级", desc: "小组榜、晋级图" },
+      { key: "explorer", label: "玩法筛选", desc: "按概率找玩法" },
+      { key: "matches", label: "比赛拆解", desc: "逐场详情" }
+    ];
     if ("scrollRestoration" in history) {
       history.scrollRestoration = "manual";
     }
@@ -6534,6 +6660,7 @@
             builderSheetOpen: !!safeUi.builderSheetOpen,
             aiSheetOpen: !!safeUi.aiSheetOpen,
             openDetails: isPlainObject(safeUi.openDetails) ? safeUi.openDetails : {},
+            activePageSection: typeof safeUi.activePageSection === "string" ? safeUi.activePageSection : "overview",
             ticketSheetHeight: Number.isFinite(Number(safeUi.ticketSheetHeight)) ? Number(safeUi.ticketSheetHeight) : null,
             sidePanelWidth: Number.isFinite(Number(safeUi.sidePanelWidth)) ? Number(safeUi.sidePanelWidth) : null,
             sidePanelHeight: Number.isFinite(Number(safeUi.sidePanelHeight)) ? Number(safeUi.sidePanelHeight) : null,
@@ -6568,6 +6695,7 @@
             builderSheetOpen: false,
             aiSheetOpen: false,
             openDetails: {},
+            activePageSection: "overview",
             ticketSheetHeight: null,
             sidePanelWidth: null,
             sidePanelHeight: null,
@@ -6585,6 +6713,18 @@
         ai: state.ai,
         ui: state.ui
       }));
+    }
+
+    function getActivePageSection() {
+      const key = state.ui && typeof state.ui.activePageSection === "string" ? state.ui.activePageSection : "overview";
+      return PAGE_SECTIONS.some(section => section.key === key) ? key : "overview";
+    }
+
+    function setActivePageSection(sectionKey, options = {}) {
+      if (!PAGE_SECTIONS.some(section => section.key === sectionKey)) return;
+      state.ui.activePageSection = sectionKey;
+      saveState();
+      render({ preserveScroll: options.preserveScroll !== false, scrollY: options.scrollY });
     }
 
     function getDetailsKey(dayId, matchId) {
@@ -6969,8 +7109,18 @@
       };
 
       if (dayId !== currentDayId) {
+        state.ui.activePageSection = "matches";
+        saveState();
         switchDay(dayId, { force: true, scrollY: 0 });
         setTimeout(focusTarget, 240);
+        return;
+      }
+
+      if (getActivePageSection() !== "matches") {
+        state.ui.activePageSection = "matches";
+        saveState();
+        render({ preserveScroll: true });
+        setTimeout(focusTarget, 180);
         return;
       }
 
@@ -14269,6 +14419,55 @@
       const chaseAdvice = buildSingleChaseAdvice(day);
       const dailyRecommendations = pickDailyRecommendedPurchases(dayAnalysis, { singleBankroll: chaseAdvice.recommendedBudget });
       const displaySettlement = settlement || settleDailyRecommendationPacks(dailyRecommendations);
+      const activeSection = getActivePageSection();
+      const renderMatchesSection = () => `
+        <div class="section-group matches-group">
+          <div class="section-head">
+            <div class="section-copy">
+              <span class="section-kicker">比赛拆解</span>
+              <h2 class="section-title">当日比赛拆解</h2>
+            </div>
+            <div class="section-meta">这里才展开所有比赛卡。平时只看总览和推荐，需要逐场核对时再进来，页面不会再一口气堆很长。</div>
+          </div>
+          <div class="matches">
+            ${dayAnalysis.matchAnalyses.map(({ match, analysis }) => renderMatchCard(day.id, match, analysis)).join("")}
+          </div>
+        </div>
+      `;
+      const sectionContent = {
+        overview: `
+          ${renderFinishedMatchesCard(day)}
+          ${renderMetricGlossary()}
+          ${renderResultSyncCard(day)}
+          <div class="section-group">
+            <div class="section-head">
+              <div class="section-copy">
+                <span class="section-kicker">页面管理</span>
+                <h2 class="section-title">今天先看这几个重点</h2>
+              </div>
+              <div class="section-meta">下面的内容已经拆到独立分区，想出票、看晋级图、筛玩法、拆比赛，直接点上面的分区按钮。</div>
+            </div>
+            <div class="dashboard-quick-grid">
+              <button type="button" class="dashboard-quick-card" data-page-section="tickets">
+                <strong>去看推荐出票</strong>
+                <span>每日单关、串关、追投建议都集中在这里。</span>
+              </button>
+              <button type="button" class="dashboard-quick-card" data-page-section="tournament">
+                <strong>去看积分晋级图</strong>
+                <span>小组积分榜和完整晋级路线图单独管理。</span>
+              </button>
+              <button type="button" class="dashboard-quick-card" data-page-section="matches">
+                <strong>去看逐场拆解</strong>
+                <span>需要比分概率、赔率面板、赛果录入时再展开。</span>
+              </button>
+            </div>
+          </div>
+        `,
+        tickets: renderPurePortfolio(day, dayAnalysis),
+        tournament: renderTournamentRoadmap(),
+        explorer: renderCandidateExplorer(day, dayAnalysis),
+        matches: renderMatchesSection()
+      };
 
       return `
         <section class="day-panel">
@@ -14294,24 +14493,22 @@
               <div class="sub">${displaySettlement.pendingCount ? `单关+串关仍有 ${displaySettlement.pendingCount} 张推荐票待赛果` : "单关+串关推荐票都已完成结算"}</div>
             </div>
           </div>
-          ${renderFinishedMatchesCard(day)}
-          ${renderMetricGlossary()}
-          ${renderResultSyncCard(day)}
-          ${renderTournamentRoadmap()}
-          ${renderPurePortfolio(day, dayAnalysis)}
-          ${renderCandidateExplorer(day, dayAnalysis)}
-
-          <div class="section-group matches-group">
-            <div class="section-head">
-              <div class="section-copy">
-                <span class="section-kicker">比赛拆解</span>
-                <h2 class="section-title">当日比赛拆解</h2>
-              </div>
-              <div class="section-meta">每张比赛卡都统一放入概率、赔率面板、比分概率和赛果录入，顺着往下看就能完成一天判断。</div>
+          <div class="page-section-nav">
+            <div class="page-section-nav-title">
+              <strong>页面分区</strong>
+              <span>当前：${PAGE_SECTIONS.find(section => section.key === activeSection).label} · 不用一直往下滑，按需要切换。</span>
             </div>
-            <div class="matches">
-              ${dayAnalysis.matchAnalyses.map(({ match, analysis }) => renderMatchCard(day.id, match, analysis)).join("")}
+            <div class="page-section-tabs">
+              ${PAGE_SECTIONS.map(section => `
+                <button type="button" class="page-section-tab ${section.key === activeSection ? "active" : ""}" data-page-section="${section.key}">
+                  <strong>${section.label}</strong>
+                  <span>${section.desc}</span>
+                </button>
+              `).join("")}
             </div>
+          </div>
+          <div class="managed-page-section" data-managed-page-section="${activeSection}">
+            ${sectionContent[activeSection] || sectionContent.overview}
           </div>
         </section>
       `;
@@ -14409,6 +14606,16 @@
           scrollToMatchCard(jumpButton.dataset.matchDay || currentDayId, jumpButton.dataset.matchJump);
         });
         document.body.dataset.matchJumpBound = "1";
+      }
+      if (!document.body.dataset.pageSectionBound) {
+        document.body.addEventListener("click", event => {
+          const target = event.target.closest("button[data-page-section]");
+          if (!target) return;
+          const nav = document.querySelector("#dashboard .page-section-nav");
+          const targetTop = nav ? Math.max(nav.getBoundingClientRect().top + window.scrollY - 12, 0) : window.scrollY;
+          setActivePageSection(target.dataset.pageSection, { preserveScroll: false, scrollY: targetTop });
+        });
+        document.body.dataset.pageSectionBound = "1";
       }
       document.querySelectorAll("input[data-match]").forEach(input => {
         input.addEventListener("input", event => {

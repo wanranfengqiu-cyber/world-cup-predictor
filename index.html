@@ -820,7 +820,8 @@
       pointer-events: none;
       border-radius: 26px;
       background:
-        linear-gradient(90deg, transparent 0 16%, rgba(229, 194, 107, 0.1) 16% 16.15%, transparent 16.15% 33%, rgba(229, 194, 107, 0.08) 33% 33.15%, transparent 33.15% 50%, rgba(229, 194, 107, 0.08) 50% 50.15%, transparent 50.15% 67%, rgba(229, 194, 107, 0.08) 67% 67.15%, transparent 67.15% 84%, rgba(229, 194, 107, 0.1) 84% 84.15%, transparent 84.15% 100%),
+        linear-gradient(90deg, transparent 0 16%, rgba(229, 194, 107, 0.14) 16% 16.12%, transparent 16.12% 33%, rgba(229, 194, 107, 0.12) 33% 33.12%, transparent 33.12% 50%, rgba(229, 194, 107, 0.12) 50% 50.12%, transparent 50.12% 67%, rgba(229, 194, 107, 0.12) 67% 67.12%, transparent 67.12% 84%, rgba(229, 194, 107, 0.14) 84% 84.12%, transparent 84.12% 100%),
+        linear-gradient(180deg, transparent 0 6%, rgba(229, 194, 107, 0.055) 6% 94%, transparent 94% 100%),
         repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 56px);
       opacity: 0.84;
     }
@@ -914,24 +915,10 @@
 
     .advancement-node.connector-up::before,
     .advancement-node.connector-down::before {
-      height: var(--connector-height, 72px);
+      height: 2px;
       width: 22px;
-      border-left: 2px solid rgba(229, 194, 107, 0.38);
-      border-top: 2px solid rgba(229, 194, 107, 0.38);
-      border-bottom: 2px solid rgba(229, 194, 107, 0.38);
-      background: transparent;
-    }
-
-    .advancement-node.connector-up::before {
-      top: calc(50% - var(--connector-height, 72px));
-      border-radius: 10px 0 0 0;
-      border-bottom: 0;
-    }
-
-    .advancement-node.connector-down::before {
-      top: 50%;
-      border-radius: 0 0 0 10px;
-      border-top: 0;
+      border: 0;
+      background: linear-gradient(90deg, transparent, rgba(229, 194, 107, 0.56));
     }
 
     .advancement-node.projected {
@@ -14013,12 +14000,10 @@
     function getAdvancementSlotMeta(total, index) {
       const span = Math.max(1, Math.floor(16 / Math.max(1, total)));
       const start = Math.round(index * (16 / Math.max(1, total)) + 1);
-      const connectorHeight = Math.max(46, Math.round(span * 38));
       return {
         start,
         span,
-        connectorClass: index % 2 === 0 ? "connector-down" : "connector-up",
-        connectorHeight
+        connectorClass: index % 2 === 0 ? "connector-down" : "connector-up"
       };
     }
 
@@ -14030,7 +14015,7 @@
         : "";
       const sourceText = match.lockedResult ? "已锁定" : match.manualPick ? "手动选择" : "概率模拟";
       return `
-        <div class="advancement-node ${stageName === "32强" ? "" : slot.connectorClass}" data-slot="${index + 1}" style="--slot-row: ${slot.start + 1}; --slot-span: ${slot.span}; --connector-height: ${slot.connectorHeight}px;">
+        <div class="advancement-node ${stageName === "32强" ? "" : slot.connectorClass}" data-slot="${index + 1}" style="--slot-row: ${slot.start + 1}; --slot-span: ${slot.span};">
           <div class="advancement-node-head">
             <span>${escapeHtml(stageName)} ${index + 1}</span>
             <span>${escapeHtml(match.label || "")}</span>
@@ -14050,7 +14035,7 @@
 
     function renderAdvancementWinnerNode(slot, index, stageName) {
       return `
-        <div class="advancement-node projected connector-up" data-slot="${index + 1}" style="--slot-row: 9; --slot-span: 2; --connector-height: 280px;">
+        <div class="advancement-node projected connector-up" data-slot="${index + 1}" style="--slot-row: 9; --slot-span: 2;">
           <div class="advancement-node-head">
             <span>${escapeHtml(stageName)} ${index + 1}</span>
             <span>${escapeHtml(slot && slot.code ? slot.code : "模拟")}</span>
@@ -14082,7 +14067,7 @@
       const finalHtml = rounds.final.map((match, index) => renderAdvancementMatchNode(match, index, "决赛", rounds.final.length)).join("");
       const championHtml = rounds.champion.length
         ? rounds.champion.map((slot, index) => `
-          <div class="advancement-node champion connector-up" data-slot="${index + 1}" style="--slot-row: 9; --slot-span: 2; --connector-height: 280px;">
+          <div class="advancement-node champion connector-up" data-slot="${index + 1}" style="--slot-row: 9; --slot-span: 2;">
             <div class="advancement-node-head">
               <span>当前模拟冠军</span>
               <span>${escapeHtml(slot.code)}</span>

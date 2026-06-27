@@ -13819,13 +13819,14 @@
     function createProjectedQualifiedSlot(groupInfo, rank) {
       const profile = groupInfo && groupInfo.rows ? groupInfo.rows[rank - 1] || null : null;
       const group = groupInfo ? groupInfo.group : "";
+      const isSettled = !!(profile && profile.mp >= 3 && profile.rank === rank);
       return {
         code: `${group}${rank}`,
-        profile,
+        profile: isSettled ? profile : null,
         group,
         rank,
-        label: profile ? profile.localName : `${group}组第 ${rank}`,
-        note: profile ? `${group}组第 ${rank} · ${profile.points} 分` : "等待小组排名同步"
+        label: isSettled ? profile.localName : `${group || "待定"}组第 ${rank}`,
+        note: isSettled ? `${group}组第 ${rank} · ${profile.points} 分 · 已结算落位` : `${group || "对应"}组第 ${rank} 尚未结算，先不填球队`
       };
     }
 
@@ -13839,28 +13840,13 @@
 
     function createOfficialThirdPlaceSlot(groups, allowedGroups, usedThirdGroups) {
       const allowed = allowedGroups.split("");
-      const bestThirdCandidates = getBestThirdPlaceCandidates(groups);
-      const candidate = bestThirdCandidates.find(profile =>
-        allowed.includes(String(profile.group).toUpperCase()) && !usedThirdGroups.has(String(profile.group).toUpperCase())
-      ) || null;
-      if (candidate) {
-        usedThirdGroups.add(String(candidate.group).toUpperCase());
-        return {
-          code: `${candidate.group}3*`,
-          profile: candidate,
-          group: candidate.group,
-          rank: 3,
-          label: candidate.localName,
-          note: `${candidate.group}组第 3 · 当前临时填入 ${allowedGroups} 组第三名候选槽，最终以官方第三名组合为准`
-        };
-      }
       return {
         code: `3${allowedGroups}`,
         profile: null,
         group: "",
         rank: 3,
         label: `最佳第三名 ${allowedGroups}`,
-        note: `官方槽位：最佳第三名来自 ${allowed.join("/")} 组之一，等待第三名组合确定`
+        note: `官方槽位：最佳第三名来自 ${allowed.join("/")} 组之一，尚未结算，先不填球队`
       };
     }
 
@@ -13872,6 +13858,17 @@
       const rank = Number(normalized[0]);
       const group = normalized.slice(1);
       return createOfficialRankSlot(groups, group, rank);
+    }
+
+    function createPendingAdvancementSlot(label) {
+      return {
+        code: "TBD",
+        profile: null,
+        group: "",
+        rank: 0,
+        label,
+        note: "等待前序比赛结算"
+      };
     }
 
     function buildProjectedKnockoutPairs(groups) {
@@ -13941,6 +13938,9 @@
     }
 
     function getAdvancementProbabilities(left, right) {
+      if (!left || !right || !left.profile || !right.profile) {
+        return { left: 0, right: 0 };
+      }
       const leftRaw = Math.max(1, scoreProjectedAdvancementSlot(left) + 140);
       const rightRaw = Math.max(1, scoreProjectedAdvancementSlot(right) + 140);
       const total = leftRaw + rightRaw;
@@ -13953,6 +13953,7 @@
     }
 
     function pickProjectedWinner(left, right, matchId = "") {
+      if (!left || !right || !left.profile || !right.profile) return null;
       const locked = findLockedKnockoutResult(left, right);
       if (locked) return locked.winnerLocal === left.label ? left : right;
       const manualPick = matchId ? getAdvancementPicks()[matchId] : "";
@@ -13994,7 +13995,7 @@
 
     function buildProjectedAdvancementRounds(groups) {
       const round32 = buildProjectedKnockoutPairs(groups).map((match, index) =>
-        createAdvancementMatch("r32", index, match.left, match.right, "32强入口按官方 Match 73-88 槽位生成；第三名槽位为当前候选临时填充。")
+        createAdvancementMatch("r32", index, match.left, match.right, "32强入口按官方 Match 73-88 槽位生成；未结算槽位先不填球队。")
       );
       const buildNextRound = (matches, stageKey, roundName) => {
         const winners = matches.map(match => match.winner);
@@ -14002,7 +14003,16 @@
         for (let index = 0; index < winners.length; index += 2) {
           const left = winners[index];
           const right = winners[index + 1];
-          if (!left || !right) continue;
+          if (!left || !right) {
+            nextMatches.push(createAdvancementMatch(
+              stageKey,
+              index / 2,
+              left || createPendingAdvancementSlot(`${roundName}上半区胜者待定`),
+              right || createPendingAdvancementSlot(`${roundName}下半区胜者待定`),
+              `${roundName}等待上一轮结算后再填入球队。`
+            ));
+            continue;
+          }
           nextMatches.push(createAdvancementMatch(stageKey, index / 2, left, right, `${roundName}按当前选择、积分、净胜球、进球数和小组排名强度模拟。`));
         }
         return nextMatches;
@@ -14030,14 +14040,15 @@
       const isManual = match && match.manualPick && slot && match.manualPick === slot.code;
       const isLocked = !!(match && match.lockedResult);
       const probability = match && match.probabilities ? match.probabilities[side] : 0.5;
+      const probabilityText = slot && slot.profile ? formatPercent(probability) : "待定";
       return `
         <button type="button"
           class="advancement-team-line ${isProjected ? "is-projected" : ""} ${isManual ? "is-manual" : ""} ${isLocked && isProjected ? "is-locked" : ""}"
           data-advancement-pick="${escapeHtml(match ? match.id : "")}"
           data-advancement-slot="${escapeHtml(slot && slot.code ? slot.code : "")}"
-          ${isLocked ? "disabled" : ""}>
+          ${isLocked || !(slot && slot.profile) ? "disabled" : ""}>
           <span class="advancement-team-name">${escapeHtml(slot ? slot.label : "待定")}</span>
-          <span class="advancement-team-prob">${formatPercent(probability)}</span>
+          <span class="advancement-team-prob">${probabilityText}</span>
         </button>
       `;
     }
@@ -14141,7 +14152,7 @@
             ${renderAdvancementRound("冠军", championHtml, "champion-round")}
           </div>
         </div>
-        <div class="advancement-note">说明：32 强入口已按官方 Match 73-88 槽位展示；最佳第三名槽位先用当前候选临时填充，最终仍要等官方第三名组合确定。你可以点击球队手动选择晋级方，后续轮次会自动重算。</div>
+        <div class="advancement-note">说明：32 强入口按官方 Match 73-88 槽位展示；尚未结算/官方未确定的位置只显示槽位，不提前填球队。等赛果或官方第三名组合确定后再自动落位。</div>
       `;
     }
 
@@ -14215,7 +14226,7 @@
               <span class="section-kicker">淘汰赛模拟</span>
               <h3 class="section-title">完整晋级图：32强到决赛</h3>
             </div>
-            <div class="section-meta">2026 为 48 队赛制：12 个小组前二 + 8 个最佳第三名进入 32 强。前二名按官方 32 强槽位落位；第三名槽位先按当前候选临时填充。</div>
+            <div class="section-meta">2026 为 48 队赛制：12 个小组前二 + 8 个最佳第三名进入 32 强。未结算的位置只显示官方槽位，暂不提前填球队。</div>
           </div>
           ${renderFullAdvancementChart(groups)}
         </div>

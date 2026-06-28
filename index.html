@@ -7224,6 +7224,8 @@
     const adaptiveCalibrationCacheByKey = new Map();
     let resultsRevision = 0;
     const TOURNAMENT_INSIGHT_TTL_MS = 8 * 60 * 1000;
+    const TOURNAMENT_ADVANCEMENT_REFRESH_MS = 2 * 60 * 1000;
+    let tournamentInsightRefreshTimer = null;
     const tournamentInsightRuntime = {
       busy: false,
       loadedAt: 0,
@@ -7359,6 +7361,9 @@
       state.ui.activePageSection = sectionKey;
       saveState();
       render({ preserveScroll: options.preserveScroll !== false, scrollY: options.scrollY });
+      if (sectionKey === "tournament") {
+        maybeAutoRefreshAdvancementChart({ forceVisibleRefresh: true });
+      }
     }
 
     function getDetailsKey(dayId, matchId) {
@@ -8099,6 +8104,27 @@
       if (tournamentInsightRuntime.busy) return;
       if (tournamentInsightRuntime.payload && Date.now() - tournamentInsightRuntime.loadedAt < TOURNAMENT_INSIGHT_TTL_MS) return;
       ensureTournamentInsightsLoaded();
+    }
+
+    function maybeAutoRefreshAdvancementChart(options = {}) {
+      if (tournamentInsightRuntime.busy) return;
+      const isTournamentPage = getActivePageSection() === "tournament";
+      const stale = !tournamentInsightRuntime.payload || Date.now() - tournamentInsightRuntime.loadedAt >= TOURNAMENT_INSIGHT_TTL_MS;
+      if (!stale && !options.forceVisibleRefresh) return;
+      if (!stale && options.forceVisibleRefresh && !isTournamentPage) return;
+      ensureTournamentInsightsLoaded({ force: !!options.forceVisibleRefresh && isTournamentPage });
+    }
+
+    function startTournamentInsightAutoRefresh() {
+      if (tournamentInsightRefreshTimer) return;
+      tournamentInsightRefreshTimer = window.setInterval(() => {
+        maybeAutoRefreshAdvancementChart({ forceVisibleRefresh: document.visibilityState === "visible" });
+      }, TOURNAMENT_ADVANCEMENT_REFRESH_MS);
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") {
+          maybeAutoRefreshAdvancementChart({ forceVisibleRefresh: true });
+        }
+      });
     }
 
     function getTournamentTeamProfile(localName) {
@@ -14568,6 +14594,7 @@
             <span class="candidate-filter-pill">已同步 ${groups.length} 个小组</span>
             <span class="candidate-filter-pill">前 2 名进入晋级区</span>
             <span class="candidate-filter-pill">另取 8 个最佳第三名</span>
+            <span class="candidate-filter-pill">晋级图每 2 分钟自动更新</span>
             ${tournamentInsightRuntime.loadedAt ? `<span class="candidate-filter-pill">更新时间 ${new Date(tournamentInsightRuntime.loadedAt).toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" })}</span>` : ""}
           </div>
           ${renderTournamentQualificationSummary(groups)}
@@ -15704,6 +15731,7 @@
       if (state.ui.builderSheetOpen) syncTicketSheetHeight();
       if (state.ui.builderSheetOpen || state.ui.aiSheetOpen) syncSidePanelSize();
     }, { passive: true });
+    startTournamentInsightAutoRefresh();
     render({ preserveScroll: false, animateDayChange: true });
   </script>
 </body>

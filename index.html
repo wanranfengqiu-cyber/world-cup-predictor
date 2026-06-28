@@ -7230,7 +7230,12 @@
       busy: false,
       loadedAt: 0,
       error: "",
-      payload: null
+      payload: null,
+      lastAttemptAt: 0,
+      lastSuccessAt: 0,
+      lastStatus: "",
+      lastPayloadSignature: "",
+      refreshCount: 0
     };
     const PAGE_SECTIONS = [
       { key: "overview", label: "今日总览", desc: "概览、赛果、指标" },
@@ -8083,20 +8088,28 @@
       }
 
       tournamentInsightRuntime.busy = true;
+      tournamentInsightRuntime.lastAttemptAt = Date.now();
+      tournamentInsightRuntime.lastStatus = "正在检查公开赛果更新";
       try {
-        const response = await fetch(RESULTS_API_URL, { headers: { Accept: "application/json" } });
-        if (!response.ok) throw new Error("HTTP " + response.status);
-        const payload = await response.json();
+        const payload = await fetchLiveResultsPayload();
         const games = Array.isArray(payload.games) ? payload.games : [];
-        tournamentInsightRuntime.payload = buildTournamentInsightPayload(games);
+        const nextPayload = buildTournamentInsightPayload(games);
+        const nextSignature = JSON.stringify(nextPayload);
+        const changed = nextSignature !== tournamentInsightRuntime.lastPayloadSignature;
+        tournamentInsightRuntime.payload = nextPayload;
         tournamentInsightRuntime.loadedAt = Date.now();
+        tournamentInsightRuntime.lastSuccessAt = tournamentInsightRuntime.loadedAt;
+        tournamentInsightRuntime.lastPayloadSignature = nextSignature;
+        tournamentInsightRuntime.refreshCount += 1;
+        tournamentInsightRuntime.lastStatus = changed ? "已同步到最新赛果" : "已检查，公开赛果暂无变化";
         tournamentInsightRuntime.error = "";
         invalidateAnalysisCaches();
-        render({ preserveScroll: true });
       } catch (error) {
         tournamentInsightRuntime.error = error && error.message ? error.message : "未知错误";
+        tournamentInsightRuntime.lastStatus = `同步失败：${tournamentInsightRuntime.error}`;
       } finally {
         tournamentInsightRuntime.busy = false;
+        render({ preserveScroll: true });
       }
     }
 
@@ -10554,6 +10567,22 @@
       return new Date(timestamp).toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
     }
 
+    function buildLiveResultsUrl() {
+      const separator = RESULTS_API_URL.includes("?") ? "&" : "?";
+      return `${RESULTS_API_URL}${separator}_=${Date.now()}`;
+    }
+
+    async function fetchLiveResultsPayload() {
+      const response = await fetch(buildLiveResultsUrl(), {
+        cache: "no-store",
+        headers: {
+          Accept: "application/json"
+        }
+      });
+      if (!response.ok) throw new Error("HTTP " + response.status);
+      return response.json();
+    }
+
     async function syncDayResults(dayId, options = {}) {
       const day = APP_DATA.find(item => item.id === dayId);
       if (!day || resultSyncRuntime.busy) return;
@@ -10568,9 +10597,7 @@
       render();
 
       try {
-        const response = await fetch(RESULTS_API_URL, { headers: { Accept: "application/json" } });
-        if (!response.ok) throw new Error("HTTP " + response.status);
-        const payload = await response.json();
+        const payload = await fetchLiveResultsPayload();
         const games = Array.isArray(payload.games) ? payload.games : [];
         const entries = [];
         let detectedFinished = 0;
@@ -14535,6 +14562,27 @@
       `;
     }
 
+    function renderTournamentRefreshStatusPills() {
+      const pills = [];
+      const statusText = tournamentInsightRuntime.busy
+        ? "正在检查公开赛果"
+        : tournamentInsightRuntime.lastStatus;
+      if (tournamentInsightRuntime.lastAttemptAt) {
+        pills.push(`最近检查 ${formatSyncTime(tournamentInsightRuntime.lastAttemptAt)}`);
+      }
+      if (tournamentInsightRuntime.lastSuccessAt) {
+        pills.push(`最近成功 ${formatSyncTime(tournamentInsightRuntime.lastSuccessAt)}`);
+      }
+      if (tournamentInsightRuntime.refreshCount) {
+        pills.push(`已检查 ${tournamentInsightRuntime.refreshCount} 次`);
+      }
+      if (statusText) {
+        pills.push(statusText);
+      }
+      if (!pills.length) return "";
+      return pills.map(text => `<span class="candidate-filter-pill">${escapeHtml(text)}</span>`).join("");
+    }
+
     function renderProjectedKnockoutBracket(groups) {
       const pairs = buildProjectedKnockoutPairs(groups);
       if (!pairs.length) {
@@ -14563,6 +14611,7 @@
     function renderTournamentRoadmap() {
       const payload = tournamentInsightRuntime.payload;
       const loadingText = tournamentInsightRuntime.busy ? "正在同步小组积分和赛果，请稍等几秒。" : "";
+      const refreshStatusPills = renderTournamentRefreshStatusPills();
       if (!payload || !payload.groupTables) {
         return `
           <div class="section-group">
@@ -14573,6 +14622,7 @@
               </div>
               <div class="section-meta">这里会跟随公开赛果自动刷新，展示哪些球队在晋级区，以及当前排名模拟出的后续淘汰赛分组图。</div>
             </div>
+            ${refreshStatusPills}
             <div class="empty-state">${escapeHtml(loadingText || tournamentInsightRuntime.error || "暂未同步到小组积分，页面会继续尝试自动拉取。")}</div>
           </div>
         `;
@@ -14595,7 +14645,7 @@
             <span class="candidate-filter-pill">前 2 名进入晋级区</span>
             <span class="candidate-filter-pill">另取 8 个最佳第三名</span>
             <span class="candidate-filter-pill">晋级图每 2 分钟自动更新</span>
-            ${tournamentInsightRuntime.loadedAt ? `<span class="candidate-filter-pill">更新时间 ${new Date(tournamentInsightRuntime.loadedAt).toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" })}</span>` : ""}
+            ${refreshStatusPills}
           </div>
           ${renderTournamentQualificationSummary(groups)}
           <div class="tournament-grid">

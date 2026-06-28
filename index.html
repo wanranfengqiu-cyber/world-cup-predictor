@@ -14124,6 +14124,13 @@
     }
 
     function getTournamentStatusBadge(profile) {
+      if (profile && profile.mp >= 3) {
+        if (profile.rank <= 2) return { label: "已晋级", tone: "qualified" };
+        if (profile.rank === 3 && isSettledBestThirdPlaceQualifier(profile)) {
+          return { label: "最佳第三", tone: "qualified" };
+        }
+        return { label: "已出局", tone: "danger" };
+      }
       const inferred = inferTournamentStatus(profile);
       if (inferred === "qualified") return { label: "已晋级", tone: "qualified" };
       if (inferred === "eliminated") return { label: "已出局", tone: "danger" };
@@ -14184,13 +14191,16 @@
 
     function buildTournamentQualificationSummary(groups) {
       const allRows = groups.flatMap(groupInfo => groupInfo.rows);
-      const qualified = allRows.filter(profile => getTournamentStatusBadge(profile).label === "已晋级");
+      const qualified = allRows.filter(profile => {
+        const label = getTournamentStatusBadge(profile).label;
+        return label === "已晋级" || label === "最佳第三";
+      });
       const projectedTopTwo = allRows.filter(profile => profile.rank <= 2 && !qualified.includes(profile));
       const bestThird = getBestThirdPlaceCandidates(groups);
       const eliminated = allRows.filter(profile => getTournamentStatusBadge(profile).label === "已出局");
       const undecided = allRows.filter(profile => {
         const status = getTournamentStatusBadge(profile).label;
-        return status !== "已晋级" && status !== "已出局" && profile.rank > 2;
+        return status !== "已晋级" && status !== "最佳第三" && status !== "已出局" && profile.rank > 2;
       });
       return { qualified, projectedTopTwo, bestThird, eliminated, undecided };
     }
@@ -14231,6 +14241,21 @@
         .slice(0, 8);
     }
 
+    function getSettledBestThirdPlaceCandidates(groups) {
+      return getBestThirdPlaceCandidates(groups)
+        .filter(profile => profile && profile.rank === 3 && profile.mp >= 3)
+        .slice(0, 8);
+    }
+
+    function isSettledBestThirdPlaceQualifier(profile) {
+      if (!profile || profile.rank !== 3 || profile.mp < 3) return false;
+      const payload = tournamentInsightRuntime.payload;
+      const groups = payload && payload.groupTables ? getOrderedTournamentGroups(payload.groupTables) : [];
+      return getSettledBestThirdPlaceCandidates(groups).some(candidate =>
+        candidate.localName === profile.localName && String(candidate.group).toUpperCase() === String(profile.group).toUpperCase()
+      );
+    }
+
     function createProjectedQualifiedSlot(groupInfo, rank) {
       const profile = groupInfo && groupInfo.rows ? groupInfo.rows[rank - 1] || null : null;
       const group = groupInfo ? groupInfo.group : "";
@@ -14253,22 +14278,80 @@
       return createProjectedQualifiedSlot(getTournamentGroupInfo(groups, groupCode), rank);
     }
 
-    function createOfficialThirdPlaceSlot(groups, allowedGroups, usedThirdGroups) {
+    function resolveOfficialThirdPlaceAssignments(groups, thirdSlotCodes) {
+      const candidates = getSettledBestThirdPlaceCandidates(groups);
+      if (candidates.length < 8) return new Map();
+      const byGroup = new Map(candidates.map(profile => [String(profile.group).toUpperCase(), profile]));
+      const uniqueSlotCodes = [...new Set(thirdSlotCodes.map(code => String(code).toUpperCase()))];
+      const sortedSlots = uniqueSlotCodes
+        .map(code => ({
+          code,
+          options: code.split("")
+            .filter(group => byGroup.has(group))
+            .sort((left, right) => compareTournamentTableRow(byGroup.get(left), byGroup.get(right)))
+        }))
+        .sort((left, right) => left.options.length - right.options.length || left.code.localeCompare(right.code));
+      const assignment = new Map();
+
+      const search = (index, usedGroups) => {
+        if (index >= sortedSlots.length) return true;
+        const slot = sortedSlots[index];
+        for (const group of slot.options) {
+          if (usedGroups.has(group)) continue;
+          usedGroups.add(group);
+          assignment.set(slot.code, byGroup.get(group));
+          if (search(index + 1, usedGroups)) return true;
+          assignment.delete(slot.code);
+          usedGroups.delete(group);
+        }
+        return false;
+      };
+
+      if (search(0, new Set())) return assignment;
+
+      const fallback = new Map();
+      const usedGroups = new Set();
+      uniqueSlotCodes.forEach(code => {
+        const profile = code.split("")
+          .map(group => byGroup.get(group))
+          .filter(Boolean)
+          .find(candidate => !usedGroups.has(String(candidate.group).toUpperCase()));
+        if (profile) {
+          usedGroups.add(String(profile.group).toUpperCase());
+          fallback.set(code, profile);
+        }
+      });
+      return fallback;
+    }
+
+    function createOfficialThirdPlaceSlot(groups, allowedGroups, thirdAssignments) {
       const allowed = allowedGroups.split("");
+      const normalized = String(allowedGroups).toUpperCase();
+      const profile = thirdAssignments && thirdAssignments.get(normalized);
+      if (profile) {
+        return {
+          code: `3${normalized}:${profile.group}`,
+          profile,
+          group: profile.group,
+          rank: 3,
+          label: profile.localName,
+          note: `${profile.group}组第 3 · ${profile.points} 分 · 最佳第三名落位`
+        };
+      }
       return {
-        code: `3${allowedGroups}`,
+        code: `3${normalized}`,
         profile: null,
         group: "",
         rank: 3,
-        label: `最佳第三名 ${allowedGroups}`,
+        label: `最佳第三名 ${normalized}`,
         note: `官方槽位：最佳第三名来自 ${allowed.join("/")} 组之一，尚未结算，先不填球队`
       };
     }
 
-    function createOfficialKnockoutSlot(groups, slotCode, usedThirdGroups) {
+    function createOfficialKnockoutSlot(groups, slotCode, thirdAssignments) {
       const normalized = String(slotCode).toUpperCase();
       if (normalized.startsWith("3")) {
-        return createOfficialThirdPlaceSlot(groups, normalized.slice(1), usedThirdGroups);
+        return createOfficialThirdPlaceSlot(groups, normalized.slice(1), thirdAssignments);
       }
       const rank = Number(normalized[0]);
       const group = normalized.slice(1);
@@ -14287,7 +14370,6 @@
     }
 
     function buildProjectedKnockoutPairs(groups) {
-      const usedThirdGroups = new Set();
       const officialRound32BracketOrder = [
         { matchNo: 73, left: "2A", right: "2B" },
         { matchNo: 75, left: "1F", right: "2C" },
@@ -14306,10 +14388,15 @@
         { matchNo: 85, left: "1B", right: "3EFGIJ" },
         { matchNo: 87, left: "1K", right: "3DEIJL" }
       ];
+      const thirdSlotCodes = officialRound32BracketOrder
+        .flatMap(item => [item.left, item.right])
+        .filter(code => String(code).toUpperCase().startsWith("3"))
+        .map(code => String(code).toUpperCase().slice(1));
+      const thirdAssignments = resolveOfficialThirdPlaceAssignments(groups, thirdSlotCodes);
 
       return officialRound32BracketOrder.map(item => {
-        const left = createOfficialKnockoutSlot(groups, item.left, usedThirdGroups);
-        const right = createOfficialKnockoutSlot(groups, item.right, usedThirdGroups);
+        const left = createOfficialKnockoutSlot(groups, item.left, thirdAssignments);
+        const right = createOfficialKnockoutSlot(groups, item.right, thirdAssignments);
         return {
           label: `M${item.matchNo} · ${item.left} vs ${item.right}`,
           left,
@@ -14410,7 +14497,7 @@
 
     function buildProjectedAdvancementRounds(groups) {
       const round32 = buildProjectedKnockoutPairs(groups).map((match, index) =>
-        createAdvancementMatch("r32", index, match.left, match.right, "32强入口按官方 Match 73-88 槽位生成；未结算槽位先不填球队。")
+        createAdvancementMatch("r32", index, match.left, match.right, "32强入口按官方 Match 73-88 槽位生成；小组赛已结算的位置会自动填入球队。")
       );
       const buildNextRound = (matches, stageKey, roundName) => {
         const winners = matches.map(match => match.winner);
@@ -14558,7 +14645,7 @@
             ${renderAdvancementRound("冠军", championHtml, "champion-round")}
           </div>
         </div>
-        <div class="advancement-note">说明：32 强入口按官方 Match 73-88 槽位展示；尚未结算/官方未确定的位置只显示槽位，不提前填球队。等赛果或官方第三名组合确定后再自动落位。</div>
+        <div class="advancement-note">说明：32 强入口按官方 Match 73-88 槽位展示；小组赛完成后，前二名和 8 个最佳第三名会自动落位。仍为空的位置代表公开赛果或官方槽位数据暂未同步完整。</div>
       `;
     }
 
@@ -14656,7 +14743,7 @@
               <span class="section-kicker">淘汰赛模拟</span>
               <h3 class="section-title">完整晋级图：32强到决赛</h3>
             </div>
-            <div class="section-meta">2026 为 48 队赛制：12 个小组前二 + 8 个最佳第三名进入 32 强。未结算的位置只显示官方槽位，暂不提前填球队。</div>
+            <div class="section-meta">2026 为 48 队赛制：12 个小组前二 + 8 个最佳第三名进入 32 强。小组赛已完赛后会按当前公开赛果自动填入晋级球队。</div>
           </div>
           ${renderFullAdvancementChart(groups)}
         </div>

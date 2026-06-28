@@ -8312,7 +8312,12 @@
       };
     }
 
+    function isDrawFriendlyStatus(status) {
+      return status === "qualified" || status === "drawEnough" || status === "seedingControl";
+    }
+
     function getTournamentIncentiveContext(match) {
+      if (match && match.__tournamentIncentiveContext) return match.__tournamentIncentiveContext;
       const context = getDynamicMatchContext(match);
       const stageRound = Number.isFinite(context.round) ? context.round : 2;
       const homeState = getRecentResultState(match.home);
@@ -8328,6 +8333,10 @@
       const bothWon = homeState.points === 3 && awayState.points === 3;
       const bothLost = homeState.points === 0 && awayState.points === 0;
       const bothDrew = homeState.points === 1 && awayState.points === 1;
+      const mutualDrawRisk = stageRound >= 3 &&
+        context.sameGroup &&
+        isDrawFriendlyStatus(context.homeStatus) &&
+        isDrawFriendlyStatus(context.awayStatus);
       const explicitDrawPreference = Number.isFinite(context.drawPreference) ? context.drawPreference : 0;
       const explicitKnockoutControl = Number.isFinite(context.knockoutPathControl) ? context.knockoutPathControl : 0;
 
@@ -8335,16 +8344,18 @@
         (homeProfile.drawBias + awayProfile.drawBias) / 2 +
         (bothWon ? 0.12 : 0) +
         (bothDrew ? 0.05 : 0) +
+        (mutualDrawRisk ? 0.20 : 0) +
         explicitDrawPreference * 0.18 +
         explicitKnockoutControl * 0.12,
         -0.1,
-        0.45
+        0.58
       );
       const mutualCagey = clamp(
         ((homeProfile.control + awayProfile.control) / 2) * 0.72 +
-        Math.max(0, drawBias) * 0.55,
+        Math.max(0, drawBias) * 0.55 +
+        (mutualDrawRisk ? 0.18 : 0),
         0,
-        0.88
+        0.94
       );
       const chaosBias = clamp(
         ((homeProfile.chaos + awayProfile.chaos) / 2) +
@@ -8365,6 +8376,7 @@
       if (context.sameGroup && context.homeProfile && context.awayProfile) {
         shortNotes.push(`${context.sameGroup}组出线形势已纳入`);
       }
+      if (mutualDrawRisk) shortNotes.push("警惕默契平局/携手晋级");
       if (Math.max(homeProfile.rotationRisk, awayProfile.rotationRisk) >= 0.35) shortNotes.push("纳入轮换风险");
       if (Math.max(homeProfile.urgency, awayProfile.urgency) - Math.min(homeProfile.urgency, awayProfile.urgency) >= 0.28) {
         shortNotes.push(homeProfile.urgency > awayProfile.urgency ? `${match.home.name}抢分更急` : `${match.away.name}抢分更急`);
@@ -8375,7 +8387,7 @@
       }
       if (!shortNotes.length) shortNotes.push("按常规抢分强度修正");
 
-      return {
+      const result = {
         round: stageRound,
         homeState,
         awayState,
@@ -8383,11 +8395,14 @@
         awayProfile,
         drawBias,
         mutualCagey,
+        mutualDrawRisk,
         chaosBias,
         paceShift,
         shortLabel: `战意层 · ${shortNotes[0]}`,
-        summary: `已把小组赛战意纳入模型：${shortNotes.join("，")}。当前会参考首战积分压力、平局可接受度、热门方是否更偏控节奏，以及后续可扩展的已晋级/轮换/控分标签。`
+        summary: `已把小组赛战意纳入模型：${shortNotes.join("，")}。当前会参考积分压力、平局可接受度、默契平局/携手晋级风险、热门方控节奏，以及已晋级/轮换/控分标签。`
       };
+      if (match) match.__tournamentIncentiveContext = result;
+      return result;
     }
 
     function computeBaseMatchXg(match) {
@@ -8894,7 +8909,20 @@
         ? clamp(1 - Math.abs(candidate.modelProb - candidate.bookProb) / 0.32, 0, 1)
         : 0.62;
       const accessPenalty = !isSingleMarketAllowed(match, candidate.marketType) && ["wdl", "handicap"].includes(candidate.marketType) ? 0.08 : 0;
-      const raw = probabilityScore * 0.54 + valueScore * 0.22 + oddsScore * 0.10 + agreementScore * 0.08 + stakeScore * 0.06 - accessPenalty;
+      const tournamentContext = match ? getTournamentIncentiveContext(match) : null;
+      const mutualDrawRisk = !!(tournamentContext && tournamentContext.mutualDrawRisk);
+      let gameTheoryAdjustment = 0;
+      if (mutualDrawRisk) {
+        const isWdlWinLoss = candidate.marketType === "wdl" && candidate.outcome !== "D";
+        const isDrawPath = (candidate.marketType === "wdl" || candidate.marketType === "handicap") && candidate.outcome === "D";
+        const isLowTotal = candidate.marketType === "total" && ["0", "1", "2"].includes(String(candidate.outcome));
+        const isDrawScore = candidate.marketType === "score" && /^\d+-\d+$/.test(String(candidate.outcome)) && String(candidate.outcome).split("-")[0] === String(candidate.outcome).split("-")[1];
+        if (isWdlWinLoss) gameTheoryAdjustment -= 0.20;
+        if (isDrawPath) gameTheoryAdjustment += 0.16;
+        if (isLowTotal) gameTheoryAdjustment += 0.08;
+        if (isDrawScore) gameTheoryAdjustment += 0.10;
+      }
+      const raw = probabilityScore * 0.54 + valueScore * 0.22 + oddsScore * 0.10 + agreementScore * 0.08 + stakeScore * 0.06 - accessPenalty + gameTheoryAdjustment;
       return clamp(raw, 0.01, 0.99);
     }
 
@@ -11328,8 +11356,12 @@
       const wantHighOdds = /(赔率较高|高赔率|高赔|冲高|激进|回报高|博)/.test(raw);
       const wantHighestProbability = /(概率最高|命中最高|命中率最高|最高概率|最高命中|最稳|最保险)/.test(raw);
       const wantStable = wantHighestProbability || /(稳一点|稳健|保守|命中率|概率高|概率更高|命中率高)/.test(raw);
+      const gameTheoryDraw = /(默契|携手晋级|双双晋级|平局双赢|默契平|假球|做平|打平都|平了都)/.test(raw);
       const excludedScore = /(不含比分|不要比分|排除比分)/.test(raw);
       const marketIntent = inferAiRequestedMarkets(raw, { excludedScore });
+      if (gameTheoryDraw && !marketIntent.length) {
+        marketIntent.push("wdl", "handicap", "total", "score");
+      }
       const includeScore = marketIntent.includes("score");
       const style = wantHighOdds ? "highOdds" : wantStable ? "stable" : "balanced";
       const compactRaw = raw.replace(/\s+/g, "");
@@ -11340,7 +11372,7 @@
         item.matches.some(match => raw.includes(match.home.name) || raw.includes(match.away.name))
       ) || APP_DATA.find(item => item.id === defaultDayId) || APP_DATA.find(item => item.id === currentDayId) || APP_DATA[0];
 
-      return { raw, stake, passSize, style, includeScore, marketIntent, day, wantHighestProbability };
+      return { raw, stake, passSize, style, includeScore, marketIntent, day, wantHighestProbability, gameTheoryDraw };
     }
 
     function parseChineseCount(value) {
@@ -11436,10 +11468,12 @@
                 ? -Math.abs(candidate.odds - 1.85) * 10
                 : -Math.abs(candidate.odds - 2.35) * 5;
             const marketPenalty = candidate.marketType === "score" && !scoreOnly ? 10 : 0;
+            const gameTheoryBonus = request.gameTheoryDraw && isMutualDrawCandidate(candidate, match) ? 42 : 0;
+            const gameTheoryPenalty = request.gameTheoryDraw && getTournamentIncentiveContext(match).mutualDrawRisk && !isMutualDrawCandidate(candidate, match) ? 34 : 0;
             const probabilityScore = hitProbability * 1000 + recommendationRate * 80 - Math.max(candidate.odds - 1, 0) * 0.15;
             const score = request.wantHighestProbability
-              ? probabilityScore
-              : recommendationRate * 70 + hitProbability * 36 + (candidate.edge || 0) * 95 + oddsScore - marketPenalty;
+              ? probabilityScore + gameTheoryBonus - gameTheoryPenalty
+              : recommendationRate * 70 + hitProbability * 36 + (candidate.edge || 0) * 95 + oddsScore - marketPenalty + gameTheoryBonus - gameTheoryPenalty;
             return { ...candidate, match, score };
           })
           .sort((a, b) => b.score - a.score || b.probability - a.probability || a.odds - b.odds)
@@ -11471,12 +11505,16 @@
         : -Math.abs(Math.log(Math.max(ticket.odds, 1)) - Math.log(targetOdds)) * 18;
       const longshotPenalty = (ticket.longshotLegCount || 0) * (request.style === "highOdds" ? 4 : 11);
       const marketDiversity = new Set(ticket.validLegs.map(leg => leg.marketType)).size;
+      const gameTheoryScore = request.gameTheoryDraw
+        ? ticket.validLegs.reduce((sum, leg) => sum + (isMutualDrawFriendlyLeg(leg) ? 22 : -12), 0)
+        : -getMutualDrawTicketPenalty(ticket, 8);
       return oddsFit
         + (ticket.probability || 0) * (request.style === "stable" ? 135 : 62)
         + (ticket.edge || 0) * 130
         + Math.min(ticket.ogi || 0, 30) * 1.1
         + marketDiversity * 2.6
-        - longshotPenalty;
+        - longshotPenalty
+        + gameTheoryScore;
     }
 
     function buildAiRequestTicketRecommendation(text) {
@@ -11564,7 +11602,7 @@
           `已按“${request.raw}”解析为：${request.day.label}、${request.stake} 元、${request.passSize === 1 ? "单关" : `${request.passSize}串1`}、${getAiRequestModeLabel(request)}${request.marketIntent && request.marketIntent.length ? `、限定玩法：${request.marketIntent.map(getAiMarketIntentLabel).join("、")}` : ""}。`,
           request.wantHighestProbability ? "已按整张票命中概率从高到低排序，优先给出概率最高的组合，不再用赔率高低抢排序。" : "",
           request.passSize > 1 && /1\s*串\s*\d+/.test(request.raw) ? `你写的 1串${request.passSize} 已按常见出票含义理解为 ${request.passSize} 个选项组成 ${request.passSize}串1。` : "",
-          request.marketIntent && request.marketIntent.includes("score") ? "已按你的要求只优先使用比分玩法；如果想混合胜平负/让球/进球数，请写“混合玩法”。" : "默认优先使用胜平负、让球和总进球，避免比分高赔把方案带得过冷。"
+          request.gameTheoryDraw ? "已启用“默契平局/携手晋级”防守模式：胜负方向降权，优先考虑平局、让平、小球和低比分平局路径。" : (request.marketIntent && request.marketIntent.includes("score") ? "已按你的要求只优先使用比分玩法；如果想混合胜平负/让球/进球数，请写“混合玩法”。" : "默认优先使用胜平负、让球和总进球，避免比分高赔把方案带得过冷。")
         ].filter(Boolean)
       };
 
@@ -14563,6 +14601,38 @@
       return ticket.optionCount > ticket.legs.length ? "复式单关" : "单关";
     }
 
+    function isMutualDrawFriendlyLeg(leg) {
+      if (!leg || !leg.match) return false;
+      const context = getTournamentIncentiveContext(leg.match);
+      if (!context || !context.mutualDrawRisk) return false;
+      if ((leg.marketType === "wdl" || leg.marketType === "handicap") && leg.outcome === "D") return true;
+      if (leg.marketType === "total" && ["0", "1", "2"].includes(String(leg.outcome))) return true;
+      if (leg.marketType === "score" && /^\d+-\d+$/.test(String(leg.outcome))) {
+        const [homeGoals, awayGoals] = String(leg.outcome).split("-");
+        return homeGoals === awayGoals;
+      }
+      return false;
+    }
+
+    function isMutualDrawCandidate(candidate, match) {
+      if (!candidate || !match) return false;
+      return isMutualDrawFriendlyLeg({
+        match,
+        marketType: candidate.marketType,
+        outcome: candidate.outcome
+      });
+    }
+
+    function getMutualDrawTicketPenalty(ticket, weight = 12) {
+      if (!ticket || !Array.isArray(ticket.legs)) return 0;
+      return ticket.legs.reduce((penalty, leg) => {
+        if (!leg || !leg.match) return penalty;
+        const context = getTournamentIncentiveContext(leg.match);
+        if (!context || !context.mutualDrawRisk) return penalty;
+        return penalty + (isMutualDrawFriendlyLeg(leg) ? weight * 0.25 : weight);
+      }, 0);
+    }
+
     function collectStrategyTickets(dayAnalysis) {
       const unique = new Map();
       (dayAnalysis.strategyPlans || []).forEach(plan => {
@@ -14586,20 +14656,24 @@
     function rankDailyRecommendedSingle(ticket) {
       const oddsBandBonus = ticket.odds >= 1.48 && ticket.odds <= 3.2 ? 8 : ticket.odds < 1.48 ? -10 : 2;
       const comboPenalty = ticket.optionCount > ticket.legs.length ? 3 : 0;
+      const mutualDrawPenalty = getMutualDrawTicketPenalty(ticket, 18);
       return ticket.probability * 100
         + ticket.edge * 150
         + Math.min(ticket.ogi, 20) * 1.2
         + oddsBandBonus
-        - comboPenalty;
+        - comboPenalty
+        - mutualDrawPenalty;
     }
 
     function rankDailyRecommendedParlay(ticket) {
       const oddsBandBonus = ticket.odds >= 2.4 && ticket.odds <= 8.5 ? 10 : ticket.odds < 2.4 ? -5 : 3;
+      const mutualDrawPenalty = getMutualDrawTicketPenalty(ticket, 14);
       return ticket.probability * 82
         + ticket.edge * 175
         + Math.min(ticket.ogi, 25) * 1.25
         + oddsBandBonus
-        + Math.min(ticket.legs.length, 4) * 1.4;
+        + Math.min(ticket.legs.length, 4) * 1.4
+        - mutualDrawPenalty;
     }
 
     function ticketsShareMatch(left, right) {
@@ -15035,6 +15109,10 @@
         adviceParts.push("这场不按同组生死战去强行加权，主要还是回到赔率结构、近况质量和热门方兑现度本身。");
       }
 
+      const tournamentContext = getTournamentIncentiveContext(match);
+      if (tournamentContext.mutualDrawRisk) {
+        cautionParts.push("高危：这场存在“平局双方都能接受 / 携手晋级”的博弈结构，胜负方向必须降仓，优先防平局、让平、小球和 0-0 / 1-1。");
+      }
       if (context.homeStatus === "qualified" || context.awayStatus === "qualified" || context.homeStatus === "seedingControl" || context.awayStatus === "seedingControl") {
         cautionParts.push("已提前占据出线主动的一方，存在控节奏、降速甚至轮换的风险，不宜机械追大胜。");
       }

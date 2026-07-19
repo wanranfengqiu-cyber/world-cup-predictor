@@ -9405,6 +9405,303 @@
         font-size: 16px;
       }
     }
+
+    .control-room-v2 .metric-help-section {
+      padding-top: 14px !important;
+      padding-bottom: 14px !important;
+    }
+
+    .control-room-v2 .metric-help-details,
+    .control-room-v2 .match-deep-dive {
+      overflow: hidden;
+      border-top: 1px solid #c7d3d7;
+      border-bottom: 1px solid #c7d3d7;
+      background: rgba(255, 255, 255, 0.48);
+    }
+
+    .control-room-v2 .metric-help-details > summary,
+    .control-room-v2 .match-deep-dive > summary {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(180px, 0.9fr) auto;
+      align-items: center;
+      gap: 18px;
+      min-height: 68px;
+      padding: 12px 14px;
+      color: var(--cr-graphite);
+      cursor: pointer;
+      list-style: none;
+    }
+
+    .control-room-v2 .metric-help-details > summary::-webkit-details-marker,
+    .control-room-v2 .match-deep-dive > summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .control-room-v2 .metric-help-details > summary:hover,
+    .control-room-v2 .match-deep-dive > summary:hover {
+      background: rgba(226, 239, 234, 0.7);
+    }
+
+    .control-room-v2 .metric-help-title,
+    .control-room-v2 .match-deep-dive > summary > span:first-child {
+      display: grid;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    .control-room-v2 .metric-help-title small,
+    .control-room-v2 .match-deep-dive > summary small {
+      color: var(--cr-pitch);
+      font-size: 10px;
+      font-weight: 900;
+    }
+
+    .control-room-v2 .metric-help-title strong,
+    .control-room-v2 .match-deep-dive > summary strong {
+      color: var(--cr-graphite);
+      font-size: 17px;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+    }
+
+    .control-room-v2 .metric-help-summary,
+    .control-room-v2 .match-deep-dive > summary > span:nth-child(2) {
+      color: #6d7e84;
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    .control-room-v2 .metric-help-details > summary > b,
+    .control-room-v2 .match-deep-dive > summary > b {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 48px;
+      min-height: 28px;
+      padding: 4px 8px;
+      border: 1px solid #b9cbc5;
+      border-radius: 3px;
+      background: #eff6f3;
+      color: #17654d;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .control-room-v2 .metric-help-details[open] > summary,
+    .control-room-v2 .match-deep-dive[open] > summary {
+      border-bottom: 1px solid #c7d3d7;
+    }
+
+    .control-room-v2 .metric-help-body {
+      padding: 14px;
+      background: #f8faf9;
+    }
+
+    .control-room-v2 .metric-help-body .glossary-grid {
+      margin: 0;
+    }
+
+    .control-room-v2 .metric-help-body .glossary-card {
+      min-height: 0;
+      padding: 14px;
+      border-color: #d2dddf;
+      border-radius: 4px;
+      background: #ffffff;
+      box-shadow: none;
+    }
+
+    .control-room-v2 .metric-help-body .glossary-card p {
+      margin-bottom: 0;
+    }
+
+    .control-room-v2 .match-forecast-caution {
+      display: grid;
+      grid-column: 1 / -1;
+      grid-template-columns: max-content minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      padding: 13px 24px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      background: #17262d;
+    }
+
+    .control-room-v2 .match-forecast-caution span {
+      color: #e5b844;
+      font-size: 10px;
+      font-weight: 900;
+      line-height: 1.7;
+      white-space: nowrap;
+    }
+
+    .control-room-v2 .match-forecast-caution strong {
+      color: #d3e0e1;
+      font-size: 11px;
+      font-weight: 600;
+      line-height: 1.7;
+      overflow-wrap: anywhere;
+    }
+
+    .control-room-v2 .match-deep-dive {
+      margin-top: 4px;
+      border-color: #bdcbd0;
+      background: #f8fafb;
+    }
+
+    .control-room-v2 .match-deep-dive > summary {
+      min-height: 62px;
+      grid-template-columns: minmax(0, 1fr) minmax(160px, 0.8fr) auto;
+    }
+
+    .control-room-v2 .match-deep-dive-body {
+      padding: 0 16px 16px;
+    }
+
+    .control-room-v2 .match-deep-dive-body > .plan-note {
+      margin: 0 -16px 12px;
+      padding: 14px 16px;
+      border-top: 0;
+      border-bottom: 1px solid #d5dfe1;
+      background: #ffffff;
+    }
+
+    .control-room-v2 .match-deep-dive-body .section-group {
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+    }
+
+    @media (max-width: 640px) {
+      .control-room-v2 .metric-help-details > summary,
+      .control-room-v2 .match-deep-dive > summary {
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 10px;
+        min-height: 60px;
+        padding: 10px;
+      }
+
+      .control-room-v2 .metric-help-summary,
+      .control-room-v2 .match-deep-dive > summary > span:nth-child(2) {
+        display: none;
+      }
+
+      .control-room-v2 .metric-help-title strong,
+      .control-room-v2 .match-deep-dive > summary strong {
+        font-size: 14px;
+      }
+
+      .control-room-v2 .metric-help-body {
+        padding: 10px;
+      }
+
+      .control-room-v2 .metric-help-body .glossary-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .control-room-v2 .match-forecast-caution {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 3px;
+        padding: 11px 16px;
+      }
+
+      .control-room-v2 .match-deep-dive-body {
+        padding: 0 10px 10px;
+      }
+
+      .control-room-v2 .match-deep-dive-body > .plan-note {
+        margin: 0 -10px 10px;
+        padding: 12px 10px;
+      }
+    }
+
+    .control-room-v2 .recommendation-alternatives {
+      margin-top: 12px;
+      overflow: hidden;
+      border-top: 1px solid #c8d4d7;
+      border-bottom: 1px solid #c8d4d7;
+      background: #f8faf9;
+    }
+
+    .control-room-v2 .recommendation-alternatives > summary {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      align-items: center;
+      gap: 12px;
+      min-height: 52px;
+      padding: 9px 12px;
+      color: var(--cr-graphite);
+      cursor: pointer;
+      list-style: none;
+    }
+
+    .control-room-v2 .recommendation-alternatives > summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .control-room-v2 .recommendation-alternatives > summary:hover {
+      background: #edf5f1;
+    }
+
+    .control-room-v2 .recommendation-alternatives > summary span {
+      color: var(--cr-graphite);
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .control-room-v2 .recommendation-alternatives > summary small {
+      color: #6d7e84;
+      font-size: 10px;
+    }
+
+    .control-room-v2 .recommendation-alternatives > summary b {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 44px;
+      min-height: 26px;
+      padding: 3px 7px;
+      border: 1px solid #b9cbc5;
+      border-radius: 3px;
+      background: #eff6f3;
+      color: #17654d;
+      font-size: 10px;
+    }
+
+    .control-room-v2 .recommendation-alternatives[open] > summary {
+      border-bottom: 1px solid #c8d4d7;
+    }
+
+    .control-room-v2 .recommendation-alternatives-body {
+      display: grid;
+      gap: 14px;
+      padding: 12px;
+    }
+
+    .control-room-v2 .recommendation-alternative-group {
+      display: grid;
+      gap: 9px;
+      min-width: 0;
+    }
+
+    .control-room-v2 .recommendation-alternative-group > span {
+      color: var(--cr-pitch);
+      font-size: 10px;
+      font-weight: 900;
+    }
+
+    @media (max-width: 640px) {
+      .control-room-v2 .recommendation-alternatives > summary {
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 8px;
+        padding: 9px 10px;
+      }
+
+      .control-room-v2 .recommendation-alternatives > summary small {
+        display: none;
+      }
+
+      .control-room-v2 .recommendation-alternatives-body {
+        padding: 10px;
+      }
+    }
   </style>
 </head>
 <body class="ui-refresh control-room-v2">
@@ -10918,11 +11215,11 @@
       refreshCount: 0
     };
     const PAGE_SECTIONS = [
-      { key: "overview", label: "今日总览", desc: "概览、赛果、指标" },
-      { key: "tickets", label: "推荐出票", desc: "单关、串关、追投" },
-      { key: "tournament", label: "积分晋级", desc: "小组榜、晋级图" },
-      { key: "explorer", label: "玩法筛选", desc: "按概率找玩法" },
-      { key: "matches", label: "比赛拆解", desc: "逐场详情" }
+      { key: "overview", label: "今日总览", desc: "先看结论" },
+      { key: "tickets", label: "推荐出票", desc: "怎么买" },
+      { key: "tournament", label: "积分晋级", desc: "谁晋级" },
+      { key: "explorer", label: "玩法筛选", desc: "自己选" },
+      { key: "matches", label: "比赛详情", desc: "逐场看" }
     ];
     if ("scrollRestoration" in history) {
       history.scrollRestoration = "manual";
@@ -16867,31 +17164,36 @@
 
     function renderMetricGlossary() {
       return `
-        <div class="section-group">
-          <div class="section-head">
-            <div class="section-copy">
-              <span class="section-kicker">页面说明</span>
-              <h2 class="section-title">推荐率、中奖概率和自动优化怎么看</h2>
+        <div class="section-group metric-help-section">
+          <details class="metric-help-details">
+            <summary>
+              <span class="metric-help-title">
+                <small>读数说明</small>
+                <strong>中奖概率、推荐率、自动优化</strong>
+              </span>
+              <span class="metric-help-summary">需要时再展开，不影响直接查看今天的结论。</span>
+              <b>展开</b>
+            </summary>
+            <div class="metric-help-body">
+              <div class="glossary-grid">
+                <div class="glossary-card">
+                  <small>中奖概率</small>
+                  <strong>这项玩法命中的估计概率</strong>
+                  <p>例如 42% 表示模型估计大约有 42% 的机会打中，只回答“中不中”。</p>
+                </div>
+                <div class="glossary-card">
+                  <small>推荐率</small>
+                  <strong>综合比较后的购买优先级</strong>
+                  <p>同时考虑概率、赔率、单关权限和比赛场景，用于比较“更值得先看哪一项”。</p>
+                </div>
+                <div class="glossary-card">
+                  <small>自动优化</small>
+                  <strong>用已完赛结果校准后续判断</strong>
+                  <p>页面会回看前面比赛的偏差，再轻量修正后面的 xG、平局和总进球判断。</p>
+                </div>
+              </div>
             </div>
-            <div class="section-meta">这里把“中奖概率”和“推荐率”拆开看：前者是这项玩法真正打中的概率，后者是把赔率匹配度、可买权限、比赛语境，以及前面赛果自动回看后的综合优先级再压成一个更直观的建议值。</div>
-          </div>
-          <div class="glossary-grid">
-            <div class="glossary-card">
-              <small>中奖概率</small>
-              <strong>这是玩法真正打中的概率</strong>
-              <p>比如某个选项显示 42%，意思是模型估计它打中的机会大约是 42%。这个数字只回答“中不中”，不直接回答“值不值得优先买”。</p>
-            </div>
-            <div class="glossary-card">
-              <small>推荐率</small>
-              <strong>这是综合后更适合买的优先级</strong>
-              <p>推荐率会一起考虑中奖概率、赔率是否划算、是否可单关、是否过冷、是否更适合串关，所以它和中奖概率不是一回事，两个数字完全可能一高一低。</p>
-            </div>
-            <div class="glossary-card">
-              <small>自动优化</small>
-              <strong>会把前面已完赛的结果反向校准到后面</strong>
-              <p>如果前面几场已经打完，页面会回看模型对总进球、主客 xG、平局偏差和庄盘贴近度的误差，再把这些偏差轻量修正到后续比赛，不再死守最初参数。</p>
-            </div>
-          </div>
+          </details>
         </div>
       `;
     }
@@ -19388,6 +19690,14 @@
       const resultFilled = result && result.homeGoals !== "" && result.awayGoals !== "";
       const picks = pickMatchRecommendedPurchases(match, analysis);
       const topSingle = pickTopMatchRecommendationCandidates(picks.single, 1)[0] || null;
+      const adviceBundle = buildMatchAdviceBundle(match, analysis);
+      const cautionParts = String(adviceBundle.caution || "")
+        .split(/[。；]/)
+        .map(part => part.trim())
+        .filter(Boolean);
+      const compactCaution = cautionParts.length
+        ? `${cautionParts[0]}。`
+        : "当前没有额外的赛制风险提醒，仍需结合临场阵容判断。";
       const recommendationText = topSingle
         ? `${marketLabel(topSingle.marketType, match)} · ${prettyOutcome(topSingle.marketType, topSingle.outcome, match)}`
         : "暂时观望";
@@ -19434,6 +19744,10 @@
                 <small>${topSingle ? `命中概率 ${formatPercent(topSingle.hitProbability ?? topSingle.probability)}` : "没有强行给方向"}</small>
               </div>
             </div>
+          </div>
+          <div class="match-forecast-caution">
+            <span>风险提醒</span>
+            <strong>${escapeHtml(compactCaution)}</strong>
           </div>
         </section>
       `;
@@ -19636,6 +19950,21 @@
       const picks = pickMatchRecommendedPurchases(match, analysis);
       const singlePicks = pickTopMatchRecommendationCandidates(picks.single, 3);
       const parlayPicks = pickTopMatchRecommendationCandidates(picks.parlay, 3);
+      const primarySingle = singlePicks.slice(0, 1);
+      const primaryParlay = parlayPicks.slice(0, 1);
+      const alternativeSingle = singlePicks.slice(1);
+      const alternativeParlay = parlayPicks.slice(1);
+      const renderPickList = (items, title, note, preferSingle, totalCount, offset = 0) => items.map((candidate, index) =>
+        renderMatchRecommendationCard(title, note, candidate, match, preferSingle, offset + index, totalCount)
+      ).join("");
+      const alternativeMarkup = [
+        alternativeSingle.length
+          ? `<div class="recommendation-alternative-group"><span>其他单关备选</span>${renderPickList(alternativeSingle, "备选单关", "用于比较不同赔率和命中率的组合。", true, singlePicks.length, 1)}</div>`
+          : "",
+        alternativeParlay.length
+          ? `<div class="recommendation-alternative-group"><span>其他串关备选</span>${renderPickList(alternativeParlay, "备选串关", "用于比较不同串关搭配和赔率弹性。", false, parlayPicks.length, 1)}</div>`
+          : ""
+      ].join("");
       return `
         <div class="section-group">
           <div class="section-head">
@@ -19643,12 +19972,22 @@
               <span class="section-kicker">本场推荐购买</span>
               <h3 class="section-title">推荐单关与串关</h3>
             </div>
-            <div class="section-meta">这里直接给你本场更适合买的玩法，每类默认展开 3 个备选，不替代下面完整赔率面板；如果你想自己比对，继续往下看即可。</div>
+            <div class="section-meta">先看每类的主推荐；其余备选保留在下方，想比较时再展开。</div>
           </div>
           <div class="candidate-list">
-            ${singlePicks.length ? singlePicks.map((candidate, index) => renderMatchRecommendationCard("推荐单关", "优先考虑命中率和单场可买权限。", candidate, match, true, index, singlePicks.length)).join("") : renderMatchRecommendationCard("推荐单关", "优先考虑命中率和单场可买权限。", null, match, true)}
-            ${parlayPicks.length ? parlayPicks.map((candidate, index) => renderMatchRecommendationCard("推荐串关", "优先考虑拿去做当天串关里的搭子。", candidate, match, false, index, parlayPicks.length)).join("") : renderMatchRecommendationCard("推荐串关", "优先考虑拿去做当天串关里的搭子。", null, match, false)}
+            ${primarySingle.length ? renderPickList(primarySingle, "推荐单关", "优先考虑命中率和单场可买权限。", true, singlePicks.length) : renderMatchRecommendationCard("推荐单关", "优先考虑命中率和单场可买权限。", null, match, true)}
+            ${primaryParlay.length ? renderPickList(primaryParlay, "推荐串关", "优先考虑拿去做当天串关里的搭子。", false, parlayPicks.length) : renderMatchRecommendationCard("推荐串关", "优先考虑拿去做当天串关里的搭子。", null, match, false)}
           </div>
+          ${alternativeMarkup ? `
+            <details class="recommendation-alternatives">
+              <summary>
+                <span>其他备选</span>
+                <small>还有 ${alternativeSingle.length + alternativeParlay.length} 项可比较</small>
+                <b>展开</b>
+              </summary>
+              <div class="recommendation-alternatives-body">${alternativeMarkup}</div>
+            </details>
+          ` : ""}
         </div>
       `;
     }
@@ -19848,36 +20187,48 @@
           </div>
           <div class="match-body">
             ${renderMatchForecastPanel(match, analysis, result)}
-            <div class="plan-note">${motivationSummary ? `<strong>战意修正：</strong>${escapeHtml(motivationSummary)}<br>` : ""}${adaptiveSummary ? `<strong>自动优化：</strong>${escapeHtml(adaptiveSummary)}<br>` : ""}${match.model && match.model.note ? escapeHtml(match.model.note) : "这场暂时没有补充建模注释。"}</div>
-            ${renderMatchContextPanel(match, analysis)}
             ${renderMatchRecommendationPanel(match, analysis)}
-            ${renderMarketOdds(dayId, match, analysis)}
-            <div class="section-group">
-              <div class="section-head">
-                <div class="section-copy">
-                  <span class="section-kicker">比分模型</span>
-                  <h3 class="section-title">比分概率 Top12</h3>
+            <details class="match-deep-dive">
+              <summary>
+                <span>
+                  <small>专业信息</small>
+                  <strong>完整分析、赔率与比分</strong>
+                </span>
+                <span>需要自己比对玩法时再展开</span>
+                <b>展开</b>
+              </summary>
+              <div class="match-deep-dive-body">
+                <div class="plan-note">${motivationSummary ? `<strong>战意修正：</strong>${escapeHtml(motivationSummary)}<br>` : ""}${adaptiveSummary ? `<strong>自动优化：</strong>${escapeHtml(adaptiveSummary)}<br>` : ""}${match.model && match.model.note ? escapeHtml(match.model.note) : "这场暂时没有补充建模注释。"}</div>
+                ${renderMatchContextPanel(match, analysis)}
+                ${renderMarketOdds(dayId, match, analysis)}
+                <div class="section-group">
+                  <div class="section-head">
+                    <div class="section-copy">
+                      <span class="section-kicker">比分模型</span>
+                      <h3 class="section-title">比分概率 Top12</h3>
+                    </div>
+                  </div>
+                  ${renderScoreProbabilityGrid(dayId, match, analysis)}
+                </div>
+                <div class="section-group">
+                  <div class="section-head">
+                    <div class="section-copy">
+                      <span class="section-kicker">结果录入</span>
+                      <h3 class="section-title">赛果录入</h3>
+                    </div>
+                  </div>
+                  <div class="result-editor">
+                    <div class="meta">录入全场比分后，这一天的中奖状态和累计盈亏会自动更新。</div>
+                    <div class="result-editor-row">
+                      <span class="result-status ${resultFilled ? "filled" : "pending"}">${resultFilled ? `已录入 ${result.homeGoals} : ${result.awayGoals}` : "待录入或待同步"}</span>
+                      <input type="number" min="0" max="20" value="${result.homeGoals}" data-match="${match.id}" data-side="homeGoals" placeholder="主队">
+                      <input type="number" min="0" max="20" value="${result.awayGoals}" data-match="${match.id}" data-side="awayGoals" placeholder="客队">
+                      <button type="button" class="btn-ghost" data-clear="${match.id}">清空</button>
+                    </div>
+                  </div>
                 </div>
               </div>
-              ${renderScoreProbabilityGrid(dayId, match, analysis)}
-            </div>
-            <div class="section-group">
-              <div class="section-head">
-                <div class="section-copy">
-                  <span class="section-kicker">结果录入</span>
-                  <h3 class="section-title">赛果录入</h3>
-                </div>
-              </div>
-              <div class="result-editor">
-                <div class="meta">录入全场比分后，这一天的中奖状态和累计盈亏会自动更新。</div>
-                <div class="result-editor-row">
-                  <span class="result-status ${resultFilled ? "filled" : "pending"}">${resultFilled ? `已录入 ${result.homeGoals} : ${result.awayGoals}` : "待录入或待同步"}</span>
-                  <input type="number" min="0" max="20" value="${result.homeGoals}" data-match="${match.id}" data-side="homeGoals" placeholder="主队">
-                  <input type="number" min="0" max="20" value="${result.awayGoals}" data-match="${match.id}" data-side="awayGoals" placeholder="客队">
-                  <button type="button" class="btn-ghost" data-clear="${match.id}">清空</button>
-                </div>
-              </div>
-            </div>
+            </details>
           </div>
         </article>
       `;
@@ -19892,10 +20243,10 @@
         <div class="section-group matches-group">
           <div class="section-head">
             <div class="section-copy">
-              <span class="section-kicker">比赛拆解</span>
-              <h2 class="section-title">当日比赛拆解</h2>
+              <span class="section-kicker">比赛详情</span>
+              <h2 class="section-title">逐场预测详情</h2>
             </div>
-            <div class="section-meta">概率分布、市场赔率、赛果与推荐路径</div>
+            <div class="section-meta">先看模型结论和推荐，需要时再展开完整赔率。</div>
           </div>
           <div class="matches">
             ${dayAnalysis.matchAnalyses.map(({ match, analysis }) => renderMatchCard(day.id, match, analysis)).join("")}
@@ -19908,29 +20259,6 @@
           ${renderFinishedMatchesCard(day)}
           ${renderMetricGlossary()}
           ${renderResultSyncCard(day)}
-          <div class="section-group">
-            <div class="section-head">
-              <div class="section-copy">
-                <span class="section-kicker">工作区</span>
-                <h2 class="section-title">当日决策入口</h2>
-              </div>
-              <div class="section-meta">推荐组合、晋级态势与逐场模型</div>
-            </div>
-            <div class="dashboard-quick-grid">
-              <button type="button" class="dashboard-quick-card" data-page-section="tickets">
-                <strong>推荐出票</strong>
-                <span>单关、串关与追投组合</span>
-              </button>
-              <button type="button" class="dashboard-quick-card" data-page-section="tournament">
-                <strong>积分晋级</strong>
-                <span>小组积分榜与完整晋级路线</span>
-              </button>
-              <button type="button" class="dashboard-quick-card" data-page-section="matches">
-                <strong>比赛拆解</strong>
-                <span>比分概率、赔率面板与赛果</span>
-              </button>
-            </div>
-          </div>
         `,
         tickets: renderPurePortfolio(day, dayAnalysis),
         tournament: renderTournamentRoadmap(),

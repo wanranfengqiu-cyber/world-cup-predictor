@@ -8656,6 +8656,616 @@
         width: min(94vw, 350px) !important;
       }
     }
+
+    /* Prediction readability layer: result first, supporting detail second. */
+    .control-room-v2 .forecast-section {
+      padding-top: 22px !important;
+    }
+
+    .control-room-v2 .match-top {
+      color: var(--cr-graphite) !important;
+    }
+
+    .control-room-v2 .match-top .team-name {
+      color: var(--cr-graphite) !important;
+    }
+
+    .control-room-v2 .match-top .flag-line,
+    .control-room-v2 .match-top .team-stars,
+    .control-room-v2 .match-top .team-stars-line,
+    .control-room-v2 .match-top .recent-copy {
+      color: #667980 !important;
+    }
+
+    .control-room-v2 .match-top .team-stars-label {
+      color: #8a6d17 !important;
+    }
+
+    .control-room-v2 .match-top .match-strip {
+      color: #40545c !important;
+    }
+
+    .control-room-v2 .match-top .match-strip-pill {
+      border-color: #c8d5d9 !important;
+      background: #edf2f3 !important;
+      color: #4e6269 !important;
+    }
+
+    .control-room-v2 .match-top .match-strip-pill.accent {
+      border-color: #a8cdbc !important;
+      background: #e3f1eb !important;
+      color: #0e674c !important;
+    }
+
+    .control-room-v2 .forecast-board {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .control-room-v2 .forecast-card {
+      display: grid;
+      gap: 14px;
+      width: 100%;
+      min-width: 0;
+      padding: 16px;
+      border: 1px solid #b9c8cd;
+      border-top: 3px solid var(--cr-graphite-3);
+      border-radius: 5px;
+      background: #ffffff;
+      color: var(--cr-graphite);
+      text-align: left;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(16, 24, 32, 0.055);
+      transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+    }
+
+    .control-room-v2 .forecast-card:hover {
+      border-color: #7e969f;
+      box-shadow: 0 13px 28px rgba(16, 24, 32, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .control-room-v2 .forecast-card:focus-visible {
+      outline: 3px solid rgba(19, 118, 84, 0.22);
+      outline-offset: 3px;
+    }
+
+    .control-room-v2 .forecast-card.is-final {
+      border-top-color: var(--cr-pitch);
+      background: #f7fbf9;
+    }
+
+    .control-room-v2 .forecast-card-topline,
+    .control-room-v2 .forecast-card-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-width: 0;
+      color: #677980;
+      font-size: 11px;
+      line-height: 1.4;
+    }
+
+    .control-room-v2 .forecast-card-foot {
+      align-items: flex-start;
+      padding-top: 11px;
+      border-top: 1px solid #e1e7e9;
+    }
+
+    .control-room-v2 .forecast-card-foot > span {
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .control-room-v2 .forecast-state {
+      display: inline-flex;
+      align-items: center;
+      min-height: 22px;
+      padding: 3px 7px;
+      border: 1px solid #c7d2d6;
+      border-radius: 3px;
+      background: #eef2f3;
+      color: #53666d;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .control-room-v2 .forecast-state.is-strong,
+    .control-room-v2 .forecast-state.is-final {
+      border-color: #a7d0bf;
+      background: #e3f1eb;
+      color: #0e674c;
+    }
+
+    .control-room-v2 .forecast-state.is-balanced {
+      border-color: #e3cf88;
+      background: #fff6d7;
+      color: #775c06;
+    }
+
+    .control-room-v2 .forecast-state.is-open {
+      border-color: #e0b3aa;
+      background: #fff0ed;
+      color: #9a3d2d;
+    }
+
+    .control-room-v2 .forecast-card-teams {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .control-room-v2 .forecast-card-teams > span {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      min-width: 0;
+    }
+
+    .control-room-v2 .forecast-card-teams > span:last-child {
+      justify-content: flex-end;
+      text-align: right;
+    }
+
+    .control-room-v2 .forecast-card-teams strong {
+      color: var(--cr-graphite);
+      font-size: 17px;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+    }
+
+    .control-room-v2 .forecast-card-teams > b {
+      color: #263840;
+      font-size: 14px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .control-room-v2 .forecast-flag {
+      flex: 0 0 auto;
+      font-size: 20px;
+      font-style: normal;
+      line-height: 1;
+    }
+
+    .control-room-v2 .forecast-card-call {
+      display: block;
+      min-height: 24px;
+      color: #16272f;
+      font-size: 16px;
+      font-weight: 900;
+      line-height: 1.5;
+    }
+
+    .control-room-v2 .forecast-probability {
+      display: grid;
+      gap: 9px;
+      min-width: 0;
+    }
+
+    .control-room-v2 .forecast-prob-track {
+      display: flex;
+      width: 100%;
+      height: 14px;
+      overflow: hidden;
+      border: 1px solid rgba(16, 24, 32, 0.15);
+      border-radius: 3px;
+      background: #e6ecee;
+    }
+
+    .control-room-v2 .forecast-prob-segment {
+      display: block;
+      height: 100%;
+      min-width: 1px;
+    }
+
+    .control-room-v2 .forecast-prob-segment + .forecast-prob-segment {
+      border-left: 2px solid #ffffff;
+    }
+
+    .control-room-v2 .forecast-prob-segment.is-home {
+      background: #167b5a;
+    }
+
+    .control-room-v2 .forecast-prob-segment.is-draw {
+      background: #d4a72c;
+    }
+
+    .control-room-v2 .forecast-prob-segment.is-away {
+      background: #d95d46;
+    }
+
+    .control-room-v2 .forecast-prob-labels {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .control-room-v2 .forecast-prob-label {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 7px;
+      min-width: 0;
+      color: #718188;
+      font-size: 11px;
+    }
+
+    .control-room-v2 .forecast-prob-label span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .control-room-v2 .forecast-prob-label strong {
+      color: #3c5058;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .control-room-v2 .forecast-prob-label.is-leader strong {
+      color: var(--cr-graphite);
+      font-size: 14px;
+    }
+
+    .control-room-v2 .match-forecast-panel {
+      display: grid;
+      grid-template-columns: minmax(250px, 0.8fr) minmax(0, 1.45fr);
+      margin: 0 0 20px;
+      overflow: hidden;
+      border: 1px solid #283d46;
+      border-radius: 4px;
+      background: #101b22;
+      color: #ffffff;
+    }
+
+    .control-room-v2 .match-forecast-call {
+      position: relative;
+      display: grid;
+      align-content: start;
+      gap: 10px;
+      min-width: 0;
+      padding: 24px;
+      border-right: 1px solid rgba(255, 255, 255, 0.11);
+    }
+
+    .control-room-v2 .match-forecast-call::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--cr-score);
+    }
+
+    .control-room-v2 .match-forecast-panel.is-final .match-forecast-call::before {
+      background: var(--cr-pitch);
+    }
+
+    .control-room-v2 .match-forecast-kicker {
+      color: #76d2ad;
+      font-size: 10px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .control-room-v2 .match-forecast-call h3 {
+      margin: 0;
+      color: #ffffff;
+      font-size: 24px;
+      line-height: 1.24;
+      overflow-wrap: anywhere;
+    }
+
+    .control-room-v2 .match-forecast-call p {
+      margin: 0;
+      color: #aab9bf;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .control-room-v2 .forecast-confidence {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      justify-self: start;
+      margin-top: 4px;
+      padding: 7px 9px;
+      border-left: 3px solid #6d7f86;
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .control-room-v2 .forecast-confidence.is-strong,
+    .control-room-v2 .forecast-confidence.is-final {
+      border-left-color: #4fc392;
+    }
+
+    .control-room-v2 .forecast-confidence.is-balanced {
+      border-left-color: #e0b532;
+    }
+
+    .control-room-v2 .forecast-confidence.is-open {
+      border-left-color: #df715c;
+    }
+
+    .control-room-v2 .forecast-confidence strong {
+      color: #ffffff;
+      font-size: 18px;
+    }
+
+    .control-room-v2 .forecast-confidence span {
+      color: #b7c6cb;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .control-room-v2 .match-forecast-data {
+      display: grid;
+      align-content: start;
+      gap: 18px;
+      min-width: 0;
+      padding: 24px;
+    }
+
+    .control-room-v2 .match-forecast-data-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .control-room-v2 .match-forecast-data-head > div {
+      display: grid;
+      gap: 4px;
+    }
+
+    .control-room-v2 .match-forecast-data-head span,
+    .control-room-v2 .match-forecast-data-head small {
+      color: #85979e;
+      font-size: 10px;
+    }
+
+    .control-room-v2 .match-forecast-data-head strong {
+      color: #ffffff;
+      font-size: 16px;
+    }
+
+    .control-room-v2 .match-forecast-panel .forecast-prob-track {
+      border-color: rgba(255, 255, 255, 0.16);
+      background: #26363e;
+    }
+
+    .control-room-v2 .match-forecast-panel .forecast-prob-segment + .forecast-prob-segment {
+      border-left-color: #101b22;
+    }
+
+    .control-room-v2 .match-forecast-panel .forecast-prob-label {
+      color: #8fa0a7;
+    }
+
+    .control-room-v2 .match-forecast-panel .forecast-prob-label strong,
+    .control-room-v2 .match-forecast-panel .forecast-prob-label.is-leader strong {
+      color: #ffffff;
+    }
+
+    .control-room-v2 .forecast-key-facts {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .control-room-v2 .forecast-key-facts > div {
+      display: grid;
+      align-content: start;
+      gap: 5px;
+      min-width: 0;
+      padding: 14px 14px 0;
+    }
+
+    .control-room-v2 .forecast-key-facts > div:first-child {
+      padding-left: 0;
+    }
+
+    .control-room-v2 .forecast-key-facts > div + div {
+      border-left: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .control-room-v2 .forecast-key-facts span,
+    .control-room-v2 .forecast-key-facts small {
+      color: #83959c;
+      font-size: 10px;
+      line-height: 1.45;
+    }
+
+    .control-room-v2 .forecast-key-facts strong {
+      color: #ffffff;
+      font-size: 14px;
+      line-height: 1.4;
+      overflow-wrap: anywhere;
+    }
+
+    .control-room-v2 .readable-score-grid {
+      display: grid;
+      overflow: hidden;
+      border: 1px solid #c5d0d4;
+      border-radius: 4px;
+      background: #ffffff;
+    }
+
+    .control-room-v2 .readable-score-row {
+      display: grid;
+      grid-template-columns: 36px minmax(100px, 0.6fr) minmax(160px, 1.4fr) 66px;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      min-height: 54px;
+      padding: 8px 14px;
+      border-top: 1px solid #e0e6e8;
+    }
+
+    .control-room-v2 .readable-score-row:first-child {
+      border-top: 0;
+    }
+
+    .control-room-v2 .readable-score-row.is-top {
+      background: #f7faf9;
+    }
+
+    .control-room-v2 .readable-score-rank {
+      color: #8a999f;
+      font-size: 11px;
+      font-weight: 900;
+      text-align: center;
+    }
+
+    .control-room-v2 .readable-score-row.is-top .readable-score-rank {
+      color: var(--cr-pitch);
+    }
+
+    .control-room-v2 .readable-score-copy {
+      display: grid;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    .control-room-v2 .readable-score-copy strong {
+      color: var(--cr-graphite);
+      font-size: 15px;
+    }
+
+    .control-room-v2 .readable-score-copy small {
+      color: #7a8a90;
+      font-size: 10px;
+    }
+
+    .control-room-v2 .readable-score-meter {
+      display: block;
+      width: 100%;
+      height: 8px;
+      overflow: hidden;
+      border-radius: 2px;
+      background: #e2e8ea;
+    }
+
+    .control-room-v2 .readable-score-meter i {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: var(--cr-pitch);
+    }
+
+    .control-room-v2 .readable-score-value {
+      color: var(--cr-graphite);
+      font-size: 14px;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 900px) {
+      .control-room-v2 .forecast-board {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .control-room-v2 .match-forecast-panel {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .control-room-v2 .match-forecast-call {
+        border-right: 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.11);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .control-room-v2 .forecast-card {
+        gap: 12px;
+        padding: 13px;
+      }
+
+      .control-room-v2 .forecast-card-teams {
+        gap: 7px;
+      }
+
+      .control-room-v2 .forecast-card-teams strong {
+        font-size: 14px;
+      }
+
+      .control-room-v2 .forecast-flag {
+        font-size: 17px;
+      }
+
+      .control-room-v2 .forecast-card-call {
+        font-size: 14px;
+      }
+
+      .control-room-v2 .forecast-card-foot {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 4px;
+      }
+
+      .control-room-v2 .forecast-prob-label {
+        display: grid;
+        gap: 2px;
+      }
+
+      .control-room-v2 .forecast-prob-label strong,
+      .control-room-v2 .forecast-prob-label.is-leader strong {
+        font-size: 12px;
+      }
+
+      .control-room-v2 .match-forecast-call,
+      .control-room-v2 .match-forecast-data {
+        padding: 18px 16px;
+      }
+
+      .control-room-v2 .match-forecast-call h3 {
+        font-size: 20px;
+      }
+
+      .control-room-v2 .match-forecast-data-head {
+        align-items: flex-start;
+      }
+
+      .control-room-v2 .match-forecast-data-head small {
+        max-width: 70px;
+        text-align: right;
+      }
+
+      .control-room-v2 .forecast-key-facts {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .control-room-v2 .forecast-key-facts > div,
+      .control-room-v2 .forecast-key-facts > div:first-child {
+        padding: 10px 0;
+      }
+
+      .control-room-v2 .forecast-key-facts > div + div {
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        border-left: 0;
+      }
+
+      .control-room-v2 .readable-score-row {
+        grid-template-columns: 28px minmax(0, 1fr) 56px;
+        gap: 9px;
+        padding: 9px 10px;
+      }
+
+      .control-room-v2 .readable-score-meter {
+        grid-column: 2 / 4;
+      }
+
+      .control-room-v2 .readable-score-value {
+        grid-column: 3;
+        grid-row: 1;
+      }
+    }
   </style>
 </head>
 <body class="ui-refresh control-room-v2">
@@ -18504,6 +19114,175 @@
       `;
     }
 
+    function getReadableWdlOutcomes(match, analysis) {
+      const probabilityMap = analysis && analysis.probabilities && analysis.probabilities.wdl
+        ? analysis.probabilities.wdl
+        : {};
+      const outcomes = [
+        { key: "H", label: `${match.home.name}胜`, shortLabel: "主胜", probability: Number(probabilityMap.H) || 0, tone: "home" },
+        { key: "D", label: "平局", shortLabel: "平局", probability: Number(probabilityMap.D) || 0, tone: "draw" },
+        { key: "A", label: `${match.away.name}胜`, shortLabel: "客胜", probability: Number(probabilityMap.A) || 0, tone: "away" }
+      ];
+      const total = outcomes.reduce((sum, item) => sum + Math.max(0, item.probability), 0);
+      return outcomes.map(item => ({
+        ...item,
+        probability: total > 0 ? Math.max(0, item.probability) / total : 1 / outcomes.length
+      }));
+    }
+
+    function getMatchForecastSnapshot(match, analysis) {
+      const outcomes = getReadableWdlOutcomes(match, analysis);
+      const ranked = [...outcomes].sort((left, right) => right.probability - left.probability);
+      const leader = ranked[0];
+      const runnerUp = ranked[1];
+      const gap = Math.max(0, leader.probability - runnerUp.probability);
+      const confidence = leader.probability >= 0.58 && gap >= 0.16
+        ? { label: "方向清晰", tone: "strong", note: "首选方向领先明显" }
+        : leader.probability >= 0.46 && gap >= 0.08
+          ? { label: "略占优势", tone: "balanced", note: "有倾向，但仍需防次选" }
+          : { label: "开放对局", tone: "open", note: "三项概率接近，波动较高" };
+      const topScore = analysis && Array.isArray(analysis.topScores) && analysis.topScores.length
+        ? analysis.topScores[0]
+        : null;
+      const topTotal = analysis && Array.isArray(analysis.topTotals) && analysis.topTotals.length
+        ? analysis.topTotals[0]
+        : null;
+      const xgProfile = analysis && analysis.xgProfile ? analysis.xgProfile : null;
+      const headline = leader.key === "D"
+        ? "平局是当前单项最高概率"
+        : `模型更倾向 ${leader.label}`;
+      return { outcomes, leader, runnerUp, gap, confidence, topScore, topTotal, xgProfile, headline };
+    }
+
+    function renderForecastProbabilityRail(snapshot, compact = false) {
+      const ariaLabel = snapshot.outcomes
+        .map(item => `${item.label} ${formatPercent(item.probability)}`)
+        .join("，");
+      return `
+        <div class="forecast-probability ${compact ? "compact" : ""}">
+          <div class="forecast-prob-track" role="img" aria-label="${escapeHtml(ariaLabel)}">
+            ${snapshot.outcomes.map(item => `
+              <span class="forecast-prob-segment is-${item.tone}" style="width:${(item.probability * 100).toFixed(2)}%"></span>
+            `).join("")}
+          </div>
+          <div class="forecast-prob-labels">
+            ${snapshot.outcomes.map(item => `
+              <div class="forecast-prob-label is-${item.tone} ${item.key === snapshot.leader.key ? "is-leader" : ""}">
+                <span>${item.shortLabel}</span>
+                <strong>${formatPercent(item.probability)}</strong>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderDailyForecastBoard(day, dayAnalysis) {
+      const items = dayAnalysis && Array.isArray(dayAnalysis.matchAnalyses)
+        ? dayAnalysis.matchAnalyses
+        : [];
+      if (!items.length) return "";
+      return `
+        <div class="section-group forecast-section">
+          <div class="section-head">
+            <div class="section-copy">
+              <span class="section-kicker">Forecast snapshot</span>
+              <h2 class="section-title">今日预测快照</h2>
+            </div>
+            <div class="section-meta">先看模型更倾向哪一边，再进入比赛拆解查看赔率、比分与出票建议。</div>
+          </div>
+          <div class="forecast-board">
+            ${items.map(({ match, analysis }) => {
+              const snapshot = getMatchForecastSnapshot(match, analysis);
+              const result = getResult(match.id);
+              const resultFilled = result.homeGoals !== "" && result.awayGoals !== "";
+              const xgText = snapshot.xgProfile
+                ? `xG ${snapshot.xgProfile.homeXg.toFixed(2)} : ${snapshot.xgProfile.awayXg.toFixed(2)}`
+                : "xG 待计算";
+              const scoreText = snapshot.topScore
+                ? `最可能比分 ${snapshot.topScore.label} · ${formatPercent(snapshot.topScore.probability)}`
+                : "比分分布待计算";
+              return `
+                <button type="button" class="forecast-card ${resultFilled ? "is-final" : ""}" data-match-jump="${match.id}" data-match-day="${day.id}">
+                  <span class="forecast-card-topline">
+                    <span>${match.kickoff || "待定"}</span>
+                    <span class="forecast-state ${resultFilled ? "is-final" : `is-${snapshot.confidence.tone}`}">${resultFilled ? "已完赛" : snapshot.confidence.label}</span>
+                  </span>
+                  <span class="forecast-card-teams">
+                    <span><i class="forecast-flag">${match.home.flag || ""}</i><strong>${match.home.name}</strong></span>
+                    <b>${resultFilled ? formatMatchResultScore(match, result) : "VS"}</b>
+                    <span><i class="forecast-flag">${match.away.flag || ""}</i><strong>${match.away.name}</strong></span>
+                  </span>
+                  <span class="forecast-card-call">${resultFilled ? describeMatchResult(match, result) : snapshot.headline}</span>
+                  ${renderForecastProbabilityRail(snapshot, true)}
+                  <span class="forecast-card-foot">
+                    <span>${scoreText}</span>
+                    <span>${xgText}</span>
+                  </span>
+                </button>
+              `;
+            }).join("")}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderMatchForecastPanel(match, analysis, result) {
+      const snapshot = getMatchForecastSnapshot(match, analysis);
+      const resultFilled = result && result.homeGoals !== "" && result.awayGoals !== "";
+      const picks = pickMatchRecommendedPurchases(match, analysis);
+      const topSingle = pickTopMatchRecommendationCandidates(picks.single, 1)[0] || null;
+      const recommendationText = topSingle
+        ? `${marketLabel(topSingle.marketType, match)} · ${prettyOutcome(topSingle.marketType, topSingle.outcome, match)}`
+        : "暂时观望";
+      const resultHeadline = resultFilled
+        ? `${match.home.name} ${formatMatchResultScore(match, result)} ${match.away.name}`
+        : snapshot.headline;
+      const resultCopy = resultFilled
+        ? `${describeMatchResult(match, result)}。下方保留赛前模型分布，方便回看判断偏差。`
+        : `90 分钟首选比第二选择高 ${formatPercent(snapshot.gap)}；${snapshot.confidence.note}。`;
+      return `
+        <section class="match-forecast-panel ${resultFilled ? "is-final" : ""}" aria-label="${match.home.name} 对 ${match.away.name} 模型结论">
+          <div class="match-forecast-call">
+            <span class="match-forecast-kicker">${resultFilled ? "Final result" : "Model read"}</span>
+            <h3>${resultHeadline}</h3>
+            <p>${resultCopy}</p>
+            <span class="forecast-confidence is-${resultFilled ? "final" : snapshot.confidence.tone}">
+              <strong>${resultFilled ? "已确认" : formatPercent(snapshot.leader.probability)}</strong>
+              <span>${resultFilled ? "最终赛果" : snapshot.confidence.label}</span>
+            </span>
+          </div>
+          <div class="match-forecast-data">
+            <div class="match-forecast-data-head">
+              <div>
+                <span>90 分钟结果概率</span>
+                <strong>${snapshot.leader.label}领先</strong>
+              </div>
+              <small>概率合计 100%</small>
+            </div>
+            ${renderForecastProbabilityRail(snapshot)}
+            <div class="forecast-key-facts">
+              <div>
+                <span>最可能比分</span>
+                <strong>${snapshot.topScore ? snapshot.topScore.label : "待计算"}</strong>
+                <small>${snapshot.topScore ? formatPercent(snapshot.topScore.probability) : "--"}</small>
+              </div>
+              <div>
+                <span>预期进球</span>
+                <strong>${snapshot.xgProfile ? snapshot.xgProfile.adjustedTotal.toFixed(2) : "--"}</strong>
+                <small>${snapshot.topTotal ? `最高区间 ${snapshot.topTotal.label}` : "总进球模型"}</small>
+              </div>
+              <div>
+                <span>优先玩法</span>
+                <strong>${recommendationText}</strong>
+                <small>${topSingle ? `命中概率 ${formatPercent(topSingle.hitProbability ?? topSingle.probability)}` : "没有强行给方向"}</small>
+              </div>
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
     function renderScoreProbabilityGrid(dayId, match, analysis) {
       const exact = analysis && analysis.probabilities ? analysis.probabilities.exact || {} : {};
       const entries = Object.entries(exact)
@@ -18519,35 +19298,33 @@
       const hiddenEntries = entries.slice(6);
       const detailKey = `${match.id}__scoreModel`;
 
-      return `
-        <div class="score-grid">
-          ${previewEntries.map(([score, probability]) => {
+      const maxProbability = entries[0] ? entries[0][1] : 1;
+      const renderScoreRows = (rows, offset = 0) => `
+        <div class="readable-score-grid">
+          ${rows.map(([score, probability], index) => {
             const odds = match.markets.exact && match.markets.exact[score];
             return `
-              <button type="button" class="odds-chip readonly">
-                <strong>${prettyOutcome("score", score, match)}</strong>
-                <small>模型 ${formatPercent(probability)}</small>
-                <small>${odds ? `赔率 ${formatOdds(odds)}` : "未录赔率"}</small>
-              </button>
+              <div class="readable-score-row ${offset + index < 3 ? "is-top" : ""}">
+                <span class="readable-score-rank">${String(offset + index + 1).padStart(2, "0")}</span>
+                <span class="readable-score-copy">
+                  <strong>${prettyOutcome("score", score, match)}</strong>
+                  <small>${odds ? `赔率 ${formatOdds(odds)}` : "未录赔率"}</small>
+                </span>
+                <span class="readable-score-meter"><i style="width:${Math.max(4, probability / maxProbability * 100).toFixed(1)}%"></i></span>
+                <strong class="readable-score-value">${formatPercent(probability)}</strong>
+              </div>
             `;
           }).join("")}
         </div>
+      `;
+
+      return `
+        ${renderScoreRows(previewEntries)}
         ${hiddenEntries.length ? `
           <details class="odds-expand" data-odds-details="${dayId}:${detailKey}" ${isDetailsOpen(dayId, detailKey) ? "open" : ""}>
             <summary>展开剩余 ${hiddenEntries.length} 个模型比分</summary>
             <div class="details-body">
-              <div class="score-grid">
-                ${hiddenEntries.map(([score, probability]) => {
-                  const odds = match.markets.exact && match.markets.exact[score];
-                  return `
-                    <button type="button" class="odds-chip readonly">
-                      <strong>${prettyOutcome("score", score, match)}</strong>
-                      <small>模型 ${formatPercent(probability)}</small>
-                      <small>${odds ? `赔率 ${formatOdds(odds)}` : "未录赔率"}</small>
-                    </button>
-                  `;
-                }).join("")}
-              </div>
+              ${renderScoreRows(hiddenEntries, previewEntries.length)}
             </div>
           </details>
         ` : ""}
@@ -18914,6 +19691,7 @@
             ` : ""}
           </div>
           <div class="match-body">
+            ${renderMatchForecastPanel(match, analysis, result)}
             <div class="plan-note">${motivationSummary ? `<strong>战意修正：</strong>${escapeHtml(motivationSummary)}<br>` : ""}${adaptiveSummary ? `<strong>自动优化：</strong>${escapeHtml(adaptiveSummary)}<br>` : ""}${match.model && match.model.note ? escapeHtml(match.model.note) : "这场暂时没有补充建模注释。"}</div>
             ${renderMatchContextPanel(match, analysis)}
             ${renderMatchRecommendationPanel(match, analysis)}
@@ -18970,6 +19748,7 @@
       `;
       const sectionContent = {
         overview: `
+          ${renderDailyForecastBoard(day, dayAnalysis)}
           ${renderFinishedMatchesCard(day)}
           ${renderMetricGlossary()}
           ${renderResultSyncCard(day)}

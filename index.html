@@ -1695,17 +1695,17 @@
     }
 
     .candidate-filter-actions {
-      display: flex;
+      display: grid;
+      grid-template-columns: minmax(0, 0.86fr) minmax(0, 1.14fr);
+      gap: 10px;
       align-items: end;
     }
 
-    .candidate-filter-actions .btn-ghost {
+    .candidate-filter-actions > button {
       width: 100%;
+      min-width: 0;
       height: 46px;
-    }
-
-    .candidate-filter-actions {
-      gap: 10px;
+      white-space: nowrap;
     }
 
     .candidate-filter-summary {
@@ -7108,7 +7108,17 @@
     }
 
     .ui-refresh [data-managed-page-section="explorer"] .candidate {
+      grid-template-columns: minmax(250px, 1.15fr) minmax(480px, 1fr);
+      gap: 14px;
+      align-items: stretch;
       padding: 16px !important;
+    }
+
+    .ui-refresh [data-managed-page-section="explorer"] .explorer-candidate-stats {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(72px, 1fr));
+      gap: 8px;
+      min-width: 0;
     }
 
     .ui-refresh [data-managed-page-section="explorer"] .candidate-list {
@@ -7631,6 +7641,10 @@
         padding-left: 24px;
       }
 
+      .ui-refresh [data-managed-page-section="explorer"] .candidate {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
       .ui-refresh .summary-bar {
         grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
       }
@@ -7737,6 +7751,29 @@
 
       .brand-copy strong {
         font-size: 14px;
+      }
+
+      .ui-refresh .candidate-filter-grid {
+        grid-template-columns: minmax(0, 1fr) !important;
+      }
+
+      .ui-refresh .candidate-filter-actions {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        width: 100%;
+      }
+
+      .ui-refresh .candidate-filter-actions > button {
+        min-height: 46px;
+        padding-inline: 8px !important;
+        writing-mode: horizontal-tb;
+      }
+
+      .ui-refresh [data-managed-page-section="explorer"] .explorer-candidate-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .ui-refresh [data-managed-page-section="explorer"] .explorer-candidate-stats .stack-stat:last-child {
+        grid-column: 1 / -1;
       }
 
       .topbar-meta {
@@ -18717,14 +18754,6 @@
       return items;
     }
 
-    function getCandidateUserFacingFit(candidate, restrictionText) {
-      if (restrictionText) return "更适合串关";
-      if (candidate.marketType === "wdl") return "更适合单关";
-      if (candidate.marketType === "handicap") return "偏进取";
-      if (candidate.marketType === "score") return "比分博取";
-      return "稳中带弹性";
-    }
-
     function renderMatchJumpButtons(legs, dayId) {
       const source = Array.isArray(legs) ? legs.filter(leg => leg && leg.match) : [];
       if (!source.length) return "";
@@ -18753,14 +18782,15 @@
               ${restrictionText ? `<span class="bet-tag risk">${restrictionText}</span>` : `<span class="bet-tag base">可单关</span>`}
             </div>
             <strong>${candidate.match.home.name} vs ${candidate.match.away.name} · ${prettyOutcome(candidate.marketType, candidate.outcome, candidate.match)}</strong>
-            <div class="meta">这里支持先按中奖概率区间过滤，再按推荐率或中奖概率排序查找，方便你专门翻找偏稳、偏冲或更适合串关的玩法。</div>
             ${renderMatchJumpButtons([{ match: candidate.match }], currentDayId)}
           </div>
-          <div class="stack-stat"><em>赔率</em><strong>${formatOdds(candidate.odds)}</strong></div>
-          <div class="stack-stat"><em>中奖概率</em><strong>${formatPercent(hitProbability)}</strong></div>
-          <div class="stack-stat"><em>推荐率</em><strong>${formatPercent(recommendationRate)}</strong></div>
-          <div class="stack-stat"><em>适合</em><strong>${getCandidateUserFacingFit(candidate, restrictionText)}</strong></div>
-          <div class="stack-stat"><em>建议</em><strong>${Math.max(TICKET_UNIT, roundStake(candidate.suggestedStake || TICKET_UNIT))} 元</strong></div>
+          <div class="explorer-candidate-stats">
+            <div class="stack-stat"><em>中奖概率</em><strong>${formatPercent(hitProbability)}</strong></div>
+            <div class="stack-stat"><em>推荐率</em><strong>${formatPercent(recommendationRate)}</strong></div>
+            <div class="stack-stat"><em>赔率</em><strong>${formatOdds(candidate.odds)}</strong></div>
+            <div class="stack-stat"><em>单关权限</em><strong>${restrictionText ? "仅串关" : "可单关"}</strong></div>
+            <div class="stack-stat"><em>建议投入</em><strong>${Math.max(TICKET_UNIT, roundStake(candidate.suggestedStake || TICKET_UNIT))} 元</strong></div>
+          </div>
         </div>
       `;
     }

@@ -3,7 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>世界杯彩票最优投注实验台</title>
+  <meta name="theme-color" content="#101820">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="2026 世界杯赛果、赔率、晋级路径、概率模型与模拟出票控制台">
+  <title>2026 世界杯赛事控制台</title>
   <style>
     :root {
       --bg: #061116;
@@ -5899,52 +5902,2835 @@
         display: none;
       }
     }
+
+    /* 2026 control-room refresh. This final layer intentionally replaces the
+       accumulated visual experiments above while preserving every data and
+       interaction selector used by the application. */
+    .ui-refresh {
+      --canvas: #eef1f3;
+      --canvas-deep: #e2e7e9;
+      --surface: #ffffff;
+      --surface-soft: #f7f9f9;
+      --ink: #172027;
+      --ink-soft: #41505a;
+      --muted: #718089;
+      --hairline: #d5dcde;
+      --hairline-strong: #b9c4c8;
+      --pitch: #13795b;
+      --pitch-dark: #0d5a43;
+      --pitch-soft: #e3f1ec;
+      --score: #f2c84b;
+      --score-soft: #fff7d6;
+      --result: #d94b35;
+      --result-soft: #fff0ed;
+      --info: #276c9a;
+      --info-soft: #e9f3f8;
+      --text: var(--ink);
+      --panel: var(--surface);
+      --panel-strong: var(--surface);
+      --panel-soft: var(--surface-soft);
+      --line: var(--hairline);
+      --line-strong: var(--hairline-strong);
+      --gold: var(--score);
+      --mint: var(--pitch);
+      --mint-strong: var(--pitch-dark);
+      --rose: var(--result);
+      --sky: var(--info);
+      --shadow: 0 22px 60px rgba(23, 32, 39, 0.16);
+      --shadow-soft: 0 8px 24px rgba(23, 32, 39, 0.08);
+      --radius-xl: 8px;
+      --radius-lg: 8px;
+      --radius-md: 6px;
+      --radius-sm: 4px;
+      --side-tool-width: 58px;
+      --side-tool-edge: 18px;
+      --side-panel-gap: 12px;
+      --side-panel-width: min(var(--side-panel-user-width, 780px), calc(100vw - var(--side-panel-right) - var(--side-panel-pad)));
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background: var(--canvas) !important;
+      color: var(--ink);
+      font-family: "Microsoft YaHei UI", "PingFang SC", "Noto Sans SC", sans-serif;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .ui-refresh *,
+    .ui-refresh *::before,
+    .ui-refresh *::after {
+      letter-spacing: 0 !important;
+    }
+
+    .ui-refresh::before,
+    .ui-refresh::after,
+    .ui-refresh .app::before,
+    .ui-refresh .app::after {
+      display: none !important;
+    }
+
+    .ui-refresh button,
+    .ui-refresh input,
+    .ui-refresh select,
+    .ui-refresh textarea {
+      font: inherit;
+    }
+
+    .ui-refresh button:focus-visible,
+    .ui-refresh input:focus-visible,
+    .ui-refresh select:focus-visible,
+    .ui-refresh textarea:focus-visible,
+    .ui-refresh summary:focus-visible {
+      outline: 3px solid rgba(19, 121, 91, 0.25) !important;
+      outline-offset: 2px;
+    }
+
+    .ui-refresh a {
+      color: var(--pitch-dark);
+    }
+
+    .ui-refresh .app {
+      width: 100% !important;
+      max-width: none !important;
+      margin: 0 !important;
+      padding: 0 0 76px !important;
+      isolation: isolate;
+    }
+
+    .app-topbar {
+      position: sticky;
+      top: 0;
+      z-index: 80;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 68px;
+      padding: 10px max(24px, calc((100vw - 1600px) / 2));
+      border-bottom: 1px solid #263139;
+      background: #172027;
+      color: #ffffff;
+      box-shadow: 0 8px 24px rgba(23, 32, 39, 0.14);
+    }
+
+    .brand-lockup,
+    .topbar-meta,
+    .status-indicator,
+    .topbar-budget {
+      display: flex;
+      align-items: center;
+    }
+
+    .brand-lockup {
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand-emblem {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      flex: 0 0 44px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      background: var(--pitch);
+      color: #ffffff;
+      font: 800 23px/1 "Bahnschrift Condensed", "Arial Narrow", sans-serif;
+    }
+
+    .brand-emblem::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      height: 5px;
+      background: var(--score);
+    }
+
+    .brand-copy {
+      display: grid;
+      min-width: 0;
+    }
+
+    .brand-copy strong {
+      overflow: hidden;
+      color: #ffffff;
+      font-size: 16px;
+      line-height: 1.25;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .brand-copy span {
+      color: #aab5ba;
+      font: 600 10px/1.35 "Bahnschrift", "Microsoft YaHei UI", sans-serif;
+      text-transform: uppercase;
+    }
+
+    .topbar-meta {
+      gap: 22px;
+      min-width: 0;
+    }
+
+    .status-indicator {
+      gap: 8px;
+      color: #dbe3e6;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .status-indicator i {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #49c491;
+      box-shadow: 0 0 0 5px rgba(73, 196, 145, 0.12);
+      animation: status-pulse 2.4s ease-in-out infinite;
+    }
+
+    @keyframes status-pulse {
+      0%, 100% { box-shadow: 0 0 0 4px rgba(73, 196, 145, 0.10); }
+      50% { box-shadow: 0 0 0 7px rgba(73, 196, 145, 0.03); }
+    }
+
+    .topbar-budget {
+      gap: 8px;
+      padding-left: 22px;
+      border-left: 1px solid rgba(255, 255, 255, 0.14);
+      color: #aeb9be;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .topbar-budget strong {
+      color: var(--score);
+      font: 800 18px/1 "Bahnschrift", "Microsoft YaHei UI", sans-serif;
+    }
+
+    .workspace-shell {
+      display: grid;
+      grid-template-columns: 236px minmax(0, 1fr);
+      width: min(1600px, 100%);
+      min-height: calc(100vh - 68px);
+      margin: 0 auto;
+    }
+
+    .matchday-sidebar {
+      position: sticky;
+      top: 68px;
+      align-self: start;
+      height: calc(100vh - 68px);
+      overflow: hidden auto;
+      padding: 28px 18px 36px;
+      border-right: 1px solid var(--hairline);
+      background: var(--canvas-deep);
+    }
+
+    .sidebar-heading {
+      display: grid;
+      gap: 2px;
+      margin: 0 8px 18px;
+    }
+
+    .sidebar-heading > span {
+      color: var(--pitch-dark);
+      font: 800 11px/1.2 "Bahnschrift", "Microsoft YaHei UI", sans-serif;
+      text-transform: uppercase;
+    }
+
+    .sidebar-heading strong {
+      color: var(--ink);
+      font: 800 28px/1.05 "Bahnschrift Condensed", "Microsoft YaHei UI", sans-serif;
+    }
+
+    .sidebar-heading small {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .ui-refresh .tab-row {
+      position: static !important;
+      inset: auto !important;
+      z-index: auto !important;
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+      gap: 6px !important;
+      width: 100% !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow: visible !important;
+      border: 0 !important;
+      border-radius: 0 !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      transform: none !important;
+      backdrop-filter: none !important;
+    }
+
+    .ui-refresh .tab-row::before,
+    .ui-refresh .tab-row::after {
+      display: none !important;
+    }
+
+    .ui-refresh .tab-btn {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      min-width: 0 !important;
+      min-height: 56px;
+      padding: 10px 12px 10px 14px !important;
+      border: 1px solid transparent !important;
+      border-left: 3px solid transparent !important;
+      border-radius: 6px !important;
+      background: transparent !important;
+      color: var(--ink-soft) !important;
+      box-shadow: none !important;
+      text-align: left;
+      transform: none !important;
+    }
+
+    .ui-refresh .tab-btn:hover {
+      border-color: var(--hairline) !important;
+      border-left-color: var(--hairline-strong) !important;
+      background: rgba(255, 255, 255, 0.55) !important;
+    }
+
+    .ui-refresh .tab-btn.active {
+      border-color: var(--hairline) !important;
+      border-left-color: var(--pitch) !important;
+      background: var(--surface) !important;
+      box-shadow: 0 6px 16px rgba(23, 32, 39, 0.06) !important;
+    }
+
+    .ui-refresh .tab-btn.active::after {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--pitch);
+    }
+
+    .ui-refresh .tab-date {
+      color: var(--ink) !important;
+      font: 800 16px/1.2 "Bahnschrift", "Microsoft YaHei UI", sans-serif;
+    }
+
+    .ui-refresh .tab-meta {
+      grid-column: 1;
+      margin: 2px 0 0 !important;
+      color: var(--muted) !important;
+      font-size: 10px !important;
+    }
+
+    .method-panel {
+      margin: 24px 8px 0;
+      border-top: 1px solid var(--hairline-strong);
+      border-bottom: 1px solid var(--hairline-strong);
+    }
+
+    .method-panel summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 13px 0;
+      color: var(--ink-soft);
+      cursor: pointer;
+      font-size: 12px;
+      list-style: none;
+    }
+
+    .method-panel summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .method-panel summary b {
+      color: var(--pitch-dark);
+      font-size: 10px;
+    }
+
+    .method-panel[open] summary b {
+      font-size: 0;
+    }
+
+    .method-panel[open] summary b::after {
+      content: "收起";
+      font-size: 10px;
+    }
+
+    .method-body {
+      display: grid;
+      gap: 14px;
+      padding: 0 0 16px;
+    }
+
+    .ui-refresh .method-body .formula {
+      display: grid;
+      gap: 7px;
+      padding: 12px !important;
+      border: 1px solid var(--hairline) !important;
+      border-radius: 6px !important;
+      background: var(--surface) !important;
+      color: var(--ink-soft) !important;
+      font: 500 10px/1.55 Consolas, monospace !important;
+      overflow-wrap: anywhere;
+    }
+
+    .constraint-list {
+      display: grid;
+      gap: 7px;
+      margin: 0;
+      padding: 0;
+      color: var(--muted);
+      font-size: 10px;
+      list-style: none;
+    }
+
+    .constraint-list li {
+      position: relative;
+      padding-left: 13px;
+    }
+
+    .constraint-list li::before {
+      content: "";
+      position: absolute;
+      top: 0.62em;
+      left: 0;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--score);
+    }
+
+    .main-stage {
+      min-width: 0;
+      padding: 30px 90px 100px 36px;
+    }
+
+    .workspace-intro {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 28px;
+      margin-bottom: 22px;
+      padding: 2px 0 22px;
+      border-bottom: 1px solid var(--hairline-strong);
+    }
+
+    .intro-copy {
+      min-width: 0;
+    }
+
+    .ui-refresh .eyebrow {
+      display: block;
+      width: fit-content;
+      margin: 0 0 7px;
+      padding: 0 !important;
+      border: 0 !important;
+      border-radius: 0 !important;
+      background: transparent !important;
+      color: var(--pitch-dark) !important;
+      font: 800 11px/1.2 "Bahnschrift", "Microsoft YaHei UI", sans-serif;
+      text-transform: uppercase;
+    }
+
+    .workspace-intro h1 {
+      margin: 0;
+      color: var(--ink);
+      font: 800 38px/1.05 "Bahnschrift Condensed", "Microsoft YaHei UI", sans-serif;
+    }
+
+    .workspace-intro p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .matchday-stamp {
+      display: grid;
+      min-width: 185px;
+      padding: 2px 0 2px 18px;
+      border-left: 4px solid var(--score);
+      text-align: right;
+    }
+
+    .matchday-stamp > span,
+    .matchday-stamp small {
+      color: var(--muted);
+      font: 700 9px/1.4 "Bahnschrift", "Microsoft YaHei UI", sans-serif;
+    }
+
+    .matchday-stamp strong {
+      color: var(--ink);
+      font: 800 18px/1.2 "Bahnschrift", "Microsoft YaHei UI", sans-serif;
+    }
+
+    #dashboard,
+    .ui-refresh .day-panel,
+    .ui-refresh .managed-page-section {
+      min-width: 0;
+    }
+
+    .ui-refresh .day-panel,
+    .ui-refresh .managed-page-section {
+      grid-template-columns: minmax(0, 1fr) !important;
+    }
+
+    .ui-refresh .day-panel {
+      gap: 20px !important;
+    }
+
+    .ui-refresh .summary-bar {
+      display: grid !important;
+      grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+      gap: 0 !important;
+      overflow: hidden;
+      border: 1px solid var(--hairline) !important;
+      border-radius: 8px !important;
+      background: var(--surface) !important;
+      box-shadow: 0 8px 24px rgba(23, 32, 39, 0.055) !important;
+    }
+
+    .ui-refresh .summary-bar .metric {
+      position: relative;
+      min-height: 116px !important;
+      padding: 16px 17px !important;
+      border: 0 !important;
+      border-left: 1px solid var(--hairline) !important;
+      border-radius: 0 !important;
+      background: transparent !important;
+      box-shadow: none !important;
+    }
+
+    .ui-refresh .summary-bar .metric:first-child {
+      border-left: 0 !important;
+    }
+
+    .ui-refresh .summary-bar .metric:first-child::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      left: 0;
+      height: 4px;
+      background: var(--pitch);
+    }
+
+    .ui-refresh .metric .label,
+    .ui-refresh .metric > .label {
+      color: var(--muted) !important;
+      font-size: 10px !important;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .ui-refresh .metric .value,
+    .ui-refresh .metric > .value {
+      display: block;
+      margin: 7px 0 4px;
+      color: var(--ink) !important;
+      font: 800 29px/1 "Bahnschrift Condensed", "Microsoft YaHei UI", sans-serif !important;
+    }
+
+    .ui-refresh .metric .value.edge-up,
+    .ui-refresh .edge-up {
+      color: var(--pitch) !important;
+    }
+
+    .ui-refresh .warning {
+      color: var(--result) !important;
+    }
+
+    .ui-refresh .metric .sub {
+      color: var(--muted) !important;
+      font-size: 10px !important;
+      line-height: 1.45 !important;
+    }
+
+    .ui-refresh .page-section-nav {
+      position: sticky !important;
+      top: 80px !important;
+      z-index: 35 !important;
+      display: grid !important;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+      gap: 12px !important;
+      padding: 8px !important;
+      border: 1px solid var(--hairline) !important;
+      border-radius: 8px !important;
+      background: rgba(255, 255, 255, 0.92) !important;
+      box-shadow: 0 8px 20px rgba(23, 32, 39, 0.08) !important;
+      backdrop-filter: blur(14px) !important;
+      min-width: 0 !important;
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+
+    .ui-refresh .page-section-nav-title {
+      display: flex !important;
+      width: auto;
+      padding: 0 8px;
+      color: var(--muted) !important;
+    }
+
+    .ui-refresh .page-section-nav-title strong {
+      color: var(--ink) !important;
+      font-size: 12px !important;
+      white-space: nowrap;
+    }
+
+    .ui-refresh .page-section-nav-title span {
+      display: none;
+    }
+
+    .ui-refresh .page-section-tabs {
+      display: grid !important;
+      grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+      gap: 5px !important;
+      min-width: 0;
+      width: 100%;
+      max-width: 100%;
+    }
+
+    .ui-refresh .page-section-tab {
+      display: grid !important;
+      gap: 1px !important;
+      min-height: 45px !important;
+      padding: 7px 9px !important;
+      border: 1px solid transparent !important;
+      border-radius: 6px !important;
+      background: transparent !important;
+      color: var(--ink-soft) !important;
+      box-shadow: none !important;
+      text-align: left;
+      transform: none !important;
+    }
+
+    .ui-refresh .page-section-tab:hover {
+      border-color: var(--hairline) !important;
+      background: var(--surface-soft) !important;
+    }
+
+    .ui-refresh .page-section-tab.active {
+      border-color: #b9d8cc !important;
+      background: var(--pitch-soft) !important;
+    }
+
+    .ui-refresh .page-section-tab strong {
+      color: var(--ink) !important;
+      font-size: 12px !important;
+    }
+
+    .ui-refresh .page-section-tab.active strong {
+      color: var(--pitch-dark) !important;
+    }
+
+    .ui-refresh .page-section-tab span {
+      color: var(--muted) !important;
+      font-size: 9px !important;
+    }
+
+    .ui-refresh .managed-page-section {
+      gap: 0 !important;
+    }
+
+    .ui-refresh .section-group {
+      position: relative;
+      display: grid;
+      gap: 16px !important;
+      padding: 24px 0 !important;
+      overflow: visible !important;
+      border: 0 !important;
+      border-top: 1px solid var(--hairline) !important;
+      border-radius: 0 !important;
+      background: transparent !important;
+      box-shadow: none !important;
+    }
+
+    .ui-refresh .managed-page-section > .section-group:first-child,
+    .ui-refresh .managed-page-section > .matches-group:first-child {
+      border-top: 0 !important;
+    }
+
+    .ui-refresh .section-group::before,
+    .ui-refresh .section-group::after {
+      display: none !important;
+    }
+
+    .ui-refresh .section-head {
+      align-items: flex-end !important;
+      gap: 18px !important;
+    }
+
+    .ui-refresh .section-copy {
+      gap: 3px !important;
+    }
+
+    .ui-refresh .section-kicker {
+      padding: 0 !important;
+      border: 0 !important;
+      border-radius: 0 !important;
+      background: transparent !important;
+      color: var(--pitch-dark) !important;
+      font: 800 10px/1.3 "Bahnschrift", "Microsoft YaHei UI", sans-serif !important;
+      text-transform: uppercase;
+    }
+
+    .ui-refresh .section-head .section-title,
+    .ui-refresh .section-title {
+      margin: 0 !important;
+      color: var(--ink) !important;
+      font: 800 22px/1.2 "Bahnschrift Condensed", "Microsoft YaHei UI", sans-serif !important;
+    }
+
+    .ui-refresh .section-meta {
+      max-width: 560px;
+      color: var(--muted) !important;
+      font-size: 11px !important;
+      line-height: 1.55 !important;
+    }
+
+    .ui-refresh .finished-score-grid,
+    .ui-refresh .glossary-grid,
+    .ui-refresh .dashboard-quick-grid {
+      gap: 10px !important;
+    }
+
+    .ui-refresh .finished-score-card,
+    .ui-refresh .glossary-card,
+    .ui-refresh .dashboard-quick-card,
+    .ui-refresh .sync-card {
+      border: 1px solid var(--hairline) !important;
+      border-radius: 8px !important;
+      background: var(--surface) !important;
+      color: var(--ink) !important;
+      box-shadow: none !important;
+    }
+
+    .ui-refresh .finished-score-card {
+      position: relative;
+      min-height: 94px;
+      padding: 15px 15px 14px 18px !important;
+      overflow: hidden;
+    }
+
+    .ui-refresh .finished-score-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: 4px;
+      background: var(--result);
+    }
+
+    .ui-refresh .finished-score-card span {
+      color: var(--muted) !important;
+      font-size: 10px !important;
+    }
+
+    .ui-refresh .finished-score-card strong {
+      color: var(--ink) !important;
+      font: 800 18px/1.25 "Bahnschrift Condensed", "Microsoft YaHei UI", sans-serif !important;
+    }
+
+    .ui-refresh .glossary-card {
+      padding: 16px !important;
+    }
+
+    .ui-refresh .glossary-card strong,
+    .ui-refresh .dashboard-quick-card strong {
+      color: var(--ink) !important;
+    }
+
+    .ui-refresh .glossary-card p,
+    .ui-refresh .glossary-card span,
+    .ui-refresh .dashboard-quick-card span {
+      color: var(--muted) !important;
+    }
+
+    .ui-refresh .glossary-card small {
+      color: #785f00 !important;
+      font-weight: 800;
+    }
+
+    .ui-refresh .dashboard-quick-card {
+      position: relative;
+      min-height: 98px;
+      padding: 16px 42px 16px 16px !important;
+      cursor: pointer;
+      text-align: left;
+      transition: border-color 160ms ease, background 160ms ease !important;
+    }
+
+    .ui-refresh .dashboard-quick-card::after {
+      content: "→";
+      position: absolute;
+      top: 50%;
+      right: 16px;
+      color: var(--pitch);
+      font: 800 21px/1 "Bahnschrift", sans-serif;
+      transform: translateY(-50%);
+    }
+
+    .ui-refresh .dashboard-quick-card:hover {
+      border-color: #9fcbbb !important;
+      background: var(--pitch-soft) !important;
+      transform: none !important;
+    }
+
+    .ui-refresh .sync-card {
+      padding: 17px !important;
+    }
+
+    .ui-refresh .sync-status {
+      border: 1px solid var(--hairline) !important;
+      border-radius: 6px !important;
+      background: var(--surface-soft) !important;
+    }
+
+    .ui-refresh .sync-status strong {
+      color: var(--ink) !important;
+    }
+
+    .ui-refresh .sync-status span,
+    .ui-refresh .sync-status em {
+      color: var(--muted) !important;
+    }
+
+    .ui-refresh .sync-copy,
+    .ui-refresh .sync-copy p,
+    .ui-refresh .info-head,
+    .ui-refresh .footer-note,
+    .ui-refresh .tiny-note,
+    .ui-refresh .meta,
+    .ui-refresh .sub {
+      color: var(--muted) !important;
+    }
+
+    .ui-refresh .sync-copy h3,
+    .ui-refresh .sync-copy strong {
+      color: var(--ink) !important;
+    }
+
+    .ui-refresh .btn-primary,
+    .ui-refresh .ticket-primary,
+    .ui-refresh .ticket-toggle,
+    .ui-refresh .btn-ghost,
+    .ui-refresh .side-panel-close,
+    .ui-refresh .side-panel-size-reset,
+    .ui-refresh .ticket-resize-reset {
+      min-height: 38px;
+      padding: 8px 12px !important;
+      border-radius: 6px !important;
+      box-shadow: none !important;
+      cursor: pointer;
+      transition: background 160ms ease, border-color 160ms ease, color 160ms ease !important;
+      transform: none !important;
+    }
+
+    .ui-refresh .btn-primary,
+    .ui-refresh .ticket-primary {
+      border: 1px solid var(--pitch) !important;
+      background: var(--pitch) !important;
+      color: #ffffff !important;
+    }
+
+    .ui-refresh .btn-primary:hover,
+    .ui-refresh .ticket-primary:hover {
+      border-color: var(--pitch-dark) !important;
+      background: var(--pitch-dark) !important;
+    }
+
+    .ui-refresh .btn-ghost,
+    .ui-refresh .ticket-toggle,
+    .ui-refresh .side-panel-close,
+    .ui-refresh .side-panel-size-reset,
+    .ui-refresh .ticket-resize-reset {
+      border: 1px solid var(--hairline-strong) !important;
+      background: var(--surface) !important;
+      color: var(--ink-soft) !important;
+    }
+
+    .ui-refresh .btn-ghost:hover,
+    .ui-refresh .ticket-toggle:hover,
+    .ui-refresh .side-panel-close:hover,
+    .ui-refresh .side-panel-size-reset:hover {
+      border-color: var(--pitch) !important;
+      color: var(--pitch-dark) !important;
+    }
+
+    .ui-refresh input,
+    .ui-refresh select,
+    .ui-refresh textarea {
+      border: 1px solid var(--hairline-strong) !important;
+      border-radius: 6px !important;
+      background: var(--surface) !important;
+      color: var(--ink) !important;
+      box-shadow: none !important;
+    }
+
+    .ui-refresh input::placeholder,
+    .ui-refresh textarea::placeholder {
+      color: #9ba7ad !important;
+    }
+
+    .ui-refresh .note-chip,
+    .ui-refresh .pill,
+    .ui-refresh .match-strip-pill,
+    .ui-refresh .bet-tag,
+    .ui-refresh .candidate-filter-pill,
+    .ui-refresh .result-status,
+    .ui-refresh .status-chip {
+      border-radius: 999px !important;
+    }
+
+    .ui-refresh .note-chip {
+      border: 1px solid var(--hairline) !important;
+      background: var(--surface) !important;
+      color: var(--ink-soft) !important;
+    }
+
+    /* Floating tools and drawers */
+    .ui-refresh .floating-tool-rail {
+      top: 50% !important;
+      right: var(--side-tool-edge) !important;
+      bottom: auto !important;
+      left: auto !important;
+      display: grid !important;
+      gap: 8px !important;
+      width: var(--side-tool-width) !important;
+      transform: translateY(-50%) !important;
+    }
+
+    .ui-refresh .floating-tool-btn {
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+      justify-items: center !important;
+      width: var(--side-tool-width) !important;
+      min-width: var(--side-tool-width) !important;
+      min-height: 58px !important;
+      padding: 8px 5px !important;
+      border: 1px solid #2e3d45 !important;
+      border-radius: 8px !important;
+      background: var(--ink) !important;
+      color: #ffffff !important;
+      box-shadow: 0 10px 26px rgba(23, 32, 39, 0.22) !important;
+      transform: none !important;
+    }
+
+    .ui-refresh .floating-tool-btn:hover,
+    .ui-refresh .floating-tool-btn.active {
+      border-color: var(--pitch) !important;
+      background: var(--pitch) !important;
+    }
+
+    .ui-refresh .floating-tool-icon {
+      color: #ffffff !important;
+      font: 800 17px/1 "Bahnschrift", "Microsoft YaHei UI", sans-serif !important;
+    }
+
+    .ui-refresh .floating-tool-label {
+      color: #ffffff !important;
+      font-size: 10px !important;
+    }
+
+    .ui-refresh .floating-tool-meta {
+      display: none !important;
+    }
+
+    .ui-refresh .ticket-dock-inner,
+    .ui-refresh .ai-panel {
+      border: 1px solid var(--hairline-strong) !important;
+      border-radius: 8px !important;
+      background: var(--surface-soft) !important;
+      color: var(--ink) !important;
+      box-shadow: 0 24px 72px rgba(23, 32, 39, 0.24) !important;
+    }
+
+    .ui-refresh .ticket-bar {
+      border-bottom: 1px solid var(--hairline) !important;
+      background: var(--surface) !important;
+    }
+
+    .ui-refresh .ticket-badge {
+      border: 0 !important;
+      border-radius: 4px !important;
+      background: var(--score) !important;
+      color: var(--ink) !important;
+    }
+
+    .ui-refresh .ticket-count strong,
+    .ui-refresh .ticket-stat strong,
+    .ui-refresh .ticket-meta b,
+    .ui-refresh .ai-panel strong,
+    .ui-refresh .ai-panel h2,
+    .ui-refresh .ai-panel h3 {
+      color: var(--ink) !important;
+    }
+
+    .ui-refresh .ticket-status-copy,
+    .ui-refresh .ticket-stat span,
+    .ui-refresh .ticket-meta,
+    .ui-refresh .ai-inline-note,
+    .ui-refresh .ai-ticket-leg span,
+    .ui-refresh .ai-ticket-head span,
+    .ui-refresh .ai-ticket-metrics span {
+      color: var(--muted) !important;
+    }
+
+    .ui-refresh .ticket-stat,
+    .ui-refresh .metric-tile,
+    .ui-refresh .ai-block,
+    .ui-refresh .ai-result-panel,
+    .ui-refresh .ai-ticket-card,
+    .ui-refresh .ai-result-metric {
+      border: 1px solid var(--hairline) !important;
+      border-radius: 8px !important;
+      background: var(--surface) !important;
+      color: var(--ink) !important;
+      box-shadow: none !important;
+    }
+
+    .ui-refresh .ai-block::before,
+    .ui-refresh .ai-block::after {
+      display: none !important;
+    }
+
+    .ui-refresh .ai-control-panel,
+    .ui-refresh .ai-upload,
+    .ui-refresh .ai-inline-note,
+    .ui-refresh .ai-endpoint-preview code {
+      border-color: var(--hairline) !important;
+      background: var(--surface) !important;
+      color: var(--ink-soft) !important;
+    }
+
+    .ui-refresh .side-panel-resize-edge::before {
+      background: rgba(19, 121, 91, 0.45) !important;
+    }
+
+    /* Recommendation tickets */
+    .ui-refresh .daily-reco-layout,
+    .ui-refresh .day-strategy {
+      gap: 12px !important;
+    }
+
+    .ui-refresh .daily-reco-layout {
+      grid-template-columns: minmax(210px, 0.68fr) repeat(2, minmax(0, 1fr)) !important;
+      min-width: 0;
+      width: 100%;
+      max-width: 100%;
+    }
+
+    .ui-refresh .daily-reco-card,
+    .ui-refresh .plan-card,
+    .ui-refresh .bet-row {
+      min-width: 0;
+    }
+
+    .ui-refresh .daily-reco-card,
+    .ui-refresh .plan-card {
+      border: 1px solid var(--hairline) !important;
+      border-radius: 8px !important;
+      background: var(--surface) !important;
+      color: var(--ink) !important;
+      box-shadow: none !important;
+    }
+
+    .ui-refresh .daily-reco-card::before,
+    .ui-refresh .daily-reco-card::after,
+    .ui-refresh .plan-card::before,
+    .ui-refresh .plan-card::after {
+      display: none !important;
+    }
+
+    .ui-refresh .daily-reco-card h3,
+    .ui-refresh .daily-reco-card .card-head,
+    .ui-refresh .daily-reco-card .card-head strong,
+    .ui-refresh .plan-card h3 {
+      color: var(--ink) !important;
+    }
+
+    .ui-refresh .daily-reco-card .card-copy,
+    .ui-refresh .daily-pack-summary,
+    .ui-refresh .plan-card .plan-note {
+      color: var(--muted) !important;
+    }
+
+    .ui-refresh .plan-card .stack-stat {
+      min-height: 52px;
+      border: 1px solid #334149 !important;
+      border-radius: 6px !important;
+      background: var(--ink) !important;
+      color: #ffffff !important;
+    }
+
+    .ui-refresh .plan-card .stack-stat em {
+      color: #aebbc1 !important;
+    }
+
+    .ui-refresh .plan-card .stack-stat strong {
+      color: #ffffff !important;
+    }
+
+    .ui-refresh .bet-list {
+      gap: 9px !important;
+    }
+
+    .ui-refresh .bet-row,
+    .ui-refresh [data-managed-page-section="explorer"] .candidate {
+      border: 1px solid #334149 !important;
+      border-radius: 8px !important;
+      background: var(--ink) !important;
+      color: #ffffff !important;
+      box-shadow: none !important;
+      transform: none !important;
+    }
+
+    .ui-refresh .bet-row:hover,
+    .ui-refresh [data-managed-page-section="explorer"] .candidate:hover {
+      border-color: #57706d !important;
+      background: #1d2930 !important;
+      transform: none !important;
+    }
+
+    .ui-refresh .bet-primary strong,
+    .ui-refresh [data-managed-page-section="explorer"] .candidate-primary > strong {
+      color: #ffffff !important;
+    }
+
+    .ui-refresh .bet-primary .meta,
+    .ui-refresh [data-managed-page-section="explorer"] .candidate-primary .meta {
+      color: #aab7bd !important;
+    }
+
+    .ui-refresh .bet-row .stack-stat,
+    .ui-refresh [data-managed-page-section="explorer"] .stack-stat {
+      min-height: 58px;
+      border: 1px solid #334149 !important;
+      border-radius: 6px !important;
+      background: #202c33 !important;
+      color: #ffffff !important;
+      box-shadow: none !important;
+    }
+
+    .ui-refresh .bet-row .stack-stat em,
+    .ui-refresh [data-managed-page-section="explorer"] .stack-stat em {
+      color: #8f9da4 !important;
+      font-style: normal;
+    }
+
+    .ui-refresh .bet-row .stack-stat strong,
+    .ui-refresh [data-managed-page-section="explorer"] .stack-stat strong {
+      color: #ffffff !important;
+    }
+
+    .ui-refresh .ticket-match-line,
+    .ui-refresh .ticket-outcome-pill {
+      border: 1px solid #445159 !important;
+      border-radius: 5px !important;
+      background: #f7f9f9 !important;
+      color: var(--ink) !important;
+    }
+
+    .ui-refresh .bet-primary .ticket-match-line {
+      color: var(--ink) !important;
+    }
+
+    .ui-refresh .ticket-outcome-pill.won,
+    .ui-refresh .settlement.won {
+      border-color: #4ea886 !important;
+      background: rgba(19, 121, 91, 0.18) !important;
+      color: #85dfbd !important;
+    }
+
+    .ui-refresh .ticket-outcome-pill.lost,
+    .ui-refresh .settlement.lost {
+      border-color: #b55b4d !important;
+      background: rgba(217, 75, 53, 0.16) !important;
+      color: #ffb0a4 !important;
+    }
+
+    .ui-refresh .settlement-line {
+      border-color: var(--hairline) !important;
+      background: var(--surface-soft) !important;
+      color: var(--ink-soft) !important;
+    }
+
+    .ui-refresh .settlement-line strong {
+      color: var(--ink) !important;
+    }
+
+    /* Probability explorer */
+    .ui-refresh .candidate-filter-grid {
+      align-items: end !important;
+      gap: 10px !important;
+    }
+
+    .ui-refresh .candidate-filter-grid label,
+    .ui-refresh .candidate-filter-grid .label {
+      color: var(--muted) !important;
+      font-size: 11px !important;
+    }
+
+    .ui-refresh .candidate-filter-grid input,
+    .ui-refresh .candidate-filter-grid select {
+      min-height: 46px;
+      padding: 10px 12px !important;
+    }
+
+    .ui-refresh .candidate-filter-toggle-row {
+      gap: 8px !important;
+    }
+
+    .ui-refresh .candidate-toggle {
+      min-height: 42px;
+      padding: 9px 13px !important;
+      border: 1px solid var(--hairline-strong) !important;
+      border-radius: 6px !important;
+      background: var(--surface) !important;
+      color: var(--ink-soft) !important;
+    }
+
+    .ui-refresh .candidate-filter-summary {
+      gap: 7px !important;
+    }
+
+    .ui-refresh .candidate-filter-pill {
+      border-color: var(--hairline) !important;
+      background: var(--surface) !important;
+      color: var(--ink-soft) !important;
+    }
+
+    .ui-refresh [data-managed-page-section="explorer"] .candidate {
+      padding: 16px !important;
+    }
+
+    .ui-refresh [data-managed-page-section="explorer"] .candidate-list {
+      gap: 10px !important;
+    }
+
+    /* Tournament tables and bracket */
+    .ui-refresh .tournament-summary-card {
+      min-height: 105px;
+      padding: 15px !important;
+      border: 1px solid var(--hairline) !important;
+      border-radius: 8px !important;
+      background: var(--surface) !important;
+      color: var(--ink) !important;
+      box-shadow: none !important;
+    }
+
+    .ui-refresh .tournament-summary-card span,
+    .ui-refresh .tournament-summary-card p {
+      color: var(--muted) !important;
+    }
+
+    .ui-refresh .tournament-summary-card strong {
+      color: var(--ink) !important;
+      font: 800 28px/1 "Bahnschrift Condensed", "Microsoft YaHei UI", sans-serif !important;
+    }
+
+    .ui-refresh .group-table-card,
+    .ui-refresh .knockout-card,
+    .ui-refresh .advancement-chart {
+      border: 1px solid #334149 !important;
+      border-radius: 8px !important;
+      background: var(--ink) !important;
+      color: #ffffff !important;
+      box-shadow: none !important;
+    }
+
+    .ui-refresh .group-table-title,
+    .ui-refresh .group-team-name,
+    .ui-refresh .advancement-round-title,
+    .ui-refresh .advancement-team-name,
+    .ui-refresh .advancement-node strong {
+      color: #ffffff !important;
+    }
+
+    .ui-refresh .group-table-head,
+    .ui-refresh .group-standing-row .rank-cell,
+    .ui-refresh .advancement-node-head {
+      color: var(--score) !important;
+    }
+
+    .ui-refresh .group-standing-row,
+    .ui-refresh .advancement-node,
+    .ui-refresh .advancement-team-line {
+      border-color: #334149 !important;
+      border-radius: 6px !important;
+      background: #202c33 !important;
+      color: #dce3e6 !important;
+      box-shadow: none !important;
+    }
+
+    .ui-refresh .group-standing-row.advance,
+    .ui-refresh .advancement-team-line.is-projected {
+      border-color: #376f60 !important;
+      background: #1b3732 !important;
+    }
+
+    .ui-refresh .advancement-toolbar,
+    .ui-refresh .advancement-legend,
+    .ui-refresh .advancement-note,
+    .ui-refresh .advancement-lock-note {
+      border-color: var(--hairline) !important;
+      border-radius: 6px !important;
+      background: var(--surface) !important;
+      color: var(--ink-soft) !important;
+    }
+
+    /* Match centre */
+    .ui-refresh .matches {
+      gap: 18px !important;
+    }
+
+    .ui-refresh .match-card {
+      overflow: hidden !important;
+      border: 1px solid var(--hairline-strong) !important;
+      border-radius: 8px !important;
+      background: var(--surface) !important;
+      color: var(--ink) !important;
+      box-shadow: 0 10px 28px rgba(23, 32, 39, 0.08) !important;
+    }
+
+    .ui-refresh .match-top {
+      padding: 24px !important;
+      border-top: 4px solid var(--pitch);
+      background: #14262a !important;
+      color: #ffffff !important;
+    }
+
+    .ui-refresh .match-row {
+      align-items: center !important;
+    }
+
+    .ui-refresh .team-name {
+      color: #ffffff !important;
+      font: 800 30px/1.1 "Bahnschrift Condensed", "Microsoft YaHei UI", sans-serif !important;
+    }
+
+    .ui-refresh .flag-line,
+    .ui-refresh .team-stars,
+    .ui-refresh .team-stars-line,
+    .ui-refresh .recent-copy {
+      color: #b7c3c7 !important;
+    }
+
+    .ui-refresh .flag {
+      color: #ffffff !important;
+      font: 800 15px/1 "Bahnschrift", "Microsoft YaHei UI", sans-serif !important;
+    }
+
+    .ui-refresh .team-stars-label {
+      color: var(--score) !important;
+    }
+
+    .ui-refresh .time-chip,
+    .ui-refresh .match-top .note-chip,
+    .ui-refresh .match-strip-pill {
+      border-color: #405258 !important;
+      background: #24363b !important;
+      color: #dfe7e9 !important;
+    }
+
+    .ui-refresh .vs-mark {
+      color: var(--score) !important;
+      font: 800 26px/1 "Bahnschrift", sans-serif !important;
+    }
+
+    .ui-refresh .match-final-banner {
+      border-color: #397763 !important;
+      border-radius: 7px !important;
+      background: #1d4439 !important;
+      color: #ffffff !important;
+    }
+
+    .ui-refresh .final-label,
+    .ui-refresh .final-copy {
+      color: #b9d8cd !important;
+    }
+
+    .ui-refresh .final-score {
+      color: #ffffff !important;
+      font: 800 26px/1 "Bahnschrift", sans-serif !important;
+    }
+
+    .ui-refresh .match-body {
+      padding: 22px !important;
+      background: var(--surface) !important;
+      color: var(--ink) !important;
+    }
+
+    .ui-refresh .match-body .plan-note {
+      padding: 14px 16px !important;
+      border: 1px solid #ead487 !important;
+      border-left: 4px solid var(--score) !important;
+      border-radius: 6px !important;
+      background: var(--score-soft) !important;
+      color: var(--ink-soft) !important;
+    }
+
+    .ui-refresh .match-body .candidate,
+    .ui-refresh .odds-box,
+    .ui-refresh .odds-chip,
+    .ui-refresh .score-grid .index-btn,
+    .ui-refresh .result-editor {
+      border: 1px solid var(--hairline) !important;
+      border-radius: 8px !important;
+      background: var(--surface-soft) !important;
+      color: var(--ink) !important;
+      box-shadow: none !important;
+    }
+
+    .ui-refresh .match-body .candidate-primary > strong,
+    .ui-refresh .match-body .candidate strong,
+    .ui-refresh .odds-box-head,
+    .ui-refresh .odds-box h4,
+    .ui-refresh .odds-chip strong,
+    .ui-refresh .score-grid .index-btn strong {
+      color: var(--ink) !important;
+    }
+
+    .ui-refresh .match-body .candidate .meta,
+    .ui-refresh .odds-panel-note,
+    .ui-refresh .odds-chip span,
+    .ui-refresh .score-grid .index-btn span {
+      color: var(--muted) !important;
+    }
+
+    .ui-refresh .match-body .stack-stat {
+      min-height: 58px;
+      border: 1px solid var(--hairline) !important;
+      border-radius: 6px !important;
+      background: var(--surface) !important;
+      color: var(--ink) !important;
+      box-shadow: none !important;
+    }
+
+    .ui-refresh .match-body .stack-stat em {
+      color: var(--muted) !important;
+      font-style: normal;
+    }
+
+    .ui-refresh .match-body .stack-stat strong {
+      color: var(--ink) !important;
+    }
+
+    .ui-refresh .match-body .bet-tag {
+      border-color: var(--hairline) !important;
+      background: var(--canvas) !important;
+      color: var(--ink-soft) !important;
+    }
+
+    .ui-refresh .match-body .bet-tag.base {
+      border-color: #9fcbbb !important;
+      background: var(--pitch-soft) !important;
+      color: var(--pitch-dark) !important;
+    }
+
+    .ui-refresh .match-body .bet-tag.balance {
+      border-color: #b8d8e8 !important;
+      background: var(--info-soft) !important;
+      color: #1d5f86 !important;
+    }
+
+    .ui-refresh .match-body .bet-tag.risk {
+      border-color: #efb3a9 !important;
+      background: var(--result-soft) !important;
+      color: #a23424 !important;
+    }
+
+    .ui-refresh .odds-chip.recommended,
+    .ui-refresh .score-grid .index-btn:hover {
+      border-color: #9fcbbb !important;
+      background: var(--pitch-soft) !important;
+      transform: none !important;
+    }
+
+    .ui-refresh .odds-expand {
+      border-color: var(--hairline) !important;
+      border-radius: 6px !important;
+      background: var(--surface) !important;
+      color: var(--ink-soft) !important;
+    }
+
+    .ui-refresh .result-status.filled {
+      border-color: #9fcbbb !important;
+      background: var(--pitch-soft) !important;
+      color: var(--pitch-dark) !important;
+    }
+
+    /* Ticket drawer */
+    .ui-refresh .ticket-dock-inner {
+      grid-template-rows: max-content auto minmax(0, 1fr) !important;
+      overflow: hidden !important;
+    }
+
+    .ui-refresh .ticket-bar {
+      display: grid !important;
+      grid-template-columns: minmax(0, 1.1fr) minmax(270px, 0.9fr) !important;
+      gap: 14px !important;
+      height: auto !important;
+      min-height: max-content !important;
+      padding: 16px !important;
+    }
+
+    .ui-refresh .ticket-count {
+      min-width: 0;
+    }
+
+    .ui-refresh .ticket-count > strong {
+      font-size: 18px !important;
+    }
+
+    .ui-refresh .ticket-status-copy {
+      font-size: 10px !important;
+      line-height: 1.45 !important;
+    }
+
+    .ui-refresh .ticket-meta {
+      display: flex !important;
+      grid-template-columns: none !important;
+      flex-wrap: wrap;
+      gap: 8px 14px !important;
+      font-size: 10px !important;
+    }
+
+    .ui-refresh .ticket-stats {
+      display: grid !important;
+      grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      gap: 8px !important;
+    }
+
+    .ui-refresh .ticket-stat {
+      min-height: 76px;
+      padding: 10px !important;
+    }
+
+    .ui-refresh .ticket-stat strong {
+      font: 800 18px/1.1 "Bahnschrift", "Microsoft YaHei UI", sans-serif !important;
+    }
+
+    .ui-refresh .ticket-actions {
+      grid-column: 1 / -1;
+      display: flex !important;
+      justify-content: flex-end;
+      gap: 8px !important;
+      padding-top: 11px;
+      border-top: 1px solid var(--hairline);
+    }
+
+    .ui-refresh .ticket-resize-tools {
+      background: var(--surface-soft) !important;
+    }
+
+    .ui-refresh .ticket-sheet {
+      min-height: 0 !important;
+      padding: 14px 16px 18px !important;
+      overflow: auto !important;
+      background: var(--surface-soft) !important;
+      color: var(--ink) !important;
+    }
+
+    .ui-refresh .builder-card.docked {
+      padding: 0 !important;
+      border: 0 !important;
+      border-radius: 0 !important;
+      background: transparent !important;
+      box-shadow: none !important;
+    }
+
+    .ui-refresh .builder-panel,
+    .ui-refresh .builder-browser,
+    .ui-refresh .builder-match-card,
+    .ui-refresh .builder-leg {
+      border: 1px solid var(--hairline) !important;
+      border-radius: 8px !important;
+      background: var(--surface) !important;
+      color: var(--ink) !important;
+      box-shadow: none !important;
+    }
+
+    .ui-refresh .builder-panel::before,
+    .ui-refresh .builder-panel::after {
+      display: none !important;
+    }
+
+    .ui-refresh .builder-panel h4,
+    .ui-refresh .builder-browser h4,
+    .ui-refresh .builder-match-title strong,
+    .ui-refresh .builder-leg-copy strong,
+    .ui-refresh .builder-field strong,
+    .ui-refresh .metric-tile strong {
+      color: var(--ink) !important;
+    }
+
+    .ui-refresh .builder-card .info-head,
+    .ui-refresh .builder-card .info-head strong,
+    .ui-refresh .builder-card .info-head h3,
+    .ui-refresh .builder-card .info-head h4 {
+      color: var(--ink) !important;
+    }
+
+    .ui-refresh .builder-match-title span,
+    .ui-refresh .builder-leg-copy .meta,
+    .ui-refresh .builder-field,
+    .ui-refresh .builder-chip-meta,
+    .ui-refresh .metric-tile span {
+      color: var(--muted) !important;
+    }
+
+    .ui-refresh .builder-market-label {
+      color: var(--ink-soft) !important;
+    }
+
+    .ui-refresh .builder-select-chip,
+    .ui-refresh .pass-btn {
+      border: 1px solid var(--hairline-strong) !important;
+      border-radius: 6px !important;
+      background: var(--surface-soft) !important;
+      color: var(--ink) !important;
+      box-shadow: none !important;
+      transform: none !important;
+    }
+
+    .ui-refresh .builder-select-chip:hover,
+    .ui-refresh .pass-btn:hover {
+      border-color: #9fcbbb !important;
+      background: var(--pitch-soft) !important;
+      transform: none !important;
+    }
+
+    .ui-refresh .builder-select-chip.selected,
+    .ui-refresh .pass-btn.active {
+      border-color: var(--pitch) !important;
+      background: var(--pitch) !important;
+      color: #ffffff !important;
+    }
+
+    .ui-refresh .builder-select-chip.selected strong,
+    .ui-refresh .builder-select-chip.selected .builder-chip-meta {
+      color: #ffffff !important;
+    }
+
+    .ui-refresh .builder-match-badge,
+    .ui-refresh .builder-leg-count,
+    .ui-refresh .market-rule-pill {
+      border-color: #d8c56e !important;
+      background: var(--score-soft) !important;
+      color: #765e00 !important;
+    }
+
+    .ui-refresh .metric-tile {
+      min-height: 54px;
+    }
+
+    /* AI drawer */
+    .ui-refresh .ai-panel {
+      grid-template-rows: auto auto minmax(148px, 1fr) !important;
+      gap: 12px !important;
+      padding: 18px !important;
+    }
+
+    .ui-refresh .ai-panel > .info-head {
+      min-height: 58px !important;
+      height: auto !important;
+      margin: 0 !important;
+      padding: 0 0 12px !important;
+      border-bottom: 1px solid var(--hairline) !important;
+    }
+
+    .ui-refresh .ai-control-panel {
+      max-height: 280px !important;
+      overflow: auto !important;
+      border: 1px solid var(--hairline) !important;
+      border-radius: 8px !important;
+      background: var(--surface) !important;
+    }
+
+    .ui-refresh .ai-control-panel:not([open]) {
+      max-height: 54px !important;
+      overflow: hidden !important;
+    }
+
+    .ui-refresh .ai-control-panel summary {
+      color: var(--ink) !important;
+      background: var(--surface) !important;
+    }
+
+    .ui-refresh .ai-control-panel summary::after {
+      content: "⌄" !important;
+      position: static !important;
+      display: inline-grid !important;
+      place-items: center;
+      width: 24px !important;
+      height: 24px !important;
+      border: 0 !important;
+      border-radius: 4px !important;
+      background: var(--canvas) !important;
+      color: var(--ink-soft) !important;
+      transform: none !important;
+    }
+
+    .ui-refresh .ai-control-panel[open] summary::after {
+      transform: rotate(180deg) !important;
+    }
+
+    .ui-refresh .ai-control-panel summary small {
+      color: var(--muted) !important;
+    }
+
+    .ui-refresh .ai-control-body {
+      background: var(--surface) !important;
+    }
+
+    .ui-refresh .ai-fields {
+      grid-template-columns: minmax(0, 1fr) !important;
+    }
+
+    .ui-refresh .ai-field.full {
+      grid-column: auto !important;
+    }
+
+    .ui-refresh .ai-result-panel {
+      min-height: 0 !important;
+      height: auto !important;
+      overflow: hidden !important;
+    }
+
+    .ui-refresh .ai-result-head {
+      border-bottom: 1px solid var(--hairline) !important;
+    }
+
+    .ui-refresh .ai-result-scroll {
+      min-height: 0 !important;
+      height: 100% !important;
+      overflow: auto !important;
+      color: var(--ink-soft) !important;
+    }
+
+    .ui-refresh .ai-upload,
+    .ui-refresh .ai-preview {
+      border-radius: 6px !important;
+    }
+
+    @media (max-width: 1180px) {
+      .workspace-shell {
+        grid-template-columns: 204px minmax(0, 1fr);
+      }
+
+      .main-stage {
+        padding-right: 82px;
+        padding-left: 24px;
+      }
+
+      .ui-refresh .summary-bar {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      }
+
+      .ui-refresh .summary-bar .metric:nth-child(4) {
+        border-left: 0 !important;
+        border-top: 1px solid var(--hairline) !important;
+      }
+
+      .ui-refresh .summary-bar .metric:nth-child(n+5) {
+        border-top: 1px solid var(--hairline) !important;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .app-topbar {
+        min-height: 62px;
+        padding: 9px 16px;
+      }
+
+      .brand-emblem {
+        width: 40px;
+        height: 40px;
+        flex-basis: 40px;
+      }
+
+      .workspace-shell {
+        display: block;
+        min-height: 0;
+      }
+
+      .matchday-sidebar {
+        position: sticky;
+        top: 62px;
+        z-index: 55;
+        height: auto;
+        padding: 10px 14px 11px;
+        overflow: hidden;
+        border-right: 0;
+        border-bottom: 1px solid var(--hairline-strong);
+        background: rgba(238, 241, 243, 0.95);
+        backdrop-filter: blur(14px);
+      }
+
+      .sidebar-heading,
+      .method-panel {
+        display: none;
+      }
+
+      .ui-refresh .tab-row {
+        display: flex !important;
+        gap: 7px !important;
+        overflow-x: auto !important;
+        overscroll-behavior-x: contain;
+        scrollbar-width: none;
+      }
+
+      .ui-refresh .tab-row::-webkit-scrollbar {
+        display: none;
+      }
+
+      .ui-refresh .tab-btn {
+        flex: 0 0 142px !important;
+        min-height: 50px;
+        padding: 8px 10px !important;
+        border: 1px solid var(--hairline) !important;
+        border-bottom: 3px solid transparent !important;
+        background: rgba(255, 255, 255, 0.58) !important;
+      }
+
+      .ui-refresh .tab-btn.active {
+        border-color: var(--hairline) !important;
+        border-bottom-color: var(--pitch) !important;
+        background: var(--surface) !important;
+      }
+
+      .ui-refresh .tab-btn.active::after {
+        display: none;
+      }
+
+      .main-stage {
+        padding: 22px 18px 118px;
+      }
+
+      .workspace-intro h1 {
+        font-size: 32px;
+      }
+
+      .ui-refresh .page-section-nav {
+        top: 130px !important;
+      }
+
+      .ui-refresh .daily-reco-layout,
+      .ui-refresh .day-strategy {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .brand-copy span,
+      .status-indicator {
+        display: none;
+      }
+
+      .brand-copy strong {
+        font-size: 14px;
+      }
+
+      .topbar-meta {
+        gap: 10px;
+      }
+
+      .topbar-budget {
+        padding-left: 0;
+        border-left: 0;
+        font-size: 10px;
+      }
+
+      .topbar-budget > span {
+        display: none;
+      }
+
+      .topbar-budget strong {
+        font-size: 15px;
+      }
+
+      .main-stage {
+        padding: 18px 12px 124px;
+      }
+
+      .workspace-intro {
+        align-items: flex-start;
+        margin-bottom: 15px;
+        padding-bottom: 16px;
+      }
+
+      .workspace-intro h1 {
+        font-size: 27px;
+        line-height: 1.1;
+      }
+
+      .workspace-intro p {
+        font-size: 11px;
+      }
+
+      .matchday-stamp {
+        display: none;
+      }
+
+      .ui-refresh .summary-bar {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        min-width: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+
+      .ui-refresh .summary-bar .metric {
+        min-height: 108px !important;
+        padding: 13px !important;
+        border-top: 1px solid var(--hairline) !important;
+      }
+
+      .ui-refresh .summary-bar .metric:nth-child(-n+2) {
+        border-top: 0 !important;
+      }
+
+      .ui-refresh .summary-bar .metric:nth-child(odd) {
+        border-left: 0 !important;
+      }
+
+      .ui-refresh .metric .value,
+      .ui-refresh .metric > .value {
+        font-size: 25px !important;
+      }
+
+      .ui-refresh .page-section-nav {
+        top: 125px !important;
+        display: block !important;
+        padding: 7px !important;
+        overflow: hidden !important;
+      }
+
+      .ui-refresh .page-section-nav-title {
+        display: none !important;
+      }
+
+      .ui-refresh .page-section-tabs {
+        display: flex !important;
+        gap: 5px !important;
+        overflow-x: auto !important;
+        scrollbar-width: none;
+      }
+
+      .ui-refresh .page-section-tabs::-webkit-scrollbar {
+        display: none;
+      }
+
+      .ui-refresh .page-section-tab {
+        flex: 0 0 112px !important;
+        min-height: 42px !important;
+      }
+
+      .ui-refresh .page-section-tab span {
+        display: none;
+      }
+
+      .ui-refresh .section-group {
+        padding: 20px 0 !important;
+      }
+
+      .ui-refresh .section-head {
+        align-items: flex-start !important;
+        flex-direction: column;
+        gap: 7px !important;
+      }
+
+      .ui-refresh .section-title,
+      .ui-refresh .section-head .section-title {
+        font-size: 20px !important;
+      }
+
+      .ui-refresh .section-meta {
+        max-width: none;
+        text-align: left !important;
+      }
+
+      .ui-refresh .dashboard-quick-grid,
+      .ui-refresh .glossary-grid,
+      .ui-refresh .finished-score-grid {
+        grid-template-columns: 1fr !important;
+      }
+
+      .ui-refresh .floating-tool-rail {
+        top: auto !important;
+        right: auto !important;
+        bottom: calc(env(safe-area-inset-bottom, 0px) + 9px) !important;
+        left: 50% !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        width: min(92vw, 330px) !important;
+        transform: translateX(-50%) !important;
+      }
+
+      .ui-refresh .floating-tool-btn {
+        width: auto !important;
+        min-width: 0 !important;
+        min-height: 48px !important;
+        grid-template-columns: auto auto !important;
+        gap: 7px;
+        padding: 8px 12px !important;
+      }
+
+      .ui-refresh .ticket-dock-inner,
+      .ui-refresh .ai-panel {
+        border-radius: 8px !important;
+      }
+
+      .ui-refresh .ticket-bar {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+        padding: 12px !important;
+      }
+
+      .ui-refresh .ticket-stats {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      }
+
+      .ui-refresh .ticket-actions {
+        grid-column: 1;
+        justify-content: stretch;
+      }
+
+      .ui-refresh .ticket-actions > * {
+        flex: 1 1 0;
+      }
+
+      .ui-refresh .ai-panel > .info-head {
+        grid-template-columns: minmax(0, 1fr) auto !important;
+        min-height: 70px !important;
+      }
+
+      .ui-refresh .ai-panel > .info-head .side-panel-size-reset {
+        display: none !important;
+      }
+
+      .ui-refresh .ai-panel > .info-head .side-panel-close {
+        min-width: 66px;
+        white-space: nowrap;
+      }
+
+      .ui-refresh .ticket-status-copy,
+      .ui-refresh .ticket-resize-tools,
+      .ui-refresh .ticket-actions .side-panel-size-reset,
+      .ui-refresh .ticket-meta {
+        display: none !important;
+      }
+
+      .ui-refresh .ticket-count > strong {
+        font-size: 16px !important;
+      }
+
+      .ui-refresh .ticket-meta {
+        gap: 5px 10px !important;
+      }
+
+      .ui-refresh .ticket-stat {
+        min-height: 64px;
+        padding: 8px !important;
+      }
+
+      .ui-refresh .ticket-stat strong {
+        font-size: 15px !important;
+      }
+
+      .ui-refresh .builder-grid,
+      .ui-refresh .builder-match-grid {
+        grid-template-columns: 1fr !important;
+      }
+
+      .ui-refresh .match-top,
+      .ui-refresh .match-body {
+        padding: 16px !important;
+      }
+
+      .ui-refresh .team-name {
+        font-size: 24px !important;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .workspace-intro h1 {
+        font-size: 24px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .ui-refresh *,
+      .ui-refresh *::before,
+      .ui-refresh *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* Control room v2: a broadcast-inspired operational layer. */
+    .control-room-v2 {
+      --cr-graphite: #101820;
+      --cr-graphite-2: #17242c;
+      --cr-graphite-3: #22333c;
+      --cr-pitch: #0f7657;
+      --cr-pitch-bright: #35ad7f;
+      --cr-score: #f5c84c;
+      --cr-paper: #f4f7f8;
+      --cr-canvas: #e9eef0;
+      --cr-line: #cbd5d9;
+      --cr-red: #d94f42;
+      --cr-info: #3a7fa8;
+      background-color: var(--cr-canvas) !important;
+      background-image:
+        linear-gradient(rgba(16, 24, 32, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(16, 24, 32, 0.018) 1px, transparent 1px) !important;
+      background-size: 32px 32px !important;
+      color: var(--cr-graphite) !important;
+    }
+
+    .control-room-v2 .app-topbar {
+      display: grid;
+      grid-template-columns: max-content minmax(280px, 1fr) max-content;
+      gap: 24px;
+      min-height: 74px;
+      padding: 10px max(24px, calc((100vw - 1660px) / 2));
+      border-bottom: 3px solid var(--cr-pitch);
+      background: var(--cr-graphite);
+      box-shadow: 0 10px 34px rgba(16, 24, 32, 0.18);
+    }
+
+    .control-room-v2 .brand-emblem {
+      width: 46px;
+      height: 46px;
+      flex-basis: 46px;
+      border: 0;
+      border-radius: 4px;
+      background: var(--cr-pitch);
+      box-shadow: inset 0 -5px 0 var(--cr-score);
+      font-family: "Bahnschrift Condensed", "Arial Narrow", sans-serif;
+    }
+
+    .control-room-v2 .brand-copy strong {
+      font-size: 16px;
+    }
+
+    .control-room-v2 .brand-copy span {
+      color: #91a3ab;
+      font-size: 9px;
+    }
+
+    .live-ribbon {
+      position: relative;
+      display: grid;
+      grid-template-columns: max-content minmax(0, 1fr) max-content;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+      min-height: 42px;
+      padding: 7px 14px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      background: #1a2831;
+      color: #dce5e8;
+    }
+
+    .live-ribbon::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: 3px;
+      background: var(--cr-score);
+    }
+
+    .live-ribbon-kicker,
+    .live-ribbon-state {
+      font: 800 9px/1.2 "Bahnschrift", "Microsoft YaHei UI", sans-serif;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .live-ribbon-kicker {
+      color: var(--cr-score);
+    }
+
+    .live-ribbon-main {
+      min-width: 0;
+      overflow: hidden;
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 700;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .live-ribbon-state {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: #9eb0b8;
+    }
+
+    .live-ribbon-state i {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--cr-pitch-bright);
+      box-shadow: 0 0 0 4px rgba(53, 173, 127, 0.12);
+    }
+
+    .control-room-v2 .workspace-shell {
+      grid-template-columns: 258px minmax(0, 1fr);
+      width: min(1660px, 100%);
+      min-height: calc(100vh - 74px);
+    }
+
+    .control-room-v2 .matchday-sidebar {
+      top: 74px;
+      height: calc(100vh - 74px);
+      padding: 24px 16px 42px;
+      border-right: 1px solid #bcc9ce;
+      background: rgba(244, 247, 248, 0.94);
+      box-shadow: 14px 0 34px rgba(16, 24, 32, 0.035);
+      backdrop-filter: blur(16px);
+    }
+
+    .control-room-v2 .sidebar-heading {
+      margin: 0 8px 18px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--cr-line);
+    }
+
+    .control-room-v2 .sidebar-heading > span {
+      color: var(--cr-pitch);
+    }
+
+    .control-room-v2 .sidebar-heading strong {
+      font-size: 30px;
+    }
+
+    .sidebar-season-meta {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1px;
+      margin: 0 8px 20px;
+      overflow: hidden;
+      border: 1px solid var(--cr-line);
+      border-radius: 4px;
+      background: var(--cr-line);
+    }
+
+    .sidebar-season-meta span {
+      display: grid;
+      gap: 1px;
+      padding: 8px 9px;
+      background: #ffffff;
+      color: #65747b;
+      font-size: 9px;
+    }
+
+    .sidebar-season-meta strong {
+      color: var(--cr-graphite);
+      font: 800 15px/1.1 "Bahnschrift", "Microsoft YaHei UI", sans-serif;
+    }
+
+    .control-room-v2 .tab-row {
+      display: grid !important;
+      gap: 18px !important;
+    }
+
+    .day-group {
+      display: grid;
+      gap: 6px;
+    }
+
+    .day-group-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 0 8px 3px;
+      color: #76868d;
+      font: 800 9px/1.2 "Bahnschrift", "Microsoft YaHei UI", sans-serif;
+      text-transform: uppercase;
+    }
+
+    .day-group-label::after {
+      content: "";
+      height: 1px;
+      flex: 1;
+      background: var(--cr-line);
+    }
+
+    .day-group-days {
+      display: grid;
+      gap: 5px;
+    }
+
+    .control-room-v2 .tab-btn {
+      grid-template-columns: minmax(0, 1fr) auto;
+      min-height: 62px;
+      padding: 10px 11px 9px 13px !important;
+      border: 1px solid transparent !important;
+      border-left: 3px solid transparent !important;
+      border-radius: 4px !important;
+      background: transparent !important;
+    }
+
+    .control-room-v2 .tab-btn:hover {
+      border-color: #c7d2d6 !important;
+      border-left-color: #9eb0b8 !important;
+      background: #ffffff !important;
+    }
+
+    .control-room-v2 .tab-btn.active {
+      border-color: #b9c9ce !important;
+      border-left-color: var(--cr-pitch) !important;
+      background: #ffffff !important;
+      box-shadow: 0 8px 18px rgba(16, 24, 32, 0.07) !important;
+    }
+
+    .tab-date-row {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      min-width: 0;
+    }
+
+    .control-room-v2 .tab-date {
+      color: var(--cr-graphite) !important;
+      font-size: 15px !important;
+    }
+
+    .tab-state {
+      display: inline-flex;
+      align-items: center;
+      min-height: 18px;
+      padding: 2px 5px;
+      border: 1px solid #ccd7da;
+      border-radius: 3px;
+      background: #eef2f3;
+      color: #63737a;
+      font-size: 8px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .tab-btn.is-settled .tab-state {
+      border-color: #b8d8cb;
+      background: #e6f2ed;
+      color: #0d694d;
+    }
+
+    .tab-btn.is-current .tab-state {
+      border-color: #ead48b;
+      background: #fff7d8;
+      color: #765b00;
+    }
+
+    .control-room-v2 .tab-meta {
+      margin-top: 3px !important;
+      color: #75858c !important;
+    }
+
+    .control-room-v2 .method-panel {
+      margin-top: 26px;
+    }
+
+    .control-room-v2 .main-stage {
+      padding: 30px 92px 110px 38px;
+    }
+
+    .control-room-v2 .workspace-intro {
+      position: relative;
+      align-items: center;
+      margin: 0 0 22px;
+      padding: 27px 28px 25px;
+      overflow: hidden;
+      border: 0;
+      border-left: 5px solid var(--cr-score);
+      background-color: var(--cr-graphite-2);
+      background-image:
+        linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+        linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+      background-size: 38px 38px;
+      color: #ffffff;
+      box-shadow: 0 16px 34px rgba(16, 24, 32, 0.14);
+    }
+
+    .control-room-v2 .workspace-intro::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: 23%;
+      width: 112px;
+      height: 112px;
+      border: 1px solid rgba(255, 255, 255, 0.075);
+      border-radius: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+
+    .control-room-v2 .workspace-intro .eyebrow {
+      color: #6fd0a8 !important;
+    }
+
+    .control-room-v2 .workspace-intro h1 {
+      color: #ffffff;
+      font-size: 38px;
+    }
+
+    .control-room-v2 .workspace-intro p {
+      color: #a9b8be;
+    }
+
+    .control-room-v2 .matchday-stamp {
+      position: relative;
+      z-index: 1;
+      min-width: 210px;
+      padding: 4px 0 4px 20px;
+      border-left-color: var(--cr-score);
+    }
+
+    .control-room-v2 .matchday-stamp > span,
+    .control-room-v2 .matchday-stamp small {
+      color: #91a3ab;
+    }
+
+    .control-room-v2 .matchday-stamp strong {
+      color: #ffffff;
+      font-size: 20px;
+    }
+
+    .control-room-v2 .summary-bar {
+      border-color: #bdcacf !important;
+      border-top: 3px solid var(--cr-pitch) !important;
+      border-radius: 4px !important;
+      box-shadow: 0 12px 28px rgba(16, 24, 32, 0.08) !important;
+    }
+
+    .control-room-v2 .summary-bar .metric {
+      min-height: 110px !important;
+      padding: 15px 16px !important;
+      border-left-color: #d3dcdf !important;
+    }
+
+    .control-room-v2 .summary-bar .metric:first-child::before {
+      background: var(--cr-score);
+    }
+
+    .control-room-v2 .metric .value,
+    .control-room-v2 .metric > .value {
+      color: var(--cr-graphite) !important;
+      font-size: 28px !important;
+    }
+
+    .control-room-v2 .page-section-nav {
+      top: 86px !important;
+      border-color: #bdcacf !important;
+      border-radius: 4px !important;
+      background: rgba(244, 247, 248, 0.95) !important;
+      box-shadow: 0 10px 24px rgba(16, 24, 32, 0.075) !important;
+    }
+
+    .control-room-v2 .page-section-tab {
+      border-radius: 3px !important;
+    }
+
+    .control-room-v2 .page-section-tab.active {
+      border-color: #a9d0c1 !important;
+      background: #dfeee8 !important;
+      box-shadow: inset 0 -2px 0 var(--cr-pitch) !important;
+    }
+
+    .control-room-v2 .section-group {
+      padding: 26px 0 !important;
+      border-top-color: #c7d2d6 !important;
+    }
+
+    .control-room-v2 .section-kicker {
+      color: var(--cr-pitch) !important;
+    }
+
+    .control-room-v2 .section-title,
+    .control-room-v2 .section-head .section-title {
+      color: var(--cr-graphite) !important;
+      font-size: 23px !important;
+    }
+
+    .control-room-v2 .plan-card,
+    .control-room-v2 .candidate,
+    .control-room-v2 .strategy-ticket,
+    .control-room-v2 .match-card,
+    .control-room-v2 .tournament-group-card,
+    .control-room-v2 .bracket-match-card {
+      border-color: #c4d0d4 !important;
+      border-radius: 4px !important;
+      background: #ffffff !important;
+      box-shadow: 0 8px 20px rgba(16, 24, 32, 0.055) !important;
+    }
+
+    .control-room-v2 .plan-card:hover,
+    .control-room-v2 .candidate:hover,
+    .control-room-v2 .match-card:hover {
+      border-color: #9fb2b9 !important;
+      box-shadow: 0 13px 28px rgba(16, 24, 32, 0.085) !important;
+    }
+
+    .control-room-v2 .match-card {
+      overflow: hidden;
+      border-top: 3px solid var(--cr-graphite-3) !important;
+    }
+
+    .control-room-v2 .match-top {
+      background: #f8fafb !important;
+    }
+
+    .control-room-v2 .match-final-banner {
+      border-radius: 3px !important;
+      background: #e4f1ec !important;
+      color: #114e3d !important;
+    }
+
+    .control-room-v2 .sync-card {
+      border-left: 4px solid var(--cr-info) !important;
+      border-radius: 4px !important;
+    }
+
+    .control-room-v2 .daily-reco-layout > .plan-card:nth-child(2) {
+      border-top: 3px solid var(--cr-pitch) !important;
+    }
+
+    .control-room-v2 .daily-reco-layout > .plan-card:nth-child(3) {
+      border-top: 3px solid var(--cr-score) !important;
+    }
+
+    .control-room-v2 .finished-score-card {
+      border-left: 3px solid var(--cr-pitch) !important;
+    }
+
+    .control-room-v2 .floating-tool-btn {
+      border-radius: 4px !important;
+      background: var(--cr-graphite) !important;
+      box-shadow: 0 10px 24px rgba(16, 24, 32, 0.2) !important;
+    }
+
+    .control-room-v2 .floating-tool-btn:hover {
+      background: var(--cr-pitch) !important;
+    }
+
+    .control-room-v2 .ticket-dock-inner,
+    .control-room-v2 .ai-panel {
+      border-color: #8ea2aa !important;
+      border-radius: 5px !important;
+      box-shadow: 0 26px 70px rgba(16, 24, 32, 0.3) !important;
+    }
+
+    .control-room-v2 .ticket-dock .info-head,
+    .control-room-v2 .ai-panel > .info-head {
+      border-bottom: 3px solid var(--cr-pitch) !important;
+      background: var(--cr-graphite) !important;
+      color: #ffffff !important;
+    }
+
+    .control-room-v2 .ticket-dock .info-head h3,
+    .control-room-v2 .ai-panel > .info-head h3 {
+      color: #ffffff !important;
+    }
+
+    @media (max-width: 1180px) {
+      .control-room-v2 .app-topbar {
+        grid-template-columns: max-content minmax(220px, 1fr) max-content;
+        gap: 14px;
+      }
+
+      .control-room-v2 .workspace-shell {
+        grid-template-columns: 220px minmax(0, 1fr);
+      }
+
+      .control-room-v2 .main-stage {
+        padding-right: 82px;
+        padding-left: 24px;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .control-room-v2 .app-topbar {
+        grid-template-columns: max-content minmax(0, 1fr) max-content;
+        min-height: 64px;
+        padding: 8px 14px;
+      }
+
+      .control-room-v2 .live-ribbon {
+        min-height: 38px;
+      }
+
+      .control-room-v2 .live-ribbon-kicker,
+      .control-room-v2 .live-ribbon-state {
+        display: none;
+      }
+
+      .control-room-v2 .live-ribbon {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .control-room-v2 .matchday-sidebar {
+        top: 64px;
+        height: auto;
+        padding: 9px 12px 10px;
+        overflow: hidden;
+      }
+
+      .control-room-v2 .sidebar-season-meta {
+        display: none;
+      }
+
+      .control-room-v2 .tab-row {
+        display: flex !important;
+        gap: 7px !important;
+      }
+
+      .control-room-v2 .day-group {
+        display: contents;
+      }
+
+      .control-room-v2 .day-group-label {
+        display: none;
+      }
+
+      .control-room-v2 .day-group-days {
+        display: contents;
+      }
+
+      .control-room-v2 .tab-btn {
+        flex: 0 0 152px !important;
+      }
+
+      .control-room-v2 .main-stage {
+        padding: 18px 18px 118px;
+      }
+
+      .control-room-v2 .page-section-nav {
+        top: 132px !important;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .control-room-v2 .app-topbar {
+        grid-template-columns: max-content minmax(0, 1fr) max-content;
+        gap: 9px;
+        min-height: 60px;
+        padding: 7px 10px;
+      }
+
+      .control-room-v2 .brand-emblem {
+        width: 38px;
+        height: 38px;
+        flex-basis: 38px;
+        font-size: 19px;
+      }
+
+      .control-room-v2 .brand-copy strong {
+        font-size: 13px;
+      }
+
+      .control-room-v2 .live-ribbon {
+        min-height: 36px;
+        padding: 6px 9px;
+      }
+
+      .control-room-v2 .live-ribbon-main {
+        font-size: 10px;
+      }
+
+      .control-room-v2 .topbar-budget {
+        display: none;
+      }
+
+      .control-room-v2 .matchday-sidebar {
+        top: 60px;
+        height: auto;
+        padding: 8px 10px 9px;
+      }
+
+      .control-room-v2 .tab-btn {
+        flex-basis: 132px !important;
+        min-height: 48px;
+        padding: 7px 9px !important;
+      }
+
+      .control-room-v2 .tab-date {
+        font-size: 13px !important;
+      }
+
+      .control-room-v2 .main-stage {
+        padding: 12px 10px 124px;
+      }
+
+      .control-room-v2 .workspace-intro {
+        min-height: 0;
+        margin-bottom: 12px;
+        padding: 17px 16px 16px;
+        border-left-width: 4px;
+      }
+
+      .control-room-v2 .workspace-intro::after {
+        right: -32px;
+        width: 100px;
+        height: 100px;
+      }
+
+      .control-room-v2 .workspace-intro h1 {
+        max-width: 280px;
+        font-size: 25px;
+      }
+
+      .control-room-v2 .workspace-intro p {
+        margin-top: 6px;
+        font-size: 10px;
+      }
+
+      .control-room-v2 .summary-bar {
+        display: flex !important;
+        gap: 0 !important;
+        overflow-x: auto !important;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+      }
+
+      .control-room-v2 .summary-bar::-webkit-scrollbar {
+        display: none;
+      }
+
+      .control-room-v2 .summary-bar .metric {
+        flex: 0 0 150px !important;
+        min-height: 104px !important;
+        padding: 12px !important;
+        border-top: 0 !important;
+        border-left: 1px solid #d3dcdf !important;
+        scroll-snap-align: start;
+      }
+
+      .control-room-v2 .summary-bar .metric:first-child {
+        border-left: 0 !important;
+      }
+
+      .control-room-v2 .metric .value,
+      .control-room-v2 .metric > .value {
+        font-size: 23px !important;
+      }
+
+      .control-room-v2 .page-section-nav {
+        top: 119px !important;
+        margin-top: 10px;
+      }
+
+      .control-room-v2 .section-group {
+        padding: 18px 0 !important;
+      }
+
+      .control-room-v2 .section-title,
+      .control-room-v2 .section-head .section-title {
+        font-size: 19px !important;
+      }
+
+      .control-room-v2 .plan-card,
+      .control-room-v2 .candidate,
+      .control-room-v2 .strategy-ticket,
+      .control-room-v2 .match-card {
+        border-radius: 3px !important;
+      }
+
+      .control-room-v2 .floating-tool-rail {
+        width: min(94vw, 350px) !important;
+      }
+    }
   </style>
 </head>
-<body>
+<body class="ui-refresh control-room-v2">
   <div class="app">
-    <section class="hero">
-      <span class="eyebrow">World Cup Betting Lab</span>
-      <h1>世界杯彩票最优投注实验台</h1>
-      <p>
-        这一版不再只是给比分预测，而是把赔率、模型概率、资金分配和出票模拟放到同一页里。
-        页面会先用比分分布模型估计比赛结果，再结合庄盘隐含概率做联合校准，最后在每天 100 元预算下给出更直观的单关、串关和复式分析。
-      </p>
-
-      <div class="hero-grid">
-        <div class="hero-card">
-          <h2>模型核心</h2>
-          <div class="formula">
-            1. 比分层：P(X=x, Y=y) = Pois(&lambda;主, x) * Pois(&lambda;客, y)<br>
-            2. 庄盘去水：先用 Shin implied probabilities 去掉 overround 与热门偏置<br>
-            3. 概率校准：p = w * p_poisson + (1 - w) * p_shin，再按市场重新归一化<br>
-            4. Kelly 基础：f* = max(0, (p * odds - 1) / (odds - 1))<br>
-            5. 缩放投注：f = min(cap, &alpha; * f*)<br>
-            6. OGI 指标：10000 * [p ln(1 + f(odds - 1)) + (1-p) ln(1-f)]
-          </div>
-          <div class="footer-note">
-            OGI 越高，代表当前票型对对数资金增长的贡献越高。比分和串关波动更大，所以页面会自动给这类玩法更保守的缩放系数。
-          </div>
-        </div>
-
-        <div class="hero-card">
-          <h2>实现约束</h2>
-          <div class="pill-row">
-            <span class="pill">单日预算：100 元</span>
-            <span class="pill">每天 100 元全部分配完</span>
-            <span class="pill">单张票 10 元起，尽量少票集中</span>
-            <span class="pill">总进球参考本届已完赛样本节奏</span>
-            <span class="pill">比分与半全场采用更保守仓位</span>
-            <span class="pill">串关默认只考虑跨场 2 串 1</span>
-            <span class="pill">没录赔率的市场只展示模型，不给投注额</span>
-            <span class="pill">赛果录入保存在本地浏览器</span>
-          </div>
+    <header class="app-topbar">
+      <div class="brand-lockup">
+        <span class="brand-emblem" aria-hidden="true"><span>26</span></span>
+        <div class="brand-copy">
+          <strong>世界杯赛事控制台</strong>
+          <span>World Cup Operations Desk</span>
         </div>
       </div>
-    </section>
+      <div id="liveRibbon" class="live-ribbon" aria-live="polite">
+        <span class="live-ribbon-kicker">Live desk</span>
+        <strong class="live-ribbon-main">正在载入当前比赛日</strong>
+        <span class="live-ribbon-state"><i aria-hidden="true"></i>数据待同步</span>
+      </div>
+      <div class="topbar-meta" aria-label="系统状态">
+        <span class="status-indicator"><i aria-hidden="true"></i>本地模型已加载</span>
+        <span class="topbar-budget"><span>每日预算</span><strong>¥100</strong></span>
+      </div>
+    </header>
 
-    <div id="dayTabs" class="tab-row"></div>
-    <div id="dashboard"></div>
+    <div class="workspace-shell">
+      <aside class="matchday-sidebar" aria-label="比赛日导航">
+        <div class="sidebar-heading">
+          <span>Matchdays</span>
+          <strong>比赛日</strong>
+          <small>6 月 22 日—实时更新</small>
+        </div>
+        <div class="sidebar-season-meta" aria-label="赛事规模">
+          <span><strong>48</strong>参赛球队</span>
+          <span><strong>104</strong>比赛总数</span>
+        </div>
+        <div id="dayTabs" class="tab-row" role="tablist" aria-label="选择比赛日"></div>
+
+        <details class="method-panel">
+          <summary>
+            <span>模型与资金规则</span>
+            <b>展开</b>
+          </summary>
+          <div class="method-body">
+            <div class="formula">
+              <span>P(score) = Pois(&lambda;h) × Pois(&lambda;a)</span>
+              <span>p = w · p<sub>model</sub> + (1-w) · p<sub>market</sub></span>
+              <span>f = min(cap, &alpha; · Kelly)</span>
+            </div>
+            <ul class="constraint-list">
+              <li>单张 10 元起，单日总额 100 元</li>
+              <li>串关仅组合跨场 2 串 1</li>
+              <li>高波动玩法使用保守仓位</li>
+              <li>赛果与票单仅保存在本机</li>
+            </ul>
+          </div>
+        </details>
+      </aside>
+
+      <main class="main-stage">
+        <section class="workspace-intro" aria-labelledby="pageTitle">
+          <div class="intro-copy">
+            <span class="eyebrow">Live tournament operations / 2026</span>
+            <h1 id="pageTitle">世界杯赛事决策室</h1>
+            <p>赛果、赔率、晋级路径与出票组合</p>
+          </div>
+          <div class="matchday-stamp" aria-label="运行模式">
+            <span>ACTIVE MATCHDAY</span>
+            <strong id="activeMatchdayLabel">实时更新</strong>
+            <small id="activeMatchdayMeta">正在载入赛事状态</small>
+          </div>
+        </section>
+
+        <div id="dashboard"></div>
+      </main>
+    </div>
+
     <section id="aiAdvisor"></section>
   </div>
   <div id="ticketDock" class="ticket-dock"></div>
@@ -7134,7 +9920,151 @@
       }
     );
 
+    const STATIC_KNOCKOUT_SNAPSHOT = [
+      { dayId: "2026-06-29", id: "wc26-74", kickoff: "06-29 16:30", home: "德国", away: "巴拉圭", score: [1, 1], penalty: [3, 4] },
+      { dayId: "2026-06-29", id: "wc26-75", kickoff: "06-29 19:00", home: "荷兰", away: "摩洛哥", score: [1, 1], penalty: [2, 3] },
+      { dayId: "2026-06-29", id: "wc26-76", kickoff: "06-29 12:00", home: "巴西", away: "日本", score: [2, 1] },
+      { dayId: "2026-06-30", id: "wc26-77", kickoff: "06-30 17:00", home: "法国", away: "瑞典", score: [3, 0] },
+      { dayId: "2026-06-30", id: "wc26-78", kickoff: "06-30 12:00", home: "科特迪瓦", away: "挪威", score: [1, 2] },
+      { dayId: "2026-06-30", id: "wc26-79", kickoff: "06-30 19:00", home: "墨西哥", away: "厄瓜多尔", score: [2, 0] },
+      { dayId: "2026-07-01", id: "wc26-80", kickoff: "07-01 12:00", home: "英格兰", away: "刚果金", score: [2, 1] },
+      { dayId: "2026-07-01", id: "wc26-81", kickoff: "07-01 17:00", home: "美国", away: "波黑", score: [2, 0] },
+      { dayId: "2026-07-01", id: "wc26-82", kickoff: "07-01 13:00", home: "比利时", away: "塞内加尔", score: [3, 2] },
+      { dayId: "2026-07-02", id: "wc26-83", kickoff: "07-02 19:00", home: "葡萄牙", away: "克罗地亚", score: [2, 1] },
+      { dayId: "2026-07-02", id: "wc26-84", kickoff: "07-02 12:00", home: "西班牙", away: "奥地利", score: [3, 0] },
+      { dayId: "2026-07-02", id: "wc26-85", kickoff: "07-02 20:00", home: "瑞士", away: "阿尔及利亚", score: [2, 0] },
+      { dayId: "2026-07-03", id: "wc26-86", kickoff: "07-03 18:00", home: "阿根廷", away: "佛得角", score: [3, 2] },
+      { dayId: "2026-07-03", id: "wc26-87", kickoff: "07-03 20:30", home: "哥伦比亚", away: "加纳", score: [1, 0] },
+      { dayId: "2026-07-03", id: "wc26-88", kickoff: "07-03 13:00", home: "澳大利亚", away: "埃及", score: [1, 1], penalty: [2, 4] },
+      { dayId: "2026-07-04", id: "wc26-89", kickoff: "07-04 17:00", home: "巴拉圭", away: "法国", score: [0, 1] },
+      { dayId: "2026-07-04", id: "wc26-90", kickoff: "07-04 12:00", home: "加拿大", away: "摩洛哥", score: [0, 3] },
+      { dayId: "2026-07-05", id: "wc26-91", kickoff: "07-05 16:00", home: "巴西", away: "挪威", score: [1, 2] },
+      { dayId: "2026-07-05", id: "wc26-92", kickoff: "07-05 18:00", home: "墨西哥", away: "英格兰", score: [2, 3] },
+      { dayId: "2026-07-06", id: "wc26-93", kickoff: "07-06 14:00", home: "葡萄牙", away: "西班牙", score: [0, 1] },
+      { dayId: "2026-07-06", id: "wc26-94", kickoff: "07-06 17:00", home: "美国", away: "比利时", score: [1, 4] },
+      { dayId: "2026-07-07", id: "wc26-95", kickoff: "07-07 12:00", home: "阿根廷", away: "埃及", score: [3, 2] },
+      { dayId: "2026-07-07", id: "wc26-96", kickoff: "07-07 13:00", home: "瑞士", away: "哥伦比亚", score: [0, 0], penalty: [4, 3] },
+      { dayId: "2026-07-09", id: "wc26-97", kickoff: "07-09 16:00", home: "法国", away: "摩洛哥", score: [2, 0] },
+      { dayId: "2026-07-10", id: "wc26-98", kickoff: "07-10 12:00", home: "西班牙", away: "比利时" },
+      {
+        dayId: "2026-07-11",
+        id: "sporttery-2040459",
+        officialMatchId: "2040459",
+        kickoff: "07-12 05:00",
+        home: "挪威",
+        away: "英格兰",
+        matchNum: "周六099",
+        oddsUpdatedAt: "2026-07-10 20:15:20",
+        markets: {
+          wdl: { H: 3.45, D: 3.65, A: 1.77 },
+          handicap: { line: 1, H: 1.83, D: 3.46, A: 3.40 }
+        },
+        blockedSingleMarkets: ["handicap"]
+      },
+      {
+        dayId: "2026-07-11",
+        id: "sporttery-2040467",
+        officialMatchId: "2040467",
+        kickoff: "07-12 09:00",
+        home: "阿根廷",
+        away: "瑞士",
+        matchNum: "周六100",
+        oddsUpdatedAt: "2026-07-10 20:11:04",
+        markets: {
+          wdl: { H: 1.51, D: 3.42, A: 5.75 },
+          handicap: { line: -1, H: 2.93, D: 3.00, A: 2.20 }
+        },
+        blockedSingleMarkets: ["handicap"]
+      }
+    ];
+
+    const STATIC_RESULT_FALLBACKS = {
+      "rsa-can": { homeGoals: "0", awayGoals: "1" }
+    };
+
+    function getStaticSnapshotTeam(localName) {
+      for (const day of APP_DATA) {
+        for (const match of day.matches) {
+          if (match.home.name === localName) return JSON.parse(JSON.stringify(match.home));
+          if (match.away.name === localName) return JSON.parse(JSON.stringify(match.away));
+        }
+      }
+      return {
+        name: localName,
+        flag: "",
+        stars: [],
+        recent: { gf: 1.4, ga: 1.4, summary: "淘汰赛阶段，页面会联网补充本届世界杯路径。" }
+      };
+    }
+
+    function getStaticSnapshotModel(markets) {
+      if (!markets || !markets.wdl) return { homeXg: 1.28, awayXg: 1.16 };
+      const rawHome = 1 / markets.wdl.H;
+      const rawAway = 1 / markets.wdl.A;
+      const share = Math.min(0.72, Math.max(0.28, 0.5 + (rawHome - rawAway) * 0.24));
+      const total = 2.48;
+      return { homeXg: total * share, awayXg: total * (1 - share) };
+    }
+
+    STATIC_KNOCKOUT_SNAPSHOT.forEach(item => {
+      let day = APP_DATA.find(candidate => candidate.id === item.dayId);
+      if (!day) {
+        const [, month, date] = item.dayId.split("-").map(Number);
+        const weekdayIndex = new Date(`${item.dayId}T12:00:00`).getDay();
+        const weekdayLabels = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
+        day = {
+          id: item.dayId,
+          label: `${month} 月 ${date} 日`,
+          weekday: item.dayId === "2026-07-11"
+            ? `${weekdayLabels[weekdayIndex]}票面`
+            : `${weekdayLabels[weekdayIndex]}赛果`,
+          summary: item.dayId === "2026-07-11"
+            ? "已内置竞彩网最新世界杯固定奖金作为离线兜底，联网成功后会继续自动覆盖更新。"
+            : "世界杯淘汰赛赛果已写入离线兜底；联网成功后会自动核对最新结果。",
+          staticKnockoutDay: true,
+          matches: []
+        };
+        APP_DATA.push(day);
+      }
+
+      const markets = item.markets || {};
+      const model = getStaticSnapshotModel(markets);
+      day.matches.push({
+        id: item.id,
+        officialMatchId: item.officialMatchId || item.id.replace("wc26-", ""),
+        kickoff: item.kickoff,
+        venue: "2026 世界杯淘汰赛",
+        home: getStaticSnapshotTeam(item.home),
+        away: getStaticSnapshotTeam(item.away),
+        model: {
+          ...model,
+          note: item.score
+            ? "比赛已经结束，赛果已写入页面并参与淘汰赛晋级锁定。"
+            : "等待比赛完成；联网成功后会自动同步赛果与最新赔率。"
+        },
+        context: { phase: "knockout" },
+        blockedSingleMarkets: item.blockedSingleMarkets || [],
+        markets,
+        oddsMeta: item.matchNum ? {
+          source: "中国体育彩票竞彩网",
+          matchNum: item.matchNum,
+          updatedAt: item.oddsUpdatedAt || ""
+        } : null,
+        penalty: item.penalty || null
+      });
+      if (item.score) {
+        STATIC_RESULT_FALLBACKS[item.id] = {
+          homeGoals: String(item.score[0]),
+          awayGoals: String(item.score[1])
+        };
+      }
+    });
+
+    APP_DATA.sort((left, right) => left.id.localeCompare(right.id));
+
     const RESULTS_API_URL = "https://worldcup26.ir/get/games";
+    const SPORTTERY_ODDS_API_URL = "https://webapi.sporttery.cn/gateway/jc/football/getMatchCalculatorV1.qry?channel=c&cversion=1.0&showType=1&gameNo=&sellStatus=0&termLimits=0&pageSize=100&pageNo=1&isFix=0&pcOrWap=1";
+    const LIVE_ODDS_CACHE_KEY = STORAGE_KEY + "-sporttery-odds-v1";
     const RESULTS_SYNC_TTL_MS = 5 * 60 * 1000;
     const TEAM_NAME_ALIASES = {
       "阿根廷": ["Argentina"],
@@ -7216,7 +10146,8 @@
     };
     const resultSyncRuntime = {
       busy: false,
-      lastByDay: {}
+      lastByDay: {},
+      lastGlobalAt: 0
     };
     let daySwitchTimer = null;
     let renderMotionTimer = null;
@@ -7287,7 +10218,10 @@
         const safeAppliedExplorer = isPlainObject(safeCandidateExplorer.applied) ? safeCandidateExplorer.applied : {};
         return {
           selectedDay: typeof parsed.selectedDay === "string" ? parsed.selectedDay : null,
-          results: isPlainObject(parsed.results) ? parsed.results : {},
+          results: {
+            ...STATIC_RESULT_FALLBACKS,
+            ...(isPlainObject(parsed.results) ? parsed.results : {})
+          },
           builders: isPlainObject(parsed.builders) ? parsed.builders : {},
           ai: {
             endpoint: typeof safeAi.endpoint === "string" && safeAi.endpoint ? safeAi.endpoint : "https://api.openai.com/v1/chat/completions",
@@ -8016,16 +10950,28 @@
           const awayLocal = resolveLocalTeamNameByApiName(game.away_team_name_en || game.away_team_label);
           const homeScore = parseApiScore(game.home_score);
           const awayScore = parseApiScore(game.away_score);
-          if (!homeLocal || !awayLocal || !isApiGameFinished(game) || homeScore == null || awayScore == null || homeScore === awayScore) return;
+          const homePenaltyScore = parseApiScore(game.home_penalty_score);
+          const awayPenaltyScore = parseApiScore(game.away_penalty_score);
+          const settledByPenalties = homeScore === awayScore
+            && homePenaltyScore != null
+            && awayPenaltyScore != null
+            && homePenaltyScore !== awayPenaltyScore;
+          if (!homeLocal || !awayLocal || !isApiGameFinished(game) || homeScore == null || awayScore == null) return;
+          if (homeScore === awayScore && !settledByPenalties) return;
+          const homeAdvanced = homeScore > awayScore || (settledByPenalties && homePenaltyScore > awayPenaltyScore);
           knockoutResults.push({
             type: String(game.type || "").toLowerCase(),
             homeLocal,
             awayLocal,
             homeScore,
             awayScore,
-            winnerLocal: homeScore > awayScore ? homeLocal : awayLocal,
-            loserLocal: homeScore > awayScore ? awayLocal : homeLocal,
-            scoreLine: `${homeScore}:${awayScore}`,
+            homePenaltyScore,
+            awayPenaltyScore,
+            winnerLocal: homeAdvanced ? homeLocal : awayLocal,
+            loserLocal: homeAdvanced ? awayLocal : homeLocal,
+            scoreLine: settledByPenalties
+              ? `${homeScore}:${awayScore}（点球 ${homePenaltyScore}:${awayPenaltyScore}）`
+              : `${homeScore}:${awayScore}`,
             kickoff: game.local_date || ""
           });
         });
@@ -10553,10 +13499,292 @@
       }) || null;
     }
 
+    function normalizeLooseTeamName(name) {
+      return String(name || "")
+        .normalize("NFKC")
+        .toLowerCase()
+        .replace(/[^\p{L}\p{N}]+/gu, "")
+        .trim();
+    }
+
+    function getKnownLocalTeamNames() {
+      const names = new Set(Object.keys(TEAM_NAME_ALIASES));
+      APP_DATA.forEach(day => day.matches.forEach(match => {
+        names.add(match.home.name);
+        names.add(match.away.name);
+      }));
+      return [...names];
+    }
+
+    function resolveLocalTeamNameBySporttery(name) {
+      const aliases = {
+        "美国队": "美国",
+        "韩国队": "韩国",
+        "刚果民主共和国": "刚果金",
+        "民主刚果": "刚果金",
+        "波斯尼亚和黑塞哥维那": "波黑",
+        "捷克共和国": "捷克"
+      };
+      const raw = String(name || "").trim();
+      if (aliases[raw]) return aliases[raw];
+      const normalized = normalizeLooseTeamName(raw);
+      return getKnownLocalTeamNames().find(localName => normalizeLooseTeamName(localName) === normalized) || raw;
+    }
+
+    function getLatestSportteryPool(match, poolCode) {
+      const pools = Array.isArray(match && match.oddsList) ? match.oddsList : [];
+      return pools
+        .filter(item => item && item.poolCode === poolCode)
+        .filter(item => [item.h, item.d, item.a].some(value => Number(value) > 0))
+        .sort((left, right) => {
+          const leftStamp = `${left.updateDate || ""} ${left.updateTime || ""}`;
+          const rightStamp = `${right.updateDate || ""} ${right.updateTime || ""}`;
+          return rightStamp.localeCompare(leftStamp);
+        })[0] || null;
+    }
+
+    function getSportteryPoolPermission(match, poolCode) {
+      const pools = Array.isArray(match && match.poolList) ? match.poolList : [];
+      return pools.find(item => item && item.poolCode === poolCode) || null;
+    }
+
+    function parseSportteryOddsValue(value) {
+      const parsed = Number(value);
+      return Number.isFinite(parsed) && parsed > 1 ? parsed : null;
+    }
+
+    function parseSportteryMatchMarkets(match) {
+      const had = getLatestSportteryPool(match, "HAD");
+      const hhad = getLatestSportteryPool(match, "HHAD");
+      const markets = {};
+      if (had) {
+        const H = parseSportteryOddsValue(had.h);
+        const D = parseSportteryOddsValue(had.d);
+        const A = parseSportteryOddsValue(had.a);
+        if (H && D && A) markets.wdl = { H, D, A };
+      }
+      if (hhad) {
+        const H = parseSportteryOddsValue(hhad.h);
+        const D = parseSportteryOddsValue(hhad.d);
+        const A = parseSportteryOddsValue(hhad.a);
+        const line = Number(hhad.goalLineValue || hhad.goalLine);
+        if (H && D && A && Number.isFinite(line)) markets.handicap = { line, H, D, A };
+      }
+      const latestPool = [had, hhad]
+        .filter(Boolean)
+        .sort((left, right) => `${right.updateDate || ""} ${right.updateTime || ""}`.localeCompare(`${left.updateDate || ""} ${left.updateTime || ""}`))[0];
+      return {
+        markets,
+        updatedAt: latestPool ? `${latestPool.updateDate || ""} ${latestPool.updateTime || ""}`.trim() : ""
+      };
+    }
+
+    function findTeamReference(localName) {
+      for (const day of APP_DATA) {
+        for (const match of day.matches) {
+          if (match.home.name === localName) return match.home;
+          if (match.away.name === localName) return match.away;
+        }
+      }
+      return null;
+    }
+
+    function cloneDynamicTeam(localName) {
+      const reference = findTeamReference(localName);
+      if (reference) return JSON.parse(JSON.stringify(reference));
+      return {
+        name: localName,
+        flag: "",
+        stars: [],
+        recent: {
+          gf: TOURNAMENT_CONTEXT.avgGoalsPerTeam,
+          ga: TOURNAMENT_CONTEXT.avgGoalsPerTeam,
+          summary: "等待实时赛事数据补充近期表现。"
+        }
+      };
+    }
+
+    function deriveModelFromWdl(markets) {
+      const wdl = markets && markets.wdl;
+      if (!wdl) return { homeXg: 1.25, awayXg: 1.15 };
+      const rawHome = 1 / wdl.H;
+      const rawDraw = 1 / wdl.D;
+      const rawAway = 1 / wdl.A;
+      const totalRaw = rawHome + rawDraw + rawAway;
+      const homeProbability = rawHome / totalRaw;
+      const awayProbability = rawAway / totalRaw;
+      const goalTotal = clamp(2.32 + Math.abs(homeProbability - awayProbability) * 0.42, 2.2, 2.75);
+      const homeShare = clamp(0.5 + (homeProbability - awayProbability) * 0.31, 0.27, 0.73);
+      return {
+        homeXg: goalTotal * homeShare,
+        awayXg: goalTotal * (1 - homeShare)
+      };
+    }
+
+    function formatSportteryKickoff(match) {
+      const date = String(match && match.matchDate || "");
+      const time = String(match && match.matchTime || "").slice(0, 5);
+      const dateParts = date.match(/^\d{4}-(\d{2})-(\d{2})$/);
+      return dateParts ? `${dateParts[1]}-${dateParts[2]} ${time}` : `${date} ${time}`.trim();
+    }
+
+    function createSportteryMatch(sourceMatch, homeName, awayName, parsed) {
+      const model = deriveModelFromWdl(parsed.markets);
+      const blockedSingleMarkets = [];
+      const hadPermission = getSportteryPoolPermission(sourceMatch, "HAD");
+      const hhadPermission = getSportteryPoolPermission(sourceMatch, "HHAD");
+      if (hadPermission && Number(hadPermission.bettingSingle) !== 1) blockedSingleMarkets.push("wdl");
+      if (hhadPermission && Number(hhadPermission.bettingSingle) !== 1) blockedSingleMarkets.push("handicap");
+      return {
+        id: `sporttery-${sourceMatch.matchId}`,
+        officialMatchId: String(sourceMatch.matchId || ""),
+        kickoff: formatSportteryKickoff(sourceMatch),
+        venue: sourceMatch.remark || "世界杯淘汰赛",
+        home: cloneDynamicTeam(homeName),
+        away: cloneDynamicTeam(awayName),
+        model: {
+          ...model,
+          note: "赔率来自中国体育彩票竞彩网公开固定奖金；页面按最新胜平负与让球盘自动重算概率和推荐顺序。"
+        },
+        context: { phase: "knockout" },
+        blockedSingleMarkets,
+        markets: parsed.markets,
+        oddsMeta: {
+          source: "中国体育彩票竞彩网",
+          matchNum: sourceMatch.matchNumStr || "",
+          updatedAt: parsed.updatedAt
+        }
+      };
+    }
+
+    function flattenSportteryMatches(payload) {
+      const days = payload && payload.value && Array.isArray(payload.value.matchInfoList)
+        ? payload.value.matchInfoList
+        : [];
+      const rows = [];
+      days.forEach(day => {
+        (Array.isArray(day.subMatchList) ? day.subMatchList : []).forEach(match => rows.push({ day, match }));
+      });
+      return rows;
+    }
+
+    function applySportteryOddsPayload(payload, options = {}) {
+      const rows = flattenSportteryMatches(payload)
+        .filter(({ match }) => String(match.leagueCode || "").toUpperCase() === "WCC" || String(match.leagueAbbName || "").includes("世界杯"));
+      let matched = 0;
+      let created = 0;
+      let skipped = 0;
+      const touchedDayIds = new Set();
+
+      rows.forEach(({ day: sourceDay, match: sourceMatch }) => {
+        const parsed = parseSportteryMatchMarkets(sourceMatch);
+        if (!parsed.markets.wdl && !parsed.markets.handicap) {
+          skipped += 1;
+          return;
+        }
+        const homeName = resolveLocalTeamNameBySporttery(sourceMatch.homeTeamAbbName || sourceMatch.homeTeamAllName);
+        const awayName = resolveLocalTeamNameBySporttery(sourceMatch.awayTeamAbbName || sourceMatch.awayTeamAllName);
+        const dayId = String(sourceMatch.businessDate || sourceDay.businessDate || "").trim();
+        if (!homeName || !awayName || !dayId) {
+          skipped += 1;
+          return;
+        }
+
+        let targetDay = APP_DATA.find(item => item.id === dayId);
+        if (!targetDay) {
+          const localDate = new Date(`${dayId}T12:00:00`);
+          targetDay = {
+            id: dayId,
+            label: `${localDate.getMonth() + 1} 月 ${localDate.getDate()} 日`,
+            weekday: sourceDay.weekday ? `${sourceDay.weekday}票面` : "实时票面",
+            summary: "已从中国体育彩票竞彩网自动匹配世界杯场次和最新固定奖金；赔率变化后会重新计算推荐。",
+            dynamicOddsDay: true,
+            matches: []
+          };
+          APP_DATA.push(targetDay);
+          created += 1;
+        }
+
+        let targetMatch = targetDay.matches.find(item =>
+          String(item.officialMatchId || "") === String(sourceMatch.matchId || "")
+          || (item.home.name === homeName && item.away.name === awayName)
+        );
+        if (!targetMatch) {
+          targetMatch = createSportteryMatch(sourceMatch, homeName, awayName, parsed);
+          targetDay.matches.push(targetMatch);
+          created += 1;
+        } else {
+          targetMatch.officialMatchId = String(sourceMatch.matchId || targetMatch.officialMatchId || "");
+          targetMatch.kickoff = formatSportteryKickoff(sourceMatch) || targetMatch.kickoff;
+          targetMatch.venue = sourceMatch.remark || targetMatch.venue;
+          targetMatch.markets = { ...targetMatch.markets, ...parsed.markets };
+          targetMatch.oddsMeta = {
+            source: "中国体育彩票竞彩网",
+            matchNum: sourceMatch.matchNumStr || "",
+            updatedAt: parsed.updatedAt
+          };
+          targetMatch.model = {
+            ...targetMatch.model,
+            ...deriveModelFromWdl(targetMatch.markets),
+            note: "赔率来自中国体育彩票竞彩网公开固定奖金；页面按最新胜平负与让球盘自动重算概率和推荐顺序。"
+          };
+          matched += 1;
+        }
+        touchedDayIds.add(dayId);
+      });
+
+      APP_DATA.sort((left, right) => left.id.localeCompare(right.id));
+      if (!options.fromCache && rows.length) {
+        try {
+          localStorage.setItem(LIVE_ODDS_CACHE_KEY, JSON.stringify({ savedAt: Date.now(), payload }));
+        } catch (error) {
+          // The live update still works when browser storage is unavailable.
+        }
+      }
+      invalidateAnalysisCaches();
+      return { matched, created, skipped, rows: rows.length, touchedDayIds: [...touchedDayIds] };
+    }
+
+    function restoreCachedSportteryOdds() {
+      try {
+        const cached = JSON.parse(localStorage.getItem(LIVE_ODDS_CACHE_KEY) || "null");
+        if (!cached || !cached.payload) return null;
+        return applySportteryOddsPayload(cached.payload, { fromCache: true });
+      } catch (error) {
+        return null;
+      }
+    }
+
+    async function fetchSportteryOddsPayload() {
+      const separator = SPORTTERY_ODDS_API_URL.includes("?") ? "&" : "?";
+      const response = await fetch(`${SPORTTERY_ODDS_API_URL}${separator}_=${Date.now()}`, {
+        cache: "no-store",
+        headers: { Accept: "application/json, text/plain, */*" }
+      });
+      if (!response.ok) throw new Error("竞彩网 HTTP " + response.status);
+      const text = await response.text();
+      const payload = JSON.parse(text);
+      if (!payload || payload.success === false) throw new Error(payload && payload.errorMessage || "竞彩网返回异常");
+      return payload;
+    }
+
+    function selectLatestLiveDay() {
+      const localDate = getLocalDateId();
+      const candidate = [...APP_DATA]
+        .filter(day => day.matches && day.matches.length && day.id <= localDate)
+        .sort((left, right) => right.id.localeCompare(left.id))[0];
+      if (!candidate) return false;
+      if ((!currentDayId || currentDayId < localDate) && candidate.id > currentDayId) {
+        currentDayId = candidate.id;
+        return true;
+      }
+      return false;
+    }
+
     function getResultSyncState(dayId) {
       return resultSyncRuntime.lastByDay[dayId] || {
         tone: "neutral",
-        message: "打开页面后会自动尝试同步当前页比赛结果；你也可以手动点一次。",
+        message: "打开页面后会自动同步全部赛果，并从竞彩网匹配最新世界杯赔率。",
         at: 0,
         auto: false
       };
@@ -10583,62 +13811,177 @@
       return response.json();
     }
 
+    function applyWorldCupSchedulePayload(games) {
+      let createdDays = 0;
+      let createdMatches = 0;
+      let updatedMatches = 0;
+      const weekdayLabels = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
+
+      (games || [])
+        .filter(game => String(game && game.type || "").toLowerCase() !== "group")
+        .forEach(game => {
+          const homeName = resolveLocalTeamNameByApiName(game.home_team_name_en || game.home_team_label);
+          const awayName = resolveLocalTeamNameByApiName(game.away_team_name_en || game.away_team_label);
+          const rawDate = String(game.local_date || "").trim();
+          const dateMatch = rawDate.match(/^(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2})$/);
+          if (!homeName || !awayName || !dateMatch) return;
+          const [, month, date, year, hour, minute] = dateMatch;
+          const dayId = `${year}-${month}-${date}`;
+          if (dayId < "2026-06-29") return;
+
+          let day = APP_DATA.find(item => item.id === dayId);
+          if (!day) {
+            const localDate = new Date(`${dayId}T12:00:00`);
+            day = {
+              id: dayId,
+              label: `${Number(month)} 月 ${Number(date)} 日`,
+              weekday: `${weekdayLabels[localDate.getDay()]}赛程`,
+              summary: "比赛日由公开世界杯赛程自动生成；赛果和竞彩网赔率会在可用后继续补入。",
+              dynamicScheduleDay: true,
+              matches: []
+            };
+            APP_DATA.push(day);
+            createdDays += 1;
+          }
+
+          let match = day.matches.find(item =>
+            String(item.resultApiMatchId || "") === String(game.id || "")
+            || (item.home.name === homeName && item.away.name === awayName)
+          );
+          if (!match) {
+            match = {
+              id: `wc26-${game.id}`,
+              resultApiMatchId: String(game.id || ""),
+              kickoff: `${month}-${date} ${hour}:${minute}`,
+              venue: `2026 世界杯${String(game.group || game.type || "淘汰赛").toUpperCase()}`,
+              home: getStaticSnapshotTeam(homeName),
+              away: getStaticSnapshotTeam(awayName),
+              model: {
+                homeXg: 1.28,
+                awayXg: 1.16,
+                note: "赛程已从公开世界杯接口自动加入；等待竞彩网赔率后会重新校准。"
+              },
+              context: { phase: "knockout" },
+              markets: {}
+            };
+            day.matches.push(match);
+            createdMatches += 1;
+          } else {
+            match.resultApiMatchId = String(game.id || match.resultApiMatchId || "");
+            match.kickoff = `${month}-${date} ${hour}:${minute}`;
+            updatedMatches += 1;
+          }
+
+          const homePenaltyScore = parseApiScore(game.home_penalty_score);
+          const awayPenaltyScore = parseApiScore(game.away_penalty_score);
+          if (homePenaltyScore != null && awayPenaltyScore != null) {
+            match.penalty = [homePenaltyScore, awayPenaltyScore];
+          }
+          if (isApiGameFinished(game)) {
+            day.weekday = day.weekday.replace("赛程", "赛果");
+          }
+        });
+
+      APP_DATA.sort((left, right) => left.id.localeCompare(right.id));
+      if (createdDays || createdMatches || updatedMatches) invalidateAnalysisCaches();
+      return { createdDays, createdMatches, updatedMatches };
+    }
+
     async function syncDayResults(dayId, options = {}) {
-      const day = APP_DATA.find(item => item.id === dayId);
-      if (!day || resultSyncRuntime.busy) return;
+      if (resultSyncRuntime.busy) return;
 
       resultSyncRuntime.busy = true;
       resultSyncRuntime.lastByDay[dayId] = {
         tone: "neutral",
-        message: "正在从公开 WorldCup26 API 拉取赛果，请稍候…",
+        message: "正在同步全部赛果，并从竞彩网匹配最新赔率…",
         at: Date.now(),
         auto: !!options.auto
       };
       render();
 
       try {
-        const payload = await fetchLiveResultsPayload();
+        const [resultsRequest, oddsRequest] = await Promise.allSettled([
+          fetchLiveResultsPayload(),
+          fetchSportteryOddsPayload()
+        ]);
+        if (resultsRequest.status === "rejected" && oddsRequest.status === "rejected") {
+          throw new Error(`赛果与赔率来源均不可用：${resultsRequest.reason && resultsRequest.reason.message || "赛果失败"}；${oddsRequest.reason && oddsRequest.reason.message || "赔率失败"}`);
+        }
+
+        const payload = resultsRequest.status === "fulfilled" ? resultsRequest.value : { games: [] };
         const games = Array.isArray(payload.games) ? payload.games : [];
+        const scheduleStats = resultsRequest.status === "fulfilled"
+          ? applyWorldCupSchedulePayload(games)
+          : null;
+        const oddsStats = oddsRequest.status === "fulfilled"
+          ? applySportteryOddsPayload(oddsRequest.value)
+          : null;
+        if ((scheduleStats || oddsStats) && options.auto) selectLatestLiveDay();
         const entries = [];
         let detectedFinished = 0;
         let pendingMatches = 0;
         let unavailableMatches = 0;
 
-        day.matches.forEach(match => {
-          const game = findApiGameForMatch(match, games);
-          if (!game) {
-            unavailableMatches += 1;
-            return;
-          }
-          if (!isApiGameFinished(game)) {
-            pendingMatches += 1;
-            return;
-          }
-          const homeGoals = parseApiScore(game.home_score);
-          const awayGoals = parseApiScore(game.away_score);
-          if (homeGoals == null || awayGoals == null) {
-            pendingMatches += 1;
-            return;
-          }
-          detectedFinished += 1;
-          entries.push({ matchId: match.id, homeGoals, awayGoals });
+        APP_DATA.forEach(day => {
+          day.matches.forEach(match => {
+            const game = findApiGameForMatch(match, games);
+            if (!game) {
+              unavailableMatches += 1;
+              return;
+            }
+            if (!isApiGameFinished(game)) {
+              pendingMatches += 1;
+              return;
+            }
+            const homeGoals = parseApiScore(game.home_score);
+            const awayGoals = parseApiScore(game.away_score);
+            if (homeGoals == null || awayGoals == null) {
+              pendingMatches += 1;
+              return;
+            }
+            detectedFinished += 1;
+            entries.push({ matchId: match.id, homeGoals, awayGoals });
+          });
         });
 
         const changed = setResultsBulk(entries, { overwrite: !!options.overwrite, renderAfter: false });
         const messageParts = [];
-        if (detectedFinished) messageParts.push(`识别到 ${detectedFinished} 场已完赛`);
-        if (changed) messageParts.push(`新回填 ${changed} 场比分`);
-        if (pendingMatches) messageParts.push(`${pendingMatches} 场未完赛或暂未出比分`);
-        if (unavailableMatches) messageParts.push(`${unavailableMatches} 场未在接口中匹配到`);
-        if (!messageParts.length) messageParts.push("当前页还没有可回填的赛果");
+        if (resultsRequest.status === "fulfilled") {
+          if (detectedFinished) messageParts.push(`全站识别 ${detectedFinished} 场已完赛`);
+          if (changed) messageParts.push(`新回填 ${changed} 场比分`);
+          if (scheduleStats && (scheduleStats.createdDays || scheduleStats.createdMatches)) {
+            messageParts.push(`新增 ${scheduleStats.createdDays} 个比赛日、${scheduleStats.createdMatches} 场赛程`);
+          }
+          if (pendingMatches) messageParts.push(`${pendingMatches} 场未完赛`);
+          if (unavailableMatches) messageParts.push(`${unavailableMatches} 场未匹配到赛果`);
+        } else {
+          messageParts.push(`赛果源暂不可用：${resultsRequest.reason && resultsRequest.reason.message || "请求失败"}`);
+        }
+        if (oddsStats) {
+          messageParts.push(`竞彩网匹配 ${oddsStats.rows} 场世界杯赔率`);
+        } else {
+          messageParts.push(`赔率源暂不可用：${oddsRequest.reason && oddsRequest.reason.message || "请求失败"}`);
+        }
+        if (!messageParts.length) messageParts.push("暂时没有可更新的数据");
 
+        const syncedAt = Date.now();
+        resultSyncRuntime.lastGlobalAt = syncedAt;
+        APP_DATA.forEach(item => {
+          resultSyncRuntime.lastByDay[item.id] = {
+            tone: changed || detectedFinished || oddsStats ? "success" : pendingMatches ? "neutral" : "warning",
+            message: messageParts.join("；") + "。",
+            at: syncedAt,
+            auto: !!options.auto
+          };
+        });
         resultSyncRuntime.lastByDay[dayId] = {
-          tone: changed || detectedFinished ? "success" : pendingMatches ? "neutral" : "warning",
+          tone: changed || detectedFinished || oddsStats ? "success" : pendingMatches ? "neutral" : "warning",
           message: messageParts.join("；") + "。",
-          at: Date.now(),
+          at: syncedAt,
           auto: !!options.auto
         };
       } catch (error) {
+        resultSyncRuntime.lastGlobalAt = Date.now();
         resultSyncRuntime.lastByDay[dayId] = {
           tone: "warning",
           message: "同步失败：" + (error && error.message ? error.message : "未知错误"),
@@ -10654,6 +13997,7 @@
     function maybeAutoSyncDay(dayId) {
       const info = getResultSyncState(dayId);
       if (resultSyncRuntime.busy) return;
+      if (resultSyncRuntime.lastGlobalAt && Date.now() - resultSyncRuntime.lastGlobalAt < RESULTS_SYNC_TTL_MS) return;
       if (info.at && Date.now() - info.at < RESULTS_SYNC_TTL_MS) return;
       syncDayResults(dayId, { overwrite: false, auto: true });
     }
@@ -12513,18 +15857,78 @@
       }
     }
 
+    function getDayCompletionSnapshot(day) {
+      const total = Array.isArray(day && day.matches) ? day.matches.length : 0;
+      const completed = total
+        ? day.matches.filter(match => hasStoredResult(match.id)).length
+        : 0;
+      const localDate = getLocalDateId();
+      if (total && completed === total) {
+        return { className: "is-settled", label: "已结算", completed, total };
+      }
+      if (day.id === localDate) {
+        return { className: "is-current", label: "今日", completed, total };
+      }
+      if (completed > 0) {
+        return { className: "is-partial", label: `${completed}/${total}`, completed, total };
+      }
+      return { className: day.id > localDate ? "is-upcoming" : "is-pending", label: day.id > localDate ? "待开赛" : "待赛果", completed, total };
+    }
+
+    function renderControlRoomChrome(day, settlement) {
+      const liveRibbon = document.getElementById("liveRibbon");
+      const activeMatchdayLabel = document.getElementById("activeMatchdayLabel");
+      const activeMatchdayMeta = document.getElementById("activeMatchdayMeta");
+      const completion = getDayCompletionSnapshot(day);
+      const syncState = getResultSyncState(day.id);
+      const syncLabel = resultSyncRuntime.busy
+        ? "同步中"
+        : syncState.tone === "success"
+          ? "数据已同步"
+          : syncState.tone === "warning"
+            ? "使用离线数据"
+            : "等待同步";
+      const pendingTickets = settlement && Number.isFinite(settlement.pendingCount) ? settlement.pendingCount : 0;
+
+      if (liveRibbon) {
+        liveRibbon.innerHTML = `
+          <span class="live-ribbon-kicker">Live desk</span>
+          <strong class="live-ribbon-main">${escapeHtml(day.label)} · ${day.matches.length} 场 · ${completion.completed} 场已结算${pendingTickets ? ` · ${pendingTickets} 张推荐票待赛果` : ""}</strong>
+          <span class="live-ribbon-state"><i aria-hidden="true"></i>${escapeHtml(syncLabel)}</span>
+        `;
+      }
+      if (activeMatchdayLabel) activeMatchdayLabel.textContent = day.label;
+      if (activeMatchdayMeta) activeMatchdayMeta.textContent = `${day.matches.length} 场 · ${completion.label} · ${syncLabel}`;
+    }
+
     function renderTabs(options = {}) {
       const scrollActiveTab = !!options.scrollActiveTab;
       const tabs = document.getElementById("dayTabs");
-      tabs.innerHTML = APP_DATA.map(day => {
-        const active = day.id === currentDayId ? "active" : "";
-        return `
-          <button class="tab-btn ${active}" data-day="${day.id}">
-            <span class="tab-date">${day.label}</span>
-            <span class="tab-meta">${day.weekday} · ${day.matches.length} 场</span>
-          </button>
-        `;
-      }).join("");
+      const groups = [
+        { key: "group", label: "Group stage / 小组赛", days: APP_DATA.filter(day => day.id <= "2026-06-28") },
+        { key: "knockout", label: "Knockout / 淘汰赛", days: APP_DATA.filter(day => day.id > "2026-06-28") }
+      ].filter(group => group.days.length);
+
+      tabs.innerHTML = groups.map(group => `
+        <div class="day-group day-group--${group.key}" role="presentation">
+          <div class="day-group-label"><span>${group.label}</span></div>
+          <div class="day-group-days" role="presentation">
+            ${group.days.map(day => {
+              const active = day.id === currentDayId ? "active" : "";
+              const completion = getDayCompletionSnapshot(day);
+              return `
+                <button class="tab-btn ${active} ${completion.className}" type="button" role="tab" aria-selected="${active ? "true" : "false"}" data-day="${day.id}">
+                  <span class="tab-date-row">
+                    <span class="tab-date">${day.label}</span>
+                    <span class="tab-state">${completion.label}</span>
+                  </span>
+                  <span class="tab-meta">${day.weekday} · ${day.matches.length} 场</span>
+                </button>
+              `;
+            }).join("")}
+          </div>
+        </div>
+      `).join("");
 
       tabs.querySelectorAll(".tab-btn").forEach(button => {
         button.addEventListener("click", () => {
@@ -12532,10 +15936,19 @@
         });
       });
 
-      const activeButton = scrollActiveTab ? tabs.querySelector(".tab-btn.active") : null;
+      const initialScroll = tabs.dataset.initialScrollDone !== "1";
+      tabs.dataset.initialScrollDone = "1";
+      const activeButton = tabs.querySelector(".tab-btn.active");
       if (activeButton) {
         requestAnimationFrame(() => {
-          activeButton.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" });
+          const sidebar = tabs.closest(".matchday-sidebar");
+          const scrollHost = window.innerWidth > 900 && sidebar ? sidebar : tabs;
+          const hostRect = scrollHost.getBoundingClientRect();
+          const activeRect = activeButton.getBoundingClientRect();
+          const outsideView = activeRect.left < hostRect.left || activeRect.right > hostRect.right || activeRect.top < hostRect.top || activeRect.bottom > hostRect.bottom;
+          if (outsideView) {
+            activeButton.scrollIntoView({ inline: "center", block: "nearest", behavior: initialScroll || !scrollActiveTab ? "auto" : "smooth" });
+          }
         });
       }
     }
@@ -13286,10 +16699,10 @@
             <div class="sync-copy">
               <span class="section-kicker">赛果同步</span>
               <h3>自动检测并回填比分</h3>
-              <p>页面会自动尝试同步当前页赛果；如果你刚打开网页，或者想立刻刷新一次，可以手动点右侧按钮，把当天已完赛的世界杯比分直接填进结算区。</p>
+              <p>页面会自动同步全部比赛结果，并从中国体育彩票竞彩网匹配最新世界杯固定奖金；赔率变化后，推荐概率和出票顺序会重新计算。</p>
             </div>
             <div class="sync-actions">
-              <button type="button" class="btn-ghost btn-ghost--accent" data-results-sync="${day.id}" ${resultSyncRuntime.busy ? "disabled" : ""}>${resultSyncRuntime.busy ? "同步中..." : "同步当前页赛果"}</button>
+              <button type="button" class="btn-ghost btn-ghost--accent" data-results-sync="${day.id}" ${resultSyncRuntime.busy ? "disabled" : ""}>${resultSyncRuntime.busy ? "同步中..." : "同步赛果与赔率"}</button>
               <div class="sync-status ${syncState.tone}">
                 <strong>${syncTitle}</strong>
                 <span>${syncState.message}</span>
@@ -14073,12 +17486,33 @@
       `;
     }
 
+    function getMatchPenaltyScore(match) {
+      if (!match || !Array.isArray(match.penalty) || match.penalty.length < 2) return null;
+      const home = Number(match.penalty[0]);
+      const away = Number(match.penalty[1]);
+      return Number.isFinite(home) && Number.isFinite(away) ? { home, away } : null;
+    }
+
+    function formatMatchResultScore(match, result, spaced = true) {
+      if (!result || result.homeGoals === "" || result.awayGoals === "") return "";
+      const separator = spaced ? " : " : ":";
+      const base = `${result.homeGoals}${separator}${result.awayGoals}`;
+      const penalty = getMatchPenaltyScore(match);
+      return penalty ? `${base}（点球 ${penalty.home}${separator}${penalty.away}）` : base;
+    }
+
     function describeMatchResult(match, result) {
       if (!result || result.homeGoals === "" || result.awayGoals === "") return "";
       const homeGoals = Number(result.homeGoals);
       const awayGoals = Number(result.awayGoals);
       if (homeGoals > awayGoals) return `${match.home.name}取胜`;
       if (homeGoals < awayGoals) return `${match.away.name}取胜`;
+      const penalty = getMatchPenaltyScore(match);
+      if (penalty && penalty.home !== penalty.away) {
+        return penalty.home > penalty.away
+          ? `${match.home.name}点球晋级`
+          : `${match.away.name}点球晋级`;
+      }
       return "双方战平";
     }
 
@@ -14103,7 +17537,7 @@
               ${completed.map(({ match, result }) => `
                 <div class="finished-score-card">
                   <span>已完赛 · ${match.kickoff || ""}</span>
-                  <strong>${match.home.name} ${result.homeGoals} : ${result.awayGoals} ${match.away.name}</strong>
+                  <strong>${match.home.name} ${formatMatchResultScore(match, result)} ${match.away.name}</strong>
                   <span>${describeMatchResult(match, result)}</span>
                 </div>
               `).join("")}
@@ -14433,10 +17867,18 @@
       const payload = tournamentInsightRuntime.payload || {};
       const results = Array.isArray(payload.knockoutResults) ? payload.knockoutResults : [];
       if (!left || !right || !left.label || !right.label) return null;
-      return results.find(result => {
-        const names = [result.homeLocal, result.awayLocal];
+      const result = results.find(item => {
+        const names = [item.homeLocal, item.awayLocal];
         return names.includes(left.label) && names.includes(right.label);
       }) || null;
+      if (!result || result.homeLocal === left.label) return result;
+      const hasPenalties = result.homePenaltyScore != null && result.awayPenaltyScore != null;
+      return {
+        ...result,
+        scoreLine: hasPenalties
+          ? `${result.awayScore}:${result.homeScore}（点球 ${result.awayPenaltyScore}:${result.homePenaltyScore}）`
+          : `${result.awayScore}:${result.homeScore}`
+      };
     }
 
     function getAdvancementProbabilities(left, right) {
@@ -14913,11 +18355,55 @@
       };
     }
 
+    function buildDailyParlayFallback(dayAnalysis) {
+      const matchPools = (dayAnalysis.matchAnalyses || []).map(({ match, analysis }) => {
+        const candidates = (analysis.candidates || [])
+          .filter(candidate => allowStrategyCandidate(candidate))
+          .filter(candidate => Number.isFinite(candidate.odds) && Number.isFinite(candidate.probability))
+          .filter(candidate => candidate.probability >= 0.20 && candidate.odds <= 6.5)
+          .map(candidate => ({ ...candidate, match }))
+          .sort((left, right) => {
+            const leftRate = left.recommendationRate ?? left.probability;
+            const rightRate = right.recommendationRate ?? right.probability;
+            return rightRate - leftRate || right.probability - left.probability || right.edge - left.edge;
+          })
+          .slice(0, 3);
+        return { match, candidates };
+      }).filter(item => item.candidates.length);
+
+      const fallbackTickets = [];
+      for (let leftIndex = 0; leftIndex < matchPools.length; leftIndex += 1) {
+        for (let rightIndex = leftIndex + 1; rightIndex < matchPools.length; rightIndex += 1) {
+          matchPools[leftIndex].candidates.forEach(leftCandidate => {
+            matchPools[rightIndex].candidates.forEach(rightCandidate => {
+              const ticket = buildStrategyTicket("parlay", [
+                cloneStrategyLeg(leftCandidate),
+                cloneStrategyLeg(rightCandidate)
+              ]);
+              if (ticket.probability < 0.08 || ticket.odds > 16 || ticket.edge < -0.22) return;
+              ticket.sourcePlanLabel = "高概率跨场兜底";
+              ticket.sourcePlanKey = "daily-parlay-fallback";
+              fallbackTickets.push(ticket);
+            });
+          });
+        }
+      }
+
+      return fallbackTickets
+        .filter((ticket, index, source) => source.findIndex(item => item.id === ticket.id) === index)
+        .sort((left, right) => rankDailyRecommendedParlay(right) - rankDailyRecommendedParlay(left));
+    }
+
     function pickDailyRecommendedPurchases(dayAnalysis, options = {}) {
       const tickets = collectStrategyTickets(dayAnalysis);
+      const strategyParlays = tickets.filter(ticket => ticket.kind === "parlay");
+      const fallbackParlays = buildDailyParlayFallback(dayAnalysis);
+      const parlayTickets = strategyParlays.concat(fallbackParlays.filter(fallback =>
+        !strategyParlays.some(ticket => ticket.id === fallback.id)
+      ));
       return {
         single: buildDailyRecommendationPack("single", tickets.filter(ticket => ticket.kind === "single"), { bankroll: options.singleBankroll }),
-        parlay: buildDailyRecommendationPack("parlay", tickets.filter(ticket => ticket.kind === "parlay"))
+        parlay: buildDailyRecommendationPack("parlay", parlayTickets)
       };
     }
 
@@ -15371,6 +18857,9 @@
       const adaptiveProfile = analysis && analysis.adaptiveProfile ? analysis.adaptiveProfile : (xgProfile ? xgProfile.adaptiveProfile : null);
       const adaptiveLabel = adaptiveProfile && adaptiveProfile.sampleCount ? `自动校准 ${adaptiveProfile.sampleCount} 场` : "";
       const adaptiveSummary = adaptiveProfile && adaptiveProfile.sampleCount ? adaptiveProfile.summary : "";
+      const oddsMetaLabel = match.oddsMeta
+        ? `${match.oddsMeta.source}${match.oddsMeta.matchNum ? ` · ${match.oddsMeta.matchNum}` : ""}${match.oddsMeta.updatedAt ? ` · 更新 ${match.oddsMeta.updatedAt}` : ""}`
+        : "";
       const venueLabel = match.venue ? `比赛地 · ${match.venue}` : "世界杯小组赛";
       const resultSummary = describeMatchResult(match, result);
 
@@ -15414,11 +18903,12 @@
               ${totalGoalsHint ? `<span class="match-strip-pill">${totalGoalsHint}</span>` : ""}
               ${motivationLabel ? `<span class="match-strip-pill">${escapeHtml(motivationLabel)}</span>` : ""}
               ${adaptiveLabel ? `<span class="match-strip-pill">${escapeHtml(adaptiveLabel)}</span>` : ""}
+              ${oddsMetaLabel ? `<span class="match-strip-pill accent">${escapeHtml(oddsMetaLabel)}</span>` : ""}
             </div>
             ${resultFilled ? `
               <div class="match-final-banner">
                 <span class="final-label">已完赛</span>
-                <strong class="final-score">${result.homeGoals} : ${result.awayGoals}</strong>
+                <strong class="final-score">${formatMatchResultScore(match, result)}</strong>
                 <span class="final-copy">${resultSummary}，这场比分已经参与出票结算。</span>
               </div>
             ` : ""}
@@ -15471,7 +18961,7 @@
               <span class="section-kicker">比赛拆解</span>
               <h2 class="section-title">当日比赛拆解</h2>
             </div>
-            <div class="section-meta">这里才展开所有比赛卡。平时只看总览和推荐，需要逐场核对时再进来，页面不会再一口气堆很长。</div>
+            <div class="section-meta">概率分布、市场赔率、赛果与推荐路径</div>
           </div>
           <div class="matches">
             ${dayAnalysis.matchAnalyses.map(({ match, analysis }) => renderMatchCard(day.id, match, analysis)).join("")}
@@ -15486,23 +18976,23 @@
           <div class="section-group">
             <div class="section-head">
               <div class="section-copy">
-                <span class="section-kicker">页面管理</span>
-                <h2 class="section-title">今天先看这几个重点</h2>
+                <span class="section-kicker">工作区</span>
+                <h2 class="section-title">当日决策入口</h2>
               </div>
-              <div class="section-meta">下面的内容已经拆到独立分区，想出票、看晋级图、筛玩法、拆比赛，直接点上面的分区按钮。</div>
+              <div class="section-meta">推荐组合、晋级态势与逐场模型</div>
             </div>
             <div class="dashboard-quick-grid">
               <button type="button" class="dashboard-quick-card" data-page-section="tickets">
-                <strong>去看推荐出票</strong>
-                <span>每日单关、串关、追投建议都集中在这里。</span>
+                <strong>推荐出票</strong>
+                <span>单关、串关与追投组合</span>
               </button>
               <button type="button" class="dashboard-quick-card" data-page-section="tournament">
-                <strong>去看积分晋级图</strong>
-                <span>小组积分榜和完整晋级路线图单独管理。</span>
+                <strong>积分晋级</strong>
+                <span>小组积分榜与完整晋级路线</span>
               </button>
               <button type="button" class="dashboard-quick-card" data-page-section="matches">
-                <strong>去看逐场拆解</strong>
-                <span>需要比分概率、赔率面板、赛果录入时再展开。</span>
+                <strong>比赛拆解</strong>
+                <span>比分概率、赔率面板与赛果</span>
               </button>
             </div>
           </div>
@@ -15540,7 +19030,7 @@
           <div class="page-section-nav">
             <div class="page-section-nav-title">
               <strong>页面分区</strong>
-              <span>当前：${PAGE_SECTIONS.find(section => section.key === activeSection).label} · 不用一直往下滑，按需要切换。</span>
+              <span>当前：${PAGE_SECTIONS.find(section => section.key === activeSection).label}</span>
             </div>
             <div class="page-section-tabs">
               ${PAGE_SECTIONS.map(section => `
@@ -15832,6 +19322,7 @@
       const chaseAdvice = buildSingleChaseAdvice(day);
       const dailyRecommendations = pickDailyRecommendedPurchases(dayAnalysis, { singleBankroll: chaseAdvice.recommendedBudget });
       const settlement = settleDailyRecommendationPacks(dailyRecommendations);
+      renderControlRoomChrome(day, settlement);
       document.getElementById("aiAdvisor").innerHTML = renderAiAdvisor();
       const dashboard = document.getElementById("dashboard");
       dashboard.innerHTML = renderDayV2(day, dayAnalysis, settlement);
@@ -15868,6 +19359,8 @@
       if (state.ui.builderSheetOpen) syncTicketSheetHeight();
       if (state.ui.builderSheetOpen || state.ui.aiSheetOpen) syncSidePanelSize();
     }, { passive: true });
+    restoreCachedSportteryOdds();
+    selectLatestLiveDay();
     startTournamentInsightAutoRefresh();
     render({ preserveScroll: false, animateDayChange: true });
   </script>

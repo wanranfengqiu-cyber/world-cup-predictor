@@ -11263,6 +11263,220 @@
         padding: 11px 10px !important;
       }
     }
+
+    /* V3 refinement: faster first read, lighter tickets and clearer tables. */
+    .control-room-v3 button:focus-visible,
+    .control-room-v3 input:focus-visible,
+    .control-room-v3 select:focus-visible,
+    .control-room-v3 textarea:focus-visible,
+    .control-room-v3 summary:focus-visible,
+    .control-room-v3 [tabindex]:focus-visible {
+      outline: 3px solid rgba(20, 115, 83, 0.28) !important;
+      outline-offset: 2px !important;
+    }
+
+    .control-room-v3 [data-managed-page-section="tickets"] .bet-row {
+      border-color: var(--v3-line) !important;
+      border-left: 4px solid var(--v3-gold) !important;
+      background: #ffffff !important;
+      color: var(--v3-ink) !important;
+      box-shadow: 0 5px 14px rgba(20, 36, 42, 0.045) !important;
+    }
+
+    .control-room-v3 [data-managed-page-section="tickets"] .bet-row:hover {
+      border-color: #a9bdb7 !important;
+      border-left-color: var(--v3-field) !important;
+      background: #ffffff !important;
+      box-shadow: 0 9px 20px rgba(20, 36, 42, 0.075) !important;
+    }
+
+    .control-room-v3 [data-managed-page-section="tickets"] .bet-row.won {
+      border-left-color: var(--v3-field) !important;
+    }
+
+    .control-room-v3 [data-managed-page-section="tickets"] .bet-row.lost {
+      border-left-color: var(--v3-red) !important;
+    }
+
+    .control-room-v3 [data-managed-page-section="tickets"] .bet-primary strong,
+    .control-room-v3 [data-managed-page-section="tickets"] .ticket-match-line,
+    .control-room-v3 [data-managed-page-section="tickets"] .bet-row .stack-stat strong {
+      color: var(--v3-ink) !important;
+    }
+
+    .control-room-v3 [data-managed-page-section="tickets"] .bet-primary .meta,
+    .control-room-v3 [data-managed-page-section="tickets"] .bet-row .stack-stat em {
+      color: var(--v3-muted) !important;
+    }
+
+    .control-room-v3 [data-managed-page-section="tickets"] .bet-row .stack-stat {
+      border-color: var(--v3-line-soft) !important;
+      background: var(--v3-surface-soft) !important;
+      color: var(--v3-ink) !important;
+    }
+
+    .control-room-v3 [data-managed-page-section="tickets"] .daily-reco-card .bet-row-stats {
+      border-top-color: var(--v3-line-soft) !important;
+    }
+
+    .control-room-v3 [data-managed-page-section="tickets"] .bet-tag.base {
+      background: var(--v3-field-soft) !important;
+      color: var(--v3-field-dark) !important;
+    }
+
+    .control-room-v3 [data-managed-page-section="tickets"] .bet-tag {
+      border: 1px solid var(--v3-line-soft);
+      background: #eef3f1 !important;
+      color: var(--v3-copy) !important;
+    }
+
+    .control-room-v3 [data-managed-page-section="tickets"] .bet-tag.base {
+      border-color: #c7ddd4;
+      background: var(--v3-field-soft) !important;
+      color: var(--v3-field-dark) !important;
+    }
+
+    .control-room-v3 [data-managed-page-section="tickets"] .bet-tag.balance {
+      border-color: #c9dbe4;
+      background: #eaf2f6 !important;
+      color: #315f75 !important;
+    }
+
+    .control-room-v3 [data-managed-page-section="tickets"] .bet-tag.risk,
+    .control-room-v3 [data-managed-page-section="tickets"] .bet-tag.upside {
+      border-color: #eadcae;
+      background: #faf3df !important;
+      color: #806613 !important;
+    }
+
+    .control-room-v3 [data-managed-page-section="tickets"] .ticket-outcome-pill.pending {
+      border-color: #dfc978 !important;
+      background: #fff8e6 !important;
+      color: #765e00 !important;
+    }
+
+    .control-room-v3 .group-table-wrap {
+      background: #ffffff;
+    }
+
+    .control-room-v3 .group-table-head {
+      border-bottom: 1px solid var(--v3-line-soft);
+      color: var(--v3-muted) !important;
+    }
+
+    .control-room-v3 .group-standing-row,
+    .control-room-v3 .group-standing-row.advance {
+      border-color: var(--v3-line-soft) !important;
+      background: #f8faf9 !important;
+      color: var(--v3-copy) !important;
+      box-shadow: none !important;
+    }
+
+    .control-room-v3 .group-standing-row.advance {
+      border-color: #c4ded3 !important;
+      background: #edf6f2 !important;
+    }
+
+    .control-room-v3 .group-standing-row > span,
+    .control-room-v3 .group-standing-row > strong,
+    .control-room-v3 .group-standing-row .group-team-name {
+      color: var(--v3-ink) !important;
+    }
+
+    .control-room-v3 .group-standing-row .rank-cell {
+      color: #9a7710 !important;
+    }
+
+    @media (min-width: 901px) {
+      .control-room-v3 .main-stage {
+        padding-top: 20px;
+      }
+
+      .control-room-v3 .workspace-intro {
+        margin-bottom: 14px;
+        padding-top: 0;
+        padding-bottom: 14px;
+      }
+
+      .control-room-v3 .workspace-intro h1 {
+        font-size: 31px;
+      }
+
+      .control-room-v3 .matchday-stamp {
+        min-width: 210px;
+        padding-top: 8px;
+        padding-bottom: 8px;
+      }
+
+      .control-room-v3 .day-panel {
+        gap: 14px !important;
+      }
+
+      .control-room-v3 .summary-bar .metric {
+        min-height: 112px !important;
+        padding: 12px 14px !important;
+      }
+
+      .control-room-v3 .metric .value,
+      .control-room-v3 .metric > .value {
+        margin: 6px 0 3px;
+        font-size: 25px !important;
+      }
+
+      .control-room-v3 .metric .sub {
+        font-size: 9px !important;
+        line-height: 1.4 !important;
+      }
+
+      .control-room-v3 .page-section-nav {
+        padding: 5px !important;
+      }
+
+      .control-room-v3 .page-section-tab {
+        min-height: 42px !important;
+        padding-top: 5px !important;
+        padding-bottom: 5px !important;
+      }
+
+      .control-room-v3 .managed-page-section > .section-group:first-child,
+      .control-room-v3 .managed-page-section > .matches-group:first-child {
+        padding-top: 10px !important;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .control-room-v3 .floating-tool-rail {
+        gap: 4px !important;
+        padding: 4px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 8px;
+        background: rgba(20, 36, 42, 0.97);
+        box-shadow: 0 12px 28px rgba(20, 36, 42, 0.24);
+      }
+
+      .control-room-v3 .floating-tool-btn {
+        min-height: 44px !important;
+        border: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+      }
+
+      .control-room-v3 .floating-tool-btn:hover,
+      .control-room-v3 .floating-tool-btn.active {
+        background: var(--v3-field) !important;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .control-room-v3 *,
+      .control-room-v3 *::before,
+      .control-room-v3 *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+      }
+    }
   </style>
 </head>
 <body class="ui-refresh control-room-v2 control-room-v3">
@@ -16307,7 +16521,7 @@
             id: dayId,
             label: `${localDate.getMonth() + 1} 月 ${localDate.getDate()} 日`,
             weekday: sourceDay.weekday ? `${sourceDay.weekday}票面` : "实时票面",
-            summary: "已从中国体育彩票竞彩网自动匹配世界杯场次和最新固定奖金；赔率变化后会重新计算推荐。",
+            summary: "竞彩网赔率已匹配；变化后自动重算推荐。",
             dynamicOddsDay: true,
             matches: []
           };
@@ -21833,22 +22047,22 @@
             <div class="metric">
               <span class="label">${day.label}</span>
               <span class="value">${day.matches.length} 场</span>
-              <div class="sub">${day.summary || ""}</div>
+              <div class="sub">${day.dynamicOddsDay ? "竞彩网赔率已匹配；变化后自动重算推荐。" : (day.summary || "")}</div>
             </div>
             <div class="metric">
               <span class="label">推荐单关</span>
               <span class="value reco-value">${getDailyRecommendationMetricValue(dailyRecommendations.single, "暂无")}</span>
-              <div class="sub">${getDailyRecommendationMetricSub(dailyRecommendations.single, "当天没有筛出足够明确的单关推荐。")}</div>
+              <div class="sub">${getDailyRecommendationMetricSub(dailyRecommendations.single, "暂无清晰单关推荐。")}</div>
             </div>
             <div class="metric">
               <span class="label">推荐串关</span>
               <span class="value reco-value">${getDailyRecommendationMetricValue(dailyRecommendations.parlay, "暂无")}</span>
-              <div class="sub">${getDailyRecommendationMetricSub(dailyRecommendations.parlay, "当天没有筛出足够明确的串关推荐。")}</div>
+              <div class="sub">${getDailyRecommendationMetricSub(dailyRecommendations.parlay, "暂无清晰串关推荐。")}</div>
             </div>
             <div class="metric">
               <span class="label">已结算盈亏</span>
               <span class="value ${displaySettlement.settledProfit >= 0 ? "edge-up" : "warning"}">${formatMoney(displaySettlement.settledProfit)}</span>
-              <div class="sub">${displaySettlement.pendingCount ? `单关+串关仍有 ${displaySettlement.pendingCount} 张推荐票待赛果` : "单关+串关推荐票都已完成结算"}</div>
+              <div class="sub">${displaySettlement.pendingCount ? `${displaySettlement.pendingCount} 张票待赛果（单关+串关）` : "单关+串关已全部结算"}</div>
             </div>
           </div>
           <div class="page-section-nav">
@@ -21901,7 +22115,7 @@
       metric.innerHTML = `
         <span class="label">中奖态势</span>
         <span class="value">${settlement.wonCount} / ${settlement.lostCount} / ${settlement.pendingCount}</span>
-        <div class="sub">顺序是 已中 / 未中 / 待赛果。这里先看整体，再往下看具体是哪几张票命中。</div>
+        <div class="sub">已中 / 未中 / 待赛果；下方查看票据明细。</div>
       `;
       summaryBar.appendChild(metric);
     }

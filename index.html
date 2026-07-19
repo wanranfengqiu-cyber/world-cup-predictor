@@ -9702,6 +9702,307 @@
         padding: 10px;
       }
     }
+
+    /* Comfort pass: soften contrast and unify surfaces without changing layout. */
+    .control-room-v2 {
+      --cr-graphite: #142229;
+      --cr-graphite-2: #1b2c33;
+      --cr-graphite-3: #2b4048;
+      --cr-pitch: #16745a;
+      --cr-pitch-bright: #45aa83;
+      --cr-score: #ddb33d;
+      --cr-paper: #f7faf9;
+      --cr-canvas: #edf2f1;
+      --cr-line: #d3ddda;
+      --cr-red: #ce5b49;
+      --cr-info: #4b7e98;
+      background-color: var(--cr-canvas) !important;
+      background-image:
+        linear-gradient(rgba(20, 34, 41, 0.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(20, 34, 41, 0.014) 1px, transparent 1px) !important;
+      background-size: 56px 56px !important;
+      color: var(--cr-graphite) !important;
+      font-family: "HarmonyOS Sans SC", "MiSans", "Microsoft YaHei UI", "PingFang SC", sans-serif;
+      line-height: 1.62;
+    }
+
+    .control-room-v2 .app-topbar {
+      border-bottom-width: 2px;
+      background: #17272e;
+      box-shadow: 0 7px 22px rgba(20, 34, 41, 0.14);
+    }
+
+    .control-room-v2 .live-ribbon {
+      border-color: rgba(255, 255, 255, 0.085);
+      border-radius: 6px;
+      background: #21343c;
+    }
+
+    .control-room-v2 .brand-emblem {
+      border-radius: 6px;
+      background: #19775c;
+      box-shadow: inset 0 -4px 0 var(--cr-score);
+    }
+
+    .control-room-v2 .matchday-sidebar {
+      border-right-color: #d1dcda;
+      background: rgba(248, 250, 249, 0.96);
+      box-shadow: 9px 0 26px rgba(20, 34, 41, 0.028);
+    }
+
+    .control-room-v2 .sidebar-season-meta {
+      border-color: #d4dedc;
+      border-radius: 6px;
+      background: #d4dedc;
+    }
+
+    .control-room-v2 .sidebar-season-meta span {
+      background: #fbfcfc;
+    }
+
+    .control-room-v2 .tab-btn {
+      border-radius: 6px !important;
+    }
+
+    .control-room-v2 .tab-btn:hover {
+      border-color: #d1dcda !important;
+      background: #f0f5f3 !important;
+      box-shadow: none !important;
+    }
+
+    .control-room-v2 .tab-btn.active,
+    .control-room-v2 .tab-btn.is-current {
+      border-color: #c5d8d1 !important;
+      border-left-color: var(--cr-pitch) !important;
+      background: #eaf3ef !important;
+      box-shadow: 0 5px 14px rgba(22, 116, 90, 0.07) !important;
+    }
+
+    .control-room-v2 .main-stage {
+      padding-top: 28px;
+    }
+
+    .control-room-v2 .workspace-intro {
+      border-left-width: 4px;
+      border-radius: 6px;
+      background-color: #1b2d34;
+      box-shadow: 0 12px 28px rgba(20, 34, 41, 0.11);
+    }
+
+    .control-room-v2 .workspace-intro p {
+      color: #b4c1c5;
+    }
+
+    .control-room-v2 .summary-bar {
+      overflow: hidden;
+      border-color: #cbd7d5 !important;
+      border-top-width: 2px !important;
+      border-radius: 6px !important;
+      background: rgba(255, 255, 255, 0.94) !important;
+      box-shadow: 0 8px 22px rgba(20, 34, 41, 0.055) !important;
+    }
+
+    .control-room-v2 .summary-bar .metric {
+      border-left-color: #dbe3e1 !important;
+      background: transparent !important;
+    }
+
+    .control-room-v2 .metric .label,
+    .control-room-v2 .metric .sub {
+      color: #66787e !important;
+    }
+
+    .control-room-v2 .metric .sub {
+      font-size: 11px;
+      line-height: 1.58;
+    }
+
+    .control-room-v2 .page-section-nav {
+      border-color: #cdd9d6 !important;
+      border-radius: 6px !important;
+      background: rgba(250, 252, 251, 0.96) !important;
+      box-shadow: 0 7px 18px rgba(20, 34, 41, 0.05) !important;
+      backdrop-filter: blur(14px);
+    }
+
+    .control-room-v2 .page-section-tab {
+      border-radius: 5px !important;
+    }
+
+    .control-room-v2 .page-section-tab:hover {
+      background: #f0f5f3 !important;
+    }
+
+    .control-room-v2 .page-section-tab.active {
+      border-color: #b9d3c9 !important;
+      background: #e7f1ed !important;
+      box-shadow: inset 0 -2px 0 var(--cr-pitch), 0 3px 10px rgba(22, 116, 90, 0.05) !important;
+    }
+
+    .control-room-v2 .section-group {
+      padding-top: 28px !important;
+      padding-bottom: 28px !important;
+      border-top-color: #d1dcda !important;
+    }
+
+    .control-room-v2 .section-title,
+    .control-room-v2 .section-head .section-title {
+      color: #182a31 !important;
+      line-height: 1.28;
+    }
+
+    .control-room-v2 .section-meta,
+    .control-room-v2 .plan-note,
+    .control-room-v2 .meta,
+    .control-room-v2 .tiny-note {
+      color: #65777d !important;
+      line-height: 1.68;
+    }
+
+    .control-room-v2 .plan-card,
+    .control-room-v2 .candidate,
+    .control-room-v2 .strategy-ticket,
+    .control-room-v2 .match-card,
+    .control-room-v2 .tournament-group-card,
+    .control-room-v2 .bracket-match-card,
+    .control-room-v2 .forecast-card,
+    .control-room-v2 .group-table-card {
+      border-color: #d0dbd8 !important;
+      border-radius: 6px !important;
+      background: rgba(255, 255, 255, 0.94) !important;
+      box-shadow: 0 6px 18px rgba(20, 34, 41, 0.045) !important;
+    }
+
+    .control-room-v2 .plan-card:hover,
+    .control-room-v2 .candidate:hover,
+    .control-room-v2 .match-card:hover,
+    .control-room-v2 .forecast-card:hover {
+      border-color: #b7c8c3 !important;
+      box-shadow: 0 10px 24px rgba(20, 34, 41, 0.075) !important;
+      transform: translateY(-1px);
+    }
+
+    .control-room-v2 .forecast-board > .forecast-card:only-child {
+      grid-column: 1 / -1;
+      justify-self: center;
+      width: min(100%, 760px);
+    }
+
+    .control-room-v2 .match-card {
+      border-top: 2px solid var(--cr-pitch) !important;
+    }
+
+    .control-room-v2 .match-top {
+      background: #fbfcfc !important;
+    }
+
+    .control-room-v2 .match-top .versus .time-chip {
+      border-color: #29424b !important;
+      background: #29424b !important;
+      color: #ffffff !important;
+      box-shadow: none !important;
+    }
+
+    .control-room-v2 .match-top .versus .note-chip {
+      max-width: 390px;
+      border: 1px solid #cbdad5 !important;
+      background: #edf4f1 !important;
+      color: #405c54 !important;
+      line-height: 1.45;
+      box-shadow: none !important;
+    }
+
+    .control-room-v2 .match-top .vs-mark {
+      color: #d3a827 !important;
+    }
+
+    .control-room-v2 .match-top .match-strip-pill {
+      border-color: #d5dfdc !important;
+      background: #f1f5f4 !important;
+      color: #587068 !important;
+    }
+
+    .control-room-v2 .match-top .match-strip-pill.accent {
+      border-color: #c2d8d0 !important;
+      background: #e9f3ef !important;
+      color: #17654d !important;
+    }
+
+    .control-room-v2 .match-forecast-panel {
+      border-color: #304850;
+      background: #192a31;
+      box-shadow: 0 8px 20px rgba(20, 34, 41, 0.08);
+    }
+
+    .control-room-v2 .match-forecast-panel .forecast-prob-segment + .forecast-prob-segment {
+      border-left-color: #192a31;
+    }
+
+    .control-room-v2 .match-forecast-caution {
+      background: #21343b;
+    }
+
+    .control-room-v2 .metric-help-details,
+    .control-room-v2 .match-deep-dive,
+    .control-room-v2 .recommendation-alternatives {
+      border-color: #d0dbd8;
+      background: rgba(250, 252, 251, 0.9);
+    }
+
+    .control-room-v2 .metric-help-details > summary:hover,
+    .control-room-v2 .match-deep-dive > summary:hover,
+    .control-room-v2 .recommendation-alternatives > summary:hover {
+      background: #edf4f1;
+    }
+
+    .control-room-v2 .sync-card {
+      border-left-color: var(--cr-info) !important;
+      background: rgba(255, 255, 255, 0.92) !important;
+    }
+
+    .control-room-v2 .floating-tool-btn {
+      border-color: rgba(255, 255, 255, 0.08) !important;
+      border-radius: 6px !important;
+      background: #1b2d34 !important;
+      box-shadow: 0 7px 18px rgba(20, 34, 41, 0.15) !important;
+    }
+
+    @media (max-width: 640px) {
+      .control-room-v2 {
+        background-image:
+          linear-gradient(rgba(20, 34, 41, 0.014) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(20, 34, 41, 0.01) 1px, transparent 1px) !important;
+        background-size: 72px 72px !important;
+      }
+
+      .control-room-v2 .app-topbar {
+        box-shadow: 0 5px 16px rgba(20, 34, 41, 0.12);
+      }
+
+      .control-room-v2 .main-stage {
+        padding-top: 14px;
+      }
+
+      .control-room-v2 .workspace-intro,
+      .control-room-v2 .summary-bar,
+      .control-room-v2 .page-section-nav,
+      .control-room-v2 .plan-card,
+      .control-room-v2 .candidate,
+      .control-room-v2 .match-card,
+      .control-room-v2 .forecast-card {
+        border-radius: 6px !important;
+      }
+
+      .control-room-v2 .section-group {
+        padding-top: 22px !important;
+        padding-bottom: 22px !important;
+      }
+
+      .control-room-v2 .match-top .versus .note-chip {
+        width: min(100%, 290px);
+        max-width: 290px;
+      }
+    }
   </style>
 </head>
 <body class="ui-refresh control-room-v2">

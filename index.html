@@ -11265,6 +11265,24 @@
     }
 
     /* V3 refinement: faster first read, lighter tickets and clearer tables. */
+    html,
+    body.control-room-v3 {
+      overflow-x: clip !important;
+    }
+
+    .control-room-v3 .app-topbar,
+    .control-room-v3 .page-section-nav {
+      position: sticky !important;
+    }
+
+    .control-room-v3 .app-topbar {
+      top: 0 !important;
+    }
+
+    .control-room-v3 .page-section-nav {
+      z-index: 35 !important;
+    }
+
     .control-room-v3 button:focus-visible,
     .control-room-v3 input:focus-visible,
     .control-room-v3 select:focus-visible,
@@ -11444,7 +11462,31 @@
       }
     }
 
+    @media (min-width: 641px) and (max-width: 1180px) {
+      .control-room-v3 .section-head {
+        align-items: flex-start !important;
+        flex-direction: column !important;
+        gap: 6px !important;
+        text-align: left !important;
+      }
+
+      .control-room-v3 .section-head .section-meta {
+        max-width: 100%;
+        text-align: left !important;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .control-room-v3 .page-section-nav {
+        top: 129px !important;
+      }
+    }
+
     @media (max-width: 640px) {
+      .control-room-v3 .page-section-nav {
+        top: 125px !important;
+      }
+
       .control-room-v3 .floating-tool-rail {
         gap: 4px !important;
         padding: 4px;
@@ -13536,7 +13578,27 @@
     }
 
     function applyScrollPosition(y) {
-      const apply = () => window.scrollTo(0, y);
+      const apply = () => {
+        const root = document.documentElement;
+        const body = document.body;
+        const rootScrollBehavior = root.style.getPropertyValue("scroll-behavior");
+        const rootScrollPriority = root.style.getPropertyPriority("scroll-behavior");
+        const bodyScrollBehavior = body.style.getPropertyValue("scroll-behavior");
+        const bodyScrollPriority = body.style.getPropertyPriority("scroll-behavior");
+        root.style.setProperty("scroll-behavior", "auto", "important");
+        body.style.setProperty("scroll-behavior", "auto", "important");
+        window.scrollTo(0, y);
+        if (rootScrollBehavior) {
+          root.style.setProperty("scroll-behavior", rootScrollBehavior, rootScrollPriority);
+        } else {
+          root.style.removeProperty("scroll-behavior");
+        }
+        if (bodyScrollBehavior) {
+          body.style.setProperty("scroll-behavior", bodyScrollBehavior, bodyScrollPriority);
+        } else {
+          body.style.removeProperty("scroll-behavior");
+        }
+      };
       apply();
       requestAnimationFrame(() => {
         apply();
@@ -22184,7 +22246,20 @@
           const target = event.target.closest("button[data-page-section]");
           if (!target) return;
           const nav = document.querySelector("#dashboard .page-section-nav");
-          const targetTop = nav ? Math.max(nav.getBoundingClientRect().top + window.scrollY - 12, 0) : window.scrollY;
+          let navDocumentTop = 0;
+          if (nav) {
+            const previousPosition = nav.style.getPropertyValue("position");
+            const previousPriority = nav.style.getPropertyPriority("position");
+            nav.style.setProperty("position", "static", "important");
+            navDocumentTop = nav.getBoundingClientRect().top + window.scrollY;
+            if (previousPosition) {
+              nav.style.setProperty("position", previousPosition, previousPriority);
+            } else {
+              nav.style.removeProperty("position");
+            }
+          }
+          const stickyTop = nav ? parseFloat(getComputedStyle(nav).top) || 12 : 12;
+          const targetTop = nav ? Math.max(navDocumentTop - stickyTop, 0) : window.scrollY;
           setActivePageSection(target.dataset.pageSection, { preserveScroll: false, scrollY: targetTop });
         });
         document.body.dataset.pageSectionBound = "1";

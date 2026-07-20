@@ -817,6 +817,7 @@
       overflow-x: auto;
       padding: 4px 0 10px;
       -webkit-overflow-scrolling: touch;
+      scroll-snap-type: x proximity;
       scrollbar-color: rgba(229, 194, 107, 0.38) rgba(255, 255, 255, 0.06);
     }
 
@@ -919,6 +920,7 @@
       grid-template-rows: auto repeat(16, minmax(58px, 1fr));
       gap: 8px;
       min-height: 1180px;
+      scroll-snap-align: start;
     }
 
     .advancement-round.final-round,
@@ -1016,6 +1018,14 @@
         0 18px 34px rgba(0, 0, 0, 0.24);
     }
 
+    .advancement-node.is-locked {
+      border-color: rgba(117, 216, 178, 0.42);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.06),
+        0 10px 24px rgba(0, 0, 0, 0.18),
+        0 0 0 1px rgba(117, 216, 178, 0.08);
+    }
+
     .advancement-node-head {
       display: flex;
       align-items: center;
@@ -1023,6 +1033,11 @@
       gap: 8px;
       color: var(--muted);
       font-size: 10px;
+    }
+
+    .advancement-node-head span:last-child {
+      color: var(--gold);
+      font-weight: 800;
     }
 
     .advancement-node strong {
@@ -1128,6 +1143,8 @@
       color: #b9f8d2;
       font-size: 11px;
       font-weight: 800;
+      line-height: 1.45;
+      white-space: normal;
     }
 
     .advancement-node[data-slot] {
@@ -1142,7 +1159,7 @@
 
     @media (max-width: 760px) {
       .advancement-chart {
-        min-width: 1120px;
+        min-width: 1080px;
         gap: 22px;
         padding: 14px;
       }
@@ -2666,7 +2683,7 @@
       font-size: 24px;
       line-height: 1.22;
       color: #ffffff;
-      letter-spacing: -0.02em;
+      letter-spacing: 0;
     }
 
     .finished-score-card span {
@@ -11631,6 +11648,7 @@
 
   <script>
     const STORAGE_KEY = "world-cup-betting-lab-v4";
+    const RESULTS_DATA_VERSION = 2;
     const BANKROLL_PER_DAY = 100;
     const DAILY_PARLAY_BANKROLL = 20;
     const TICKET_UNIT = 10;
@@ -12815,35 +12833,36 @@
     );
 
     const STATIC_KNOCKOUT_SNAPSHOT = [
-      { dayId: "2026-06-29", id: "wc26-74", kickoff: "06-29 16:30", home: "德国", away: "巴拉圭", score: [1, 1], penalty: [3, 4] },
-      { dayId: "2026-06-29", id: "wc26-75", kickoff: "06-29 19:00", home: "荷兰", away: "摩洛哥", score: [1, 1], penalty: [2, 3] },
-      { dayId: "2026-06-29", id: "wc26-76", kickoff: "06-29 12:00", home: "巴西", away: "日本", score: [2, 1] },
-      { dayId: "2026-06-30", id: "wc26-77", kickoff: "06-30 17:00", home: "法国", away: "瑞典", score: [3, 0] },
-      { dayId: "2026-06-30", id: "wc26-78", kickoff: "06-30 12:00", home: "科特迪瓦", away: "挪威", score: [1, 2] },
-      { dayId: "2026-06-30", id: "wc26-79", kickoff: "06-30 19:00", home: "墨西哥", away: "厄瓜多尔", score: [2, 0] },
-      { dayId: "2026-07-01", id: "wc26-80", kickoff: "07-01 12:00", home: "英格兰", away: "刚果金", score: [2, 1] },
-      { dayId: "2026-07-01", id: "wc26-81", kickoff: "07-01 17:00", home: "美国", away: "波黑", score: [2, 0] },
-      { dayId: "2026-07-01", id: "wc26-82", kickoff: "07-01 13:00", home: "比利时", away: "塞内加尔", score: [3, 2] },
-      { dayId: "2026-07-02", id: "wc26-83", kickoff: "07-02 19:00", home: "葡萄牙", away: "克罗地亚", score: [2, 1] },
-      { dayId: "2026-07-02", id: "wc26-84", kickoff: "07-02 12:00", home: "西班牙", away: "奥地利", score: [3, 0] },
-      { dayId: "2026-07-02", id: "wc26-85", kickoff: "07-02 20:00", home: "瑞士", away: "阿尔及利亚", score: [2, 0] },
-      { dayId: "2026-07-03", id: "wc26-86", kickoff: "07-03 18:00", home: "阿根廷", away: "佛得角", score: [3, 2] },
-      { dayId: "2026-07-03", id: "wc26-87", kickoff: "07-03 20:30", home: "哥伦比亚", away: "加纳", score: [1, 0] },
-      { dayId: "2026-07-03", id: "wc26-88", kickoff: "07-03 13:00", home: "澳大利亚", away: "埃及", score: [1, 1], penalty: [2, 4] },
-      { dayId: "2026-07-04", id: "wc26-89", kickoff: "07-04 17:00", home: "巴拉圭", away: "法国", score: [0, 1] },
-      { dayId: "2026-07-04", id: "wc26-90", kickoff: "07-04 12:00", home: "加拿大", away: "摩洛哥", score: [0, 3] },
-      { dayId: "2026-07-05", id: "wc26-91", kickoff: "07-05 16:00", home: "巴西", away: "挪威", score: [1, 2] },
-      { dayId: "2026-07-05", id: "wc26-92", kickoff: "07-05 18:00", home: "墨西哥", away: "英格兰", score: [2, 3] },
-      { dayId: "2026-07-06", id: "wc26-93", kickoff: "07-06 14:00", home: "葡萄牙", away: "西班牙", score: [0, 1] },
-      { dayId: "2026-07-06", id: "wc26-94", kickoff: "07-06 17:00", home: "美国", away: "比利时", score: [1, 4] },
-      { dayId: "2026-07-07", id: "wc26-95", kickoff: "07-07 12:00", home: "阿根廷", away: "埃及", score: [3, 2] },
-      { dayId: "2026-07-07", id: "wc26-96", kickoff: "07-07 13:00", home: "瑞士", away: "哥伦比亚", score: [0, 0], penalty: [4, 3] },
-      { dayId: "2026-07-09", id: "wc26-97", kickoff: "07-09 16:00", home: "法国", away: "摩洛哥", score: [2, 0] },
-      { dayId: "2026-07-10", id: "wc26-98", kickoff: "07-10 12:00", home: "西班牙", away: "比利时" },
+      { matchNo: 74, dayId: "2026-06-29", id: "wc26-74", kickoff: "06-29 16:30", home: "德国", away: "巴拉圭", regularScore: [1, 1], finalScore: [1, 1], penalty: [3, 4] },
+      { matchNo: 75, dayId: "2026-06-29", id: "wc26-75", kickoff: "06-29 19:00", home: "荷兰", away: "摩洛哥", regularScore: [1, 1], finalScore: [1, 1], penalty: [2, 3] },
+      { matchNo: 76, dayId: "2026-06-29", id: "wc26-76", kickoff: "06-29 12:00", home: "巴西", away: "日本", regularScore: [2, 1], finalScore: [2, 1] },
+      { matchNo: 77, dayId: "2026-06-30", id: "wc26-77", kickoff: "06-30 17:00", home: "法国", away: "瑞典", regularScore: [3, 0], finalScore: [3, 0] },
+      { matchNo: 78, dayId: "2026-06-30", id: "wc26-78", kickoff: "06-30 12:00", home: "科特迪瓦", away: "挪威", regularScore: [1, 2], finalScore: [1, 2] },
+      { matchNo: 79, dayId: "2026-06-30", id: "wc26-79", kickoff: "06-30 19:00", home: "墨西哥", away: "厄瓜多尔", regularScore: [2, 0], finalScore: [2, 0] },
+      { matchNo: 80, dayId: "2026-07-01", id: "wc26-80", kickoff: "07-01 12:00", home: "英格兰", away: "刚果金", regularScore: [2, 1], finalScore: [2, 1] },
+      { matchNo: 81, dayId: "2026-07-01", id: "wc26-81", kickoff: "07-01 17:00", home: "美国", away: "波黑", regularScore: [2, 0], finalScore: [2, 0] },
+      { matchNo: 82, dayId: "2026-07-01", id: "wc26-82", kickoff: "07-01 13:00", home: "比利时", away: "塞内加尔", regularScore: [2, 2], finalScore: [3, 2] },
+      { matchNo: 83, dayId: "2026-07-02", id: "wc26-83", kickoff: "07-02 19:00", home: "葡萄牙", away: "克罗地亚", regularScore: [2, 1], finalScore: [2, 1] },
+      { matchNo: 84, dayId: "2026-07-02", id: "wc26-84", kickoff: "07-02 12:00", home: "西班牙", away: "奥地利", regularScore: [3, 0], finalScore: [3, 0] },
+      { matchNo: 85, dayId: "2026-07-02", id: "wc26-85", kickoff: "07-02 20:00", home: "瑞士", away: "阿尔及利亚", regularScore: [2, 0], finalScore: [2, 0] },
+      { matchNo: 86, dayId: "2026-07-03", id: "wc26-86", kickoff: "07-03 18:00", home: "阿根廷", away: "佛得角", regularScore: [1, 1], finalScore: [3, 2] },
+      { matchNo: 87, dayId: "2026-07-03", id: "wc26-87", kickoff: "07-03 20:30", home: "哥伦比亚", away: "加纳", regularScore: [1, 0], finalScore: [1, 0] },
+      { matchNo: 88, dayId: "2026-07-03", id: "wc26-88", kickoff: "07-03 13:00", home: "澳大利亚", away: "埃及", regularScore: [1, 1], finalScore: [1, 1], penalty: [2, 4] },
+      { matchNo: 89, dayId: "2026-07-04", id: "wc26-89", kickoff: "07-04 17:00", home: "巴拉圭", away: "法国", regularScore: [0, 1], finalScore: [0, 1] },
+      { matchNo: 90, dayId: "2026-07-04", id: "wc26-90", kickoff: "07-04 12:00", home: "加拿大", away: "摩洛哥", regularScore: [0, 3], finalScore: [0, 3] },
+      { matchNo: 91, dayId: "2026-07-05", id: "wc26-91", kickoff: "07-05 16:00", home: "巴西", away: "挪威", regularScore: [1, 2], finalScore: [1, 2] },
+      { matchNo: 92, dayId: "2026-07-05", id: "wc26-92", kickoff: "07-05 18:00", home: "墨西哥", away: "英格兰", regularScore: [2, 3], finalScore: [2, 3] },
+      { matchNo: 93, dayId: "2026-07-06", id: "wc26-93", kickoff: "07-06 14:00", home: "葡萄牙", away: "西班牙", regularScore: [0, 1], finalScore: [0, 1] },
+      { matchNo: 94, dayId: "2026-07-06", id: "wc26-94", kickoff: "07-06 17:00", home: "美国", away: "比利时", regularScore: [1, 4], finalScore: [1, 4] },
+      { matchNo: 95, dayId: "2026-07-07", id: "wc26-95", kickoff: "07-07 12:00", home: "阿根廷", away: "埃及", regularScore: [3, 2], finalScore: [3, 2] },
+      { matchNo: 96, dayId: "2026-07-07", id: "wc26-96", kickoff: "07-07 13:00", home: "瑞士", away: "哥伦比亚", regularScore: [0, 0], finalScore: [0, 0], penalty: [4, 3] },
+      { matchNo: 97, dayId: "2026-07-09", id: "wc26-97", kickoff: "07-09 16:00", home: "法国", away: "摩洛哥", regularScore: [2, 0], finalScore: [2, 0] },
+      { matchNo: 98, dayId: "2026-07-10", id: "wc26-98", kickoff: "07-10 12:00", home: "西班牙", away: "比利时", regularScore: [2, 1], finalScore: [2, 1] },
       {
         dayId: "2026-07-11",
         id: "sporttery-2040459",
         officialMatchId: "2040459",
+        matchNo: 99,
         kickoff: "07-12 05:00",
         home: "挪威",
         away: "英格兰",
@@ -12853,12 +12872,15 @@
           wdl: { H: 3.45, D: 3.65, A: 1.77 },
           handicap: { line: 1, H: 1.83, D: 3.46, A: 3.40 }
         },
-        blockedSingleMarkets: ["handicap"]
+        blockedSingleMarkets: ["handicap"],
+        regularScore: [1, 1],
+        finalScore: [1, 2]
       },
       {
         dayId: "2026-07-11",
         id: "sporttery-2040467",
         officialMatchId: "2040467",
+        matchNo: 100,
         kickoff: "07-12 09:00",
         home: "阿根廷",
         away: "瑞士",
@@ -12868,12 +12890,18 @@
           wdl: { H: 1.51, D: 3.42, A: 5.75 },
           handicap: { line: -1, H: 2.93, D: 3.00, A: 2.20 }
         },
-        blockedSingleMarkets: ["handicap"]
-      }
+        blockedSingleMarkets: ["handicap"],
+        regularScore: [1, 1],
+        finalScore: [3, 1]
+      },
+      { matchNo: 101, dayId: "2026-07-14", id: "wc26-101", kickoff: "07-14 14:00", home: "法国", away: "西班牙", regularScore: [0, 2], finalScore: [0, 2] },
+      { matchNo: 102, dayId: "2026-07-15", id: "wc26-102", kickoff: "07-15 15:00", home: "英格兰", away: "阿根廷", regularScore: [1, 2], finalScore: [1, 2] },
+      { matchNo: 103, dayId: "2026-07-18", id: "wc26-103", kickoff: "07-18 17:00", home: "法国", away: "英格兰", regularScore: [4, 6], finalScore: [4, 6] },
+      { matchNo: 104, dayId: "2026-07-19", id: "wc26-104", kickoff: "07-19 15:00", home: "西班牙", away: "阿根廷", regularScore: [0, 0], finalScore: [1, 0] }
     ];
 
     const STATIC_RESULT_FALLBACKS = {
-      "rsa-can": { homeGoals: "0", awayGoals: "1" }
+      "rsa-can": { homeGoals: "0", awayGoals: "1", source: "static-regular", settlementBasis: "regular-time" }
     };
 
     function getStaticSnapshotTeam(localName) {
@@ -12932,7 +12960,7 @@
         away: getStaticSnapshotTeam(item.away),
         model: {
           ...model,
-          note: item.score
+          note: item.finalScore
             ? "比赛已经结束，赛果已写入页面并参与淘汰赛晋级锁定。"
             : "等待比赛完成；联网成功后会自动同步赛果与最新赔率。"
         },
@@ -12944,12 +12972,20 @@
           matchNum: item.matchNum,
           updatedAt: item.oddsUpdatedAt || ""
         } : null,
+        matchNo: item.matchNo || null,
+        resultApiMatchId: item.matchNo ? String(item.matchNo) : "",
+        regularScore: item.regularScore || null,
+        finalScore: item.finalScore || null,
         penalty: item.penalty || null
       });
-      if (item.score) {
+      if (item.regularScore) {
         STATIC_RESULT_FALLBACKS[item.id] = {
-          homeGoals: String(item.score[0]),
-          awayGoals: String(item.score[1])
+          homeGoals: String(item.regularScore[0]),
+          awayGoals: String(item.regularScore[1]),
+          finalHomeGoals: String(item.finalScore[0]),
+          finalAwayGoals: String(item.finalScore[1]),
+          source: "static-regular",
+          settlementBasis: "regular-time"
         };
       }
     });
@@ -13110,12 +13146,40 @@
         const safeCandidateExplorer = isPlainObject(safeUi.candidateExplorer) ? safeUi.candidateExplorer : {};
         const defaultExplorer = createDefaultCandidateExplorerState();
         const safeAppliedExplorer = isPlainObject(safeCandidateExplorer.applied) ? safeCandidateExplorer.applied : {};
+        const storedVersion = Number(parsed.resultsDataVersion) || 0;
+        const storedResults = isPlainObject(parsed.results) ? parsed.results : {};
+        const normalizedStoredResults = Object.fromEntries(Object.entries(storedResults).map(([matchId, result]) => [
+          matchId,
+          isPlainObject(result)
+            ? {
+                ...result,
+                source: result.source || "legacy",
+                settlementBasis: result.settlementBasis || "regular-time"
+              }
+            : result
+        ]));
+        const mergedResults = { ...STATIC_RESULT_FALLBACKS, ...normalizedStoredResults };
+        if (storedVersion < RESULTS_DATA_VERSION) {
+          Object.entries(STATIC_RESULT_FALLBACKS).forEach(([matchId, result]) => {
+            const current = storedResults[matchId];
+            const legacyFinal = [result.finalHomeGoals, result.finalAwayGoals].map(String);
+            const legacyRegular = [result.homeGoals, result.awayGoals].map(String);
+            const currentPair = current && [current.homeGoals, current.awayGoals].map(String);
+            const looksLikeAutoFinal = current
+              && currentPair[0] === legacyFinal[0]
+              && currentPair[1] === legacyFinal[1];
+            const alreadyRegular = current
+              && currentPair[0] === legacyRegular[0]
+              && currentPair[1] === legacyRegular[1];
+            if (looksLikeAutoFinal || !current || alreadyRegular) {
+              mergedResults[matchId] = { ...result };
+            }
+          });
+        }
         return {
           selectedDay: typeof parsed.selectedDay === "string" ? parsed.selectedDay : null,
-          results: {
-            ...STATIC_RESULT_FALLBACKS,
-            ...(isPlainObject(parsed.results) ? parsed.results : {})
-          },
+          resultsDataVersion: RESULTS_DATA_VERSION,
+          results: mergedResults,
           builders: isPlainObject(parsed.builders) ? parsed.builders : {},
           ai: {
             endpoint: typeof safeAi.endpoint === "string" && safeAi.endpoint ? safeAi.endpoint : "https://api.openai.com/v1/chat/completions",
@@ -13151,7 +13215,8 @@
       } catch (error) {
         return {
           selectedDay: null,
-          results: {},
+          resultsDataVersion: RESULTS_DATA_VERSION,
+          results: { ...STATIC_RESULT_FALLBACKS },
           builders: {},
           ai: {
             endpoint: "https://api.openai.com/v1/chat/completions",
@@ -13177,6 +13242,7 @@
     function saveState() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify({
         selectedDay: currentDayId,
+        resultsDataVersion: RESULTS_DATA_VERSION,
         results: state.results,
         builders: state.builders,
         ai: state.ai,
@@ -13867,6 +13933,7 @@
           const awayLocal = resolveLocalTeamNameByApiName(game.away_team_name_en || game.away_team_label);
           const homeScore = parseApiScore(game.home_score);
           const awayScore = parseApiScore(game.away_score);
+          const regularTimeScore = deriveRegularTimeScore(game);
           const homePenaltyScore = parseApiScore(game.home_penalty_score);
           const awayPenaltyScore = parseApiScore(game.away_penalty_score);
           const settledByPenalties = homeScore === awayScore
@@ -13876,19 +13943,27 @@
           if (!homeLocal || !awayLocal || !isApiGameFinished(game) || homeScore == null || awayScore == null) return;
           if (homeScore === awayScore && !settledByPenalties) return;
           const homeAdvanced = homeScore > awayScore || (settledByPenalties && homePenaltyScore > awayPenaltyScore);
+          const regularHomeScore = regularTimeScore ? regularTimeScore.home : homeScore;
+          const regularAwayScore = regularTimeScore ? regularTimeScore.away : awayScore;
+          const settledAfterExtraTime = homeScore !== regularHomeScore || awayScore !== regularAwayScore;
           knockoutResults.push({
+            matchNo: Number(game.id) || null,
             type: String(game.type || "").toLowerCase(),
             homeLocal,
             awayLocal,
             homeScore,
             awayScore,
+            regularHomeScore,
+            regularAwayScore,
             homePenaltyScore,
             awayPenaltyScore,
             winnerLocal: homeAdvanced ? homeLocal : awayLocal,
             loserLocal: homeAdvanced ? awayLocal : homeLocal,
             scoreLine: settledByPenalties
-              ? `${homeScore}:${awayScore}（点球 ${homePenaltyScore}:${awayPenaltyScore}）`
-              : `${homeScore}:${awayScore}`,
+              ? `90分钟 ${regularHomeScore}:${regularAwayScore} · 点球 ${homePenaltyScore}:${awayPenaltyScore}`
+              : settledAfterExtraTime
+                ? `90分钟 ${regularHomeScore}:${regularAwayScore} · 加时后 ${homeScore}:${awayScore}`
+                : `90分钟 ${regularHomeScore}:${regularAwayScore}`,
             kickoff: game.local_date || ""
           });
         });
@@ -16346,6 +16421,8 @@
     function setResult(matchId, side, value) {
       if (!state.results[matchId]) state.results[matchId] = { homeGoals: "", awayGoals: "" };
       state.results[matchId][side] = value;
+      state.results[matchId].source = "manual";
+      state.results[matchId].settlementBasis = "regular-time";
       invalidateAnalysisCaches();
       saveState();
       render();
@@ -16360,15 +16437,31 @@
 
     function setResultsBulk(entries, options = {}) {
       const overwrite = !!options.overwrite;
+      const correctAuto = !!options.correctAuto;
       let changed = 0;
       entries.forEach(entry => {
         const current = getResult(entry.matchId);
         const alreadyFilled = current.homeGoals !== "" && current.awayGoals !== "";
-        if (alreadyFilled && !overwrite) return;
+        const isProtectedResult = current.source === "manual" || current.source === "legacy";
+        if (alreadyFilled && !overwrite && (!correctAuto || isProtectedResult)) return;
         const nextHome = String(entry.homeGoals);
         const nextAway = String(entry.awayGoals);
-        if (String(current.homeGoals) === nextHome && String(current.awayGoals) === nextAway) return;
-        state.results[entry.matchId] = { homeGoals: nextHome, awayGoals: nextAway };
+        const nextResult = {
+          homeGoals: nextHome,
+          awayGoals: nextAway,
+          finalHomeGoals: entry.finalHomeGoals == null ? current.finalHomeGoals : String(entry.finalHomeGoals),
+          finalAwayGoals: entry.finalAwayGoals == null ? current.finalAwayGoals : String(entry.finalAwayGoals),
+          source: entry.source || "auto-regular",
+          settlementBasis: "regular-time",
+          resultConfidence: entry.resultConfidence || current.resultConfidence || "regular-time"
+        };
+        const sameResult = String(current.homeGoals) === nextHome
+          && String(current.awayGoals) === nextAway
+          && String(current.finalHomeGoals || "") === String(nextResult.finalHomeGoals || "")
+          && String(current.finalAwayGoals || "") === String(nextResult.finalAwayGoals || "")
+          && current.source === nextResult.source;
+        if (sameResult) return;
+        state.results[entry.matchId] = nextResult;
         changed += 1;
       });
       if (changed) {
@@ -16404,6 +16497,77 @@
       if (!raw || raw.toLowerCase() === "null") return null;
       const parsed = Number(raw);
       return Number.isFinite(parsed) ? parsed : null;
+    }
+
+    function parseApiScorerMinutes(value) {
+      if (value == null || String(value).trim().toLowerCase() === "null") return [];
+      const minutes = [];
+      const raw = String(value);
+      const patterns = [
+        /(\d{1,3})(?:\+(\d+))?\((?:P|OG)\)/gi,
+        /(\d{1,3})(?:\+(\d+))?['’]/gi
+      ];
+      patterns.forEach(pattern => {
+        let match;
+        while ((match = pattern.exec(raw))) {
+          minutes.push({ base: Number(match[1]), added: Number(match[2] || 0) });
+        }
+      });
+      return minutes;
+    }
+
+    function getExplicitRegularTimeScore(game) {
+      const fieldPairs = [
+        ["home_score_90", "away_score_90"],
+        ["home_score_90min", "away_score_90min"],
+        ["home_score_regular", "away_score_regular"],
+        ["home_score_regulation", "away_score_regulation"]
+      ];
+      for (const [homeField, awayField] of fieldPairs) {
+        const home = parseApiScore(game && game[homeField]);
+        const away = parseApiScore(game && game[awayField]);
+        if (home != null && away != null) return { home, away };
+      }
+      return null;
+    }
+
+    function deriveRegularTimeScore(game) {
+      const finalHome = parseApiScore(game && game.home_score);
+      const finalAway = parseApiScore(game && game.away_score);
+      if (finalHome == null || finalAway == null) return null;
+
+      const explicit = getExplicitRegularTimeScore(game);
+      if (explicit) {
+        return {
+          ...explicit,
+          finalHome,
+          finalAway,
+          source: "api-regular-time"
+        };
+      }
+
+      const gameType = String(game && game.type || "").toLowerCase();
+      if (gameType === "group") {
+        return {
+          home: finalHome,
+          away: finalAway,
+          finalHome,
+          finalAway,
+          source: "api-final-is-regular"
+        };
+      }
+
+      const homeMinutes = parseApiScorerMinutes(game && game.home_scorers);
+      const awayMinutes = parseApiScorerMinutes(game && game.away_scorers);
+      const extraHome = homeMinutes.filter(item => item.base > 90).length;
+      const extraAway = awayMinutes.filter(item => item.base > 90).length;
+      return {
+        home: Math.max(0, finalHome - extraHome),
+        away: Math.max(0, finalAway - extraAway),
+        finalHome,
+        finalAway,
+        source: extraHome || extraAway ? "derived-from-scorer-minutes" : "api-final-no-extra-detected"
+      };
     }
 
     function findApiGameForMatch(match, games) {
@@ -16769,6 +16933,7 @@
             match = {
               id: `wc26-${game.id}`,
               resultApiMatchId: String(game.id || ""),
+              matchNo: Number(game.id) || null,
               kickoff: `${month}-${date} ${hour}:${minute}`,
               venue: `2026 世界杯${String(game.group || game.type || "淘汰赛").toUpperCase()}`,
               home: getStaticSnapshotTeam(homeName),
@@ -16785,12 +16950,19 @@
             createdMatches += 1;
           } else {
             match.resultApiMatchId = String(game.id || match.resultApiMatchId || "");
+            match.matchNo = Number(game.id) || match.matchNo || null;
             match.kickoff = `${month}-${date} ${hour}:${minute}`;
             updatedMatches += 1;
           }
 
           const homePenaltyScore = parseApiScore(game.home_penalty_score);
           const awayPenaltyScore = parseApiScore(game.away_penalty_score);
+          const regularTimeScore = deriveRegularTimeScore(game);
+          if (regularTimeScore) {
+            match.regularScore = [regularTimeScore.home, regularTimeScore.away];
+            match.finalScore = [regularTimeScore.finalHome, regularTimeScore.finalAway];
+            match.resultConfidence = regularTimeScore.source;
+          }
           if (homePenaltyScore != null && awayPenaltyScore != null) {
             match.penalty = [homePenaltyScore, awayPenaltyScore];
           }
@@ -16850,22 +17022,36 @@
               pendingMatches += 1;
               return;
             }
-            const homeGoals = parseApiScore(game.home_score);
-            const awayGoals = parseApiScore(game.away_score);
-            if (homeGoals == null || awayGoals == null) {
+            const regularTimeScore = deriveRegularTimeScore(game);
+            if (!regularTimeScore) {
               pendingMatches += 1;
               return;
             }
             detectedFinished += 1;
-            entries.push({ matchId: match.id, homeGoals, awayGoals });
+            match.regularScore = [regularTimeScore.home, regularTimeScore.away];
+            match.finalScore = [regularTimeScore.finalHome, regularTimeScore.finalAway];
+            match.resultConfidence = regularTimeScore.source;
+            entries.push({
+              matchId: match.id,
+              homeGoals: regularTimeScore.home,
+              awayGoals: regularTimeScore.away,
+              finalHomeGoals: regularTimeScore.finalHome,
+              finalAwayGoals: regularTimeScore.finalAway,
+              source: "auto-regular",
+              resultConfidence: regularTimeScore.source
+            });
           });
         });
 
-        const changed = setResultsBulk(entries, { overwrite: !!options.overwrite, renderAfter: false });
+        const changed = setResultsBulk(entries, {
+          overwrite: !!options.overwrite,
+          correctAuto: true,
+          renderAfter: false
+        });
         const messageParts = [];
         if (resultsRequest.status === "fulfilled") {
           if (detectedFinished) messageParts.push(`全站识别 ${detectedFinished} 场已完赛`);
-          if (changed) messageParts.push(`新回填 ${changed} 场比分`);
+          if (changed) messageParts.push(`校正 ${changed} 场 90 分钟结算比分`);
           if (scheduleStats && (scheduleStats.createdDays || scheduleStats.createdMatches)) {
             messageParts.push(`新增 ${scheduleStats.createdDays} 个比赛日、${scheduleStats.createdMatches} 场赛程`);
           }
@@ -20412,27 +20598,52 @@
       return Number.isFinite(home) && Number.isFinite(away) ? { home, away } : null;
     }
 
+    function getMatchFinalScore(match, result) {
+      const storedHome = result && result.finalHomeGoals !== "" ? Number(result.finalHomeGoals) : NaN;
+      const storedAway = result && result.finalAwayGoals !== "" ? Number(result.finalAwayGoals) : NaN;
+      const snapshot = match && Array.isArray(match.finalScore) ? match.finalScore : null;
+      const home = Number.isFinite(storedHome) ? storedHome : snapshot && Number(snapshot[0]);
+      const away = Number.isFinite(storedAway) ? storedAway : snapshot && Number(snapshot[1]);
+      return Number.isFinite(home) && Number.isFinite(away) ? { home, away } : null;
+    }
+
+    function getMatchExtraResultText(match, result, spaced = true) {
+      const finalScore = getMatchFinalScore(match, result);
+      if (!finalScore) return "";
+      const regularHome = Number(result.homeGoals);
+      const regularAway = Number(result.awayGoals);
+      const separator = spaced ? " : " : ":";
+      const penalty = getMatchPenaltyScore(match);
+      if (penalty && penalty.home !== penalty.away) {
+        const winner = penalty.home > penalty.away ? match.home.name : match.away.name;
+        return `点球 ${penalty.home}${separator}${penalty.away} · ${winner}晋级`;
+      }
+      if (finalScore.home !== regularHome || finalScore.away !== regularAway) {
+        const winner = finalScore.home > finalScore.away ? match.home.name : match.away.name;
+        return `加时后 ${finalScore.home}${separator}${finalScore.away} · ${winner}晋级`;
+      }
+      return match.context && match.context.phase === "knockout" && finalScore.home !== finalScore.away
+        ? `${finalScore.home}${separator}${finalScore.away} · ${finalScore.home > finalScore.away ? match.home.name : match.away.name}晋级`
+        : "";
+    }
+
     function formatMatchResultScore(match, result, spaced = true) {
       if (!result || result.homeGoals === "" || result.awayGoals === "") return "";
       const separator = spaced ? " : " : ":";
-      const base = `${result.homeGoals}${separator}${result.awayGoals}`;
-      const penalty = getMatchPenaltyScore(match);
-      return penalty ? `${base}（点球 ${penalty.home}${separator}${penalty.away}）` : base;
+      return `${result.homeGoals}${separator}${result.awayGoals}`;
     }
 
     function describeMatchResult(match, result) {
       if (!result || result.homeGoals === "" || result.awayGoals === "") return "";
       const homeGoals = Number(result.homeGoals);
       const awayGoals = Number(result.awayGoals);
-      if (homeGoals > awayGoals) return `${match.home.name}取胜`;
-      if (homeGoals < awayGoals) return `${match.away.name}取胜`;
-      const penalty = getMatchPenaltyScore(match);
-      if (penalty && penalty.home !== penalty.away) {
-        return penalty.home > penalty.away
-          ? `${match.home.name}点球晋级`
-          : `${match.away.name}点球晋级`;
-      }
-      return "双方战平";
+      const regularSummary = homeGoals > awayGoals
+        ? `${match.home.name}90分钟取胜`
+        : homeGoals < awayGoals
+          ? `${match.away.name}90分钟取胜`
+          : "90分钟战平";
+      const extraText = getMatchExtraResultText(match, result);
+      return extraText ? `${regularSummary}；${extraText}` : regularSummary;
     }
 
     function renderFinishedMatchesCard(day) {
@@ -20449,13 +20660,13 @@
               <span class="section-kicker">已完赛比分</span>
               <h2 class="section-title">当天已同步赛果</h2>
             </div>
-            <div class="section-meta">已完成 ${completed.length} 场。这里的比分会直接参与下方票单结算和中奖标记。</div>
+            <div class="section-meta">已完成 ${completed.length} 场。出票只按 90 分钟比分结算，淘汰赛晋级另看加时和点球。</div>
           </div>
           <div class="finished-score-strip">
             <div class="finished-score-grid">
               ${completed.map(({ match, result }) => `
                 <div class="finished-score-card">
-                  <span>已完赛 · ${match.kickoff || ""}</span>
+                  <span>已完赛 · ${match.kickoff || ""} · 90 分钟结算</span>
                   <strong>${match.home.name} ${formatMatchResultScore(match, result)} ${match.away.name}</strong>
                   <span>${describeMatchResult(match, result)}</span>
                 </div>
@@ -20722,20 +20933,35 @@
       };
     }
 
+    function createSettledRound32Slot(groups, localName, fallbackSlot) {
+      const profile = groups
+        .flatMap(groupInfo => groupInfo.rows || [])
+        .find(candidate => candidate.localName === localName) || null;
+      if (!profile) return fallbackSlot;
+      return {
+        ...fallbackSlot,
+        profile,
+        group: profile.group || fallbackSlot.group,
+        rank: profile.rank || fallbackSlot.rank,
+        label: localName,
+        note: `官方 Match 赛果已确认 · ${profile.group || "小组"}第 ${profile.rank || "-"}`
+      };
+    }
+
     function buildProjectedKnockoutPairs(groups) {
       const officialRound32BracketOrder = [
-        { matchNo: 73, left: "2A", right: "2B" },
-        { matchNo: 75, left: "1F", right: "2C" },
         { matchNo: 74, left: "1E", right: "3ABCDF" },
         { matchNo: 77, left: "1I", right: "3CDFGH" },
-        { matchNo: 76, left: "1C", right: "2F" },
-        { matchNo: 78, left: "2E", right: "2I" },
-        { matchNo: 79, left: "1A", right: "3CEFHI" },
-        { matchNo: 80, left: "1L", right: "3EHIJK" },
+        { matchNo: 73, left: "2A", right: "2B" },
+        { matchNo: 75, left: "1F", right: "2C" },
         { matchNo: 83, left: "2K", right: "2L" },
         { matchNo: 84, left: "1H", right: "2J" },
         { matchNo: 81, left: "1D", right: "3BEFIJ" },
         { matchNo: 82, left: "1G", right: "3AEHIJ" },
+        { matchNo: 76, left: "1C", right: "2F" },
+        { matchNo: 78, left: "2E", right: "2I" },
+        { matchNo: 79, left: "1A", right: "3CEFHI" },
+        { matchNo: 80, left: "1L", right: "3EHIJK" },
         { matchNo: 86, left: "1J", right: "2H" },
         { matchNo: 88, left: "2D", right: "2G" },
         { matchNo: 85, left: "1B", right: "3EFGIJ" },
@@ -20748,9 +20974,18 @@
       const thirdAssignments = resolveOfficialThirdPlaceAssignments(groups, thirdSlotCodes);
 
       return officialRound32BracketOrder.map(item => {
-        const left = createOfficialKnockoutSlot(groups, item.left, thirdAssignments);
-        const right = createOfficialKnockoutSlot(groups, item.right, thirdAssignments);
+        let left = createOfficialKnockoutSlot(groups, item.left, thirdAssignments);
+        let right = createOfficialKnockoutSlot(groups, item.right, thirdAssignments);
+        const payload = tournamentInsightRuntime.payload || {};
+        const liveResults = Array.isArray(payload.knockoutResults) ? payload.knockoutResults : [];
+        const settledResult = liveResults.find(result => Number(result.matchNo) === item.matchNo)
+          || getStaticKnockoutResult(item.matchNo);
+        if (settledResult) {
+          left = createSettledRound32Slot(groups, settledResult.homeLocal, left);
+          right = createSettledRound32Slot(groups, settledResult.awayLocal, right);
+        }
         return {
+          matchNo: item.matchNo,
           label: `M${item.matchNo} · ${item.left} vs ${item.right}`,
           left,
           right,
@@ -20776,28 +21011,90 @@
       return state.ui.advancementPicks;
     }
 
-    function getAdvancementMatchId(stageKey, index, left, right) {
+    function getAdvancementMatchId(stageKey, index, left, right, matchNo = null) {
+      if (matchNo) return `wc26-bracket-M${matchNo}`;
       const leftCode = left && left.code ? left.code : "left";
       const rightCode = right && right.code ? right.code : "right";
       return `${stageKey}-${index + 1}-${leftCode}-${rightCode}`;
     }
 
-    function findLockedKnockoutResult(left, right) {
+    function formatKnockoutResultScoreLine(result) {
+      const regularHome = result.regularHomeScore == null ? result.homeScore : result.regularHomeScore;
+      const regularAway = result.regularAwayScore == null ? result.awayScore : result.regularAwayScore;
+      const hasPenalties = result.homePenaltyScore != null && result.awayPenaltyScore != null;
+      const hasExtraTime = result.homeScore !== regularHome || result.awayScore !== regularAway;
+      if (hasPenalties) {
+        return `90分钟 ${regularHome}:${regularAway} · 点球 ${result.homePenaltyScore}:${result.awayPenaltyScore}`;
+      }
+      if (hasExtraTime) {
+        return `90分钟 ${regularHome}:${regularAway} · 加时后 ${result.homeScore}:${result.awayScore}`;
+      }
+      return `90分钟 ${regularHome}:${regularAway}`;
+    }
+
+    function getStaticKnockoutResult(matchNo) {
+      const item = STATIC_KNOCKOUT_SNAPSHOT.find(candidate => Number(candidate.matchNo) === Number(matchNo))
+        || (Number(matchNo) === 73 ? {
+          matchNo: 73,
+          home: "南非",
+          away: "加拿大",
+          regularScore: [0, 1],
+          finalScore: [0, 1]
+        } : null);
+      if (!item || !item.finalScore) return null;
+      const [homeScore, awayScore] = item.finalScore;
+      const [regularHomeScore, regularAwayScore] = item.regularScore || item.finalScore;
+      const homePenaltyScore = item.penalty ? item.penalty[0] : null;
+      const awayPenaltyScore = item.penalty ? item.penalty[1] : null;
+      const homeAdvanced = homeScore > awayScore
+        || (homeScore === awayScore && homePenaltyScore != null && homePenaltyScore > awayPenaltyScore);
+      const result = {
+        matchNo: Number(matchNo),
+        homeLocal: item.home,
+        awayLocal: item.away,
+        homeScore,
+        awayScore,
+        regularHomeScore,
+        regularAwayScore,
+        homePenaltyScore,
+        awayPenaltyScore,
+        winnerLocal: homeAdvanced ? item.home : item.away,
+        loserLocal: homeAdvanced ? item.away : item.home,
+        source: "offline-snapshot"
+      };
+      result.scoreLine = formatKnockoutResultScoreLine(result);
+      return result;
+    }
+
+    function orientKnockoutResult(result, leftLabel) {
+      if (!result || result.homeLocal === leftLabel) return result;
+      const oriented = {
+        ...result,
+        homeLocal: result.awayLocal,
+        awayLocal: result.homeLocal,
+        homeScore: result.awayScore,
+        awayScore: result.homeScore,
+        regularHomeScore: result.regularAwayScore,
+        regularAwayScore: result.regularHomeScore,
+        homePenaltyScore: result.awayPenaltyScore,
+        awayPenaltyScore: result.homePenaltyScore
+      };
+      oriented.scoreLine = formatKnockoutResultScoreLine(oriented);
+      return oriented;
+    }
+
+    function findLockedKnockoutResult(left, right, matchNo = null) {
       const payload = tournamentInsightRuntime.payload || {};
       const results = Array.isArray(payload.knockoutResults) ? payload.knockoutResults : [];
       if (!left || !right || !left.label || !right.label) return null;
-      const result = results.find(item => {
+      const result = results.find(item => Number(item.matchNo) === Number(matchNo)) || results.find(item => {
         const names = [item.homeLocal, item.awayLocal];
         return names.includes(left.label) && names.includes(right.label);
-      }) || null;
-      if (!result || result.homeLocal === left.label) return result;
-      const hasPenalties = result.homePenaltyScore != null && result.awayPenaltyScore != null;
-      return {
-        ...result,
-        scoreLine: hasPenalties
-          ? `${result.awayScore}:${result.homeScore}（点球 ${result.awayPenaltyScore}:${result.homePenaltyScore}）`
-          : `${result.awayScore}:${result.homeScore}`
-      };
+      }) || getStaticKnockoutResult(matchNo);
+      if (!result) return null;
+      const resultTeams = new Set([result.homeLocal, result.awayLocal]);
+      if (!resultTeams.has(left.label) || !resultTeams.has(right.label)) return null;
+      return orientKnockoutResult(result, left.label);
     }
 
     function getAdvancementProbabilities(left, right) {
@@ -20815,9 +21112,9 @@
       };
     }
 
-    function pickProjectedWinner(left, right, matchId = "") {
+    function pickProjectedWinner(left, right, matchId = "", matchNo = null) {
       if (!left || !right || !left.profile || !right.profile) return null;
-      const locked = findLockedKnockoutResult(left, right);
+      const locked = findLockedKnockoutResult(left, right, matchNo);
       if (locked) return locked.winnerLocal === left.label ? left : right;
       const manualPick = matchId ? getAdvancementPicks()[matchId] : "";
       if (manualPick) {
@@ -20837,15 +21134,16 @@
       render({ preserveScroll: true });
     }
 
-    function createAdvancementMatch(stageKey, index, left, right, note) {
-      const id = getAdvancementMatchId(stageKey, index, left, right);
-      const lockedResult = findLockedKnockoutResult(left, right);
+    function createAdvancementMatch(stageKey, index, left, right, note, matchNo = null) {
+      const id = getAdvancementMatchId(stageKey, index, left, right, matchNo);
+      const lockedResult = findLockedKnockoutResult(left, right, matchNo);
       const probabilities = getAdvancementProbabilities(left, right);
-      const winner = pickProjectedWinner(left, right, id);
+      const winner = pickProjectedWinner(left, right, id, matchNo);
       return {
         id,
+        matchNo,
         stageKey,
-        label: `${left.label} vs ${right.label}`,
+        label: `${matchNo ? `M${matchNo} · ` : ""}${left.label} vs ${right.label}`,
         left,
         right,
         probabilities,
@@ -20857,33 +21155,64 @@
     }
 
     function buildProjectedAdvancementRounds(groups) {
-      const round32 = buildProjectedKnockoutPairs(groups).map((match, index) =>
-        createAdvancementMatch("r32", index, match.left, match.right, "32强入口按官方 Match 73-88 槽位生成；小组赛已结算的位置会自动填入球队。")
-      );
-      const buildNextRound = (matches, stageKey, roundName) => {
-        const winners = matches.map(match => match.winner);
-        const nextMatches = [];
-        for (let index = 0; index < winners.length; index += 2) {
-          const left = winners[index];
-          const right = winners[index + 1];
-          if (!left || !right) {
-            nextMatches.push(createAdvancementMatch(
-              stageKey,
-              index / 2,
-              left || createPendingAdvancementSlot(`${roundName}上半区胜者待定`),
-              right || createPendingAdvancementSlot(`${roundName}下半区胜者待定`),
-              `${roundName}等待上一轮结算后再填入球队。`
-            ));
-            continue;
-          }
-          nextMatches.push(createAdvancementMatch(stageKey, index / 2, left, right, `${roundName}按当前选择、积分、净胜球、进球数和小组排名强度模拟。`));
-        }
-        return nextMatches;
+      const matchesByNo = new Map();
+      const round32 = buildProjectedKnockoutPairs(groups).map((match, index) => {
+        const node = createAdvancementMatch(
+          "r32",
+          index,
+          match.left,
+          match.right,
+          "32强入口按官方 Match 73-88 槽位生成；小组赛已结算的位置会自动填入球队。",
+          match.matchNo
+        );
+        matchesByNo.set(match.matchNo, node);
+        return node;
+      });
+
+      const getPreviousWinner = (matchNo, sideLabel) => {
+        const previous = matchesByNo.get(matchNo);
+        return previous && previous.winner
+          ? previous.winner
+          : createPendingAdvancementSlot(`${sideLabel} M${matchNo} 胜者待定`);
       };
-      const round16 = buildNextRound(round32, "r16", "16强");
-      const quarter = buildNextRound(round16, "qf", "8强");
-      const semi = buildNextRound(quarter, "sf", "半决赛");
-      const final = buildNextRound(semi, "final", "决赛");
+      const buildOfficialRound = (stageKey, roundName, definitions) => definitions.map((definition, index) => {
+        const left = getPreviousWinner(definition.leftFrom, roundName);
+        const right = getPreviousWinner(definition.rightFrom, roundName);
+        const node = createAdvancementMatch(
+          stageKey,
+          index,
+          left,
+          right,
+          `M${definition.matchNo}：M${definition.leftFrom} 胜者对 M${definition.rightFrom} 胜者。`,
+          definition.matchNo
+        );
+        matchesByNo.set(definition.matchNo, node);
+        return node;
+      });
+
+      const round16 = buildOfficialRound("r16", "16强", [
+        { matchNo: 89, leftFrom: 74, rightFrom: 77 },
+        { matchNo: 90, leftFrom: 73, rightFrom: 75 },
+        { matchNo: 93, leftFrom: 83, rightFrom: 84 },
+        { matchNo: 94, leftFrom: 81, rightFrom: 82 },
+        { matchNo: 91, leftFrom: 76, rightFrom: 78 },
+        { matchNo: 92, leftFrom: 79, rightFrom: 80 },
+        { matchNo: 95, leftFrom: 86, rightFrom: 88 },
+        { matchNo: 96, leftFrom: 85, rightFrom: 87 }
+      ]);
+      const quarter = buildOfficialRound("qf", "8强", [
+        { matchNo: 97, leftFrom: 89, rightFrom: 90 },
+        { matchNo: 98, leftFrom: 93, rightFrom: 94 },
+        { matchNo: 99, leftFrom: 91, rightFrom: 92 },
+        { matchNo: 100, leftFrom: 95, rightFrom: 96 }
+      ]);
+      const semi = buildOfficialRound("sf", "半决赛", [
+        { matchNo: 101, leftFrom: 97, rightFrom: 98 },
+        { matchNo: 102, leftFrom: 99, rightFrom: 100 }
+      ]);
+      const final = buildOfficialRound("final", "决赛", [
+        { matchNo: 104, leftFrom: 101, rightFrom: 102 }
+      ]);
       const champion = final[0] ? [final[0].winner] : [];
       return { round32, round16, quarter, semi, final, champion };
     }
@@ -20927,17 +21256,17 @@
     }
 
     function renderAdvancementMatchNode(match, index, stageName, totalCount = 1) {
-      const winner = match.winner || pickProjectedWinner(match.left, match.right, match.id);
+      const winner = match.winner || pickProjectedWinner(match.left, match.right, match.id, match.matchNo);
       const slot = getAdvancementSlotMeta(totalCount, index);
       const lockedText = match.lockedResult
         ? `<span class="advancement-lock-note">已出结果 · ${escapeHtml(match.lockedResult.scoreLine)} · 锁定 ${escapeHtml(match.lockedResult.winnerLocal)}</span>`
         : "";
       const sourceText = match.lockedResult ? "已锁定" : match.manualPick ? "手动选择" : "概率模拟";
       return `
-        <div class="advancement-node ${stageName === "32强" ? "" : slot.connectorClass}" data-slot="${index + 1}" style="--slot-row: ${slot.start + 1}; --slot-span: ${slot.span};">
+        <div class="advancement-node ${match.lockedResult ? "is-locked" : ""} ${stageName === "32强" ? "" : slot.connectorClass}" data-slot="${index + 1}" style="--slot-row: ${slot.start + 1}; --slot-span: ${slot.span};">
           <div class="advancement-node-head">
-            <span>${escapeHtml(stageName)} ${index + 1}</span>
-            <span>${escapeHtml(match.label || "")}</span>
+            <span>${escapeHtml(match.matchNo ? `M${match.matchNo}` : `${stageName} ${index + 1}`)}</span>
+            <span>${escapeHtml(stageName)}</span>
           </div>
           <div class="advancement-match-teams">
             ${renderAdvancementTeamLine(match.left, winner, match, "left")}
@@ -20954,7 +21283,7 @@
 
     function renderAdvancementWinnerNode(slot, index, stageName) {
       return `
-        <div class="advancement-node projected connector-up" data-slot="${index + 1}" style="--slot-row: 9; --slot-span: 2;">
+        <div class="advancement-node projected champion connector-up" data-slot="${index + 1}" style="--slot-row: 9; --slot-span: 2;">
           <div class="advancement-node-head">
             <span>${escapeHtml(stageName)} ${index + 1}</span>
             <span>${escapeHtml(slot && slot.code ? slot.code : "模拟")}</span>
@@ -21006,7 +21335,7 @@
             ${renderAdvancementRound("冠军", championHtml, "champion-round")}
           </div>
         </div>
-        <div class="advancement-note">说明：32 强入口按官方 Match 73-88 槽位展示；小组赛完成后，前二名和 8 个最佳第三名会自动落位。仍为空的位置代表公开赛果或官方槽位数据暂未同步完整。</div>
+        <div class="advancement-note">官方路径已按 Match 73-104 的前序胜者关系逐场绑定。蓝绿色节点为已出结果并锁定；淘汰赛晋级使用含加时和点球的最终结果，彩票结算仍只使用 90 分钟比分。</div>
       `;
     }
 
@@ -21388,6 +21717,7 @@
           <div class="candidate-filter-summary daily-pack-summary">
             <span class="candidate-filter-pill">总投入 ${pack.totalStake} 元</span>
             <span class="candidate-filter-pill">共 ${pack.tickets.length} 张票</span>
+            <span class="candidate-filter-pill settlement-rule-pill">按 90 分钟结算</span>
             <span class="candidate-filter-pill">至少中 1 张约 ${formatPercent(pack.atLeastOneHitApprox)}</span>
             <span class="candidate-filter-pill">平均赔率 ${formatOdds(pack.averageOdds)}</span>
           </div>
@@ -21578,12 +21908,12 @@
       return `
         <section class="match-forecast-panel ${resultFilled ? "is-final" : ""}" aria-label="${match.home.name} 对 ${match.away.name} 模型结论">
           <div class="match-forecast-call">
-            <span class="match-forecast-kicker">${resultFilled ? "Final result" : "Model read"}</span>
+            <span class="match-forecast-kicker">${resultFilled ? "90 min result" : "Model read"}</span>
             <h3>${resultHeadline}</h3>
             <p>${resultCopy}</p>
             <span class="forecast-confidence is-${resultFilled ? "final" : snapshot.confidence.tone}">
               <strong>${resultFilled ? "已确认" : formatPercent(snapshot.leader.probability)}</strong>
-              <span>${resultFilled ? "最终赛果" : snapshot.confidence.label}</span>
+              <span>${resultFilled ? "90 分钟赛果" : snapshot.confidence.label}</span>
             </span>
           </div>
           <div class="match-forecast-data">
@@ -22047,9 +22377,9 @@
             </div>
             ${resultFilled ? `
               <div class="match-final-banner">
-                <span class="final-label">已完赛</span>
+                <span class="final-label">90分钟结算</span>
                 <strong class="final-score">${formatMatchResultScore(match, result)}</strong>
-                <span class="final-copy">${resultSummary}，这场比分已经参与出票结算。</span>
+                <span class="final-copy">${resultSummary}。这场票面比分已参与出票结算。</span>
               </div>
             ` : ""}
           </div>
@@ -22086,9 +22416,9 @@
                     </div>
                   </div>
                   <div class="result-editor">
-                    <div class="meta">录入全场比分后，这一天的中奖状态和累计盈亏会自动更新。</div>
+                    <div class="meta">这里录入的是 90 分钟比分；加时赛和点球只用于淘汰赛晋级，不参与胜平负、让球、总进球和比分票结算。</div>
                     <div class="result-editor-row">
-                      <span class="result-status ${resultFilled ? "filled" : "pending"}">${resultFilled ? `已录入 ${result.homeGoals} : ${result.awayGoals}` : "待录入或待同步"}</span>
+                      <span class="result-status ${resultFilled ? "filled" : "pending"}">${resultFilled ? `90分钟 ${result.homeGoals} : ${result.awayGoals}` : "待录入或待同步"}</span>
                       <input type="number" min="0" max="20" value="${result.homeGoals}" data-match="${match.id}" data-side="homeGoals" placeholder="主队">
                       <input type="number" min="0" max="20" value="${result.awayGoals}" data-match="${match.id}" data-side="awayGoals" placeholder="客队">
                       <button type="button" class="btn-ghost" data-clear="${match.id}">清空</button>
